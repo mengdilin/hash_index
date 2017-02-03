@@ -33,6 +33,9 @@ bool Page::isFull() {
   return counter == MAX_ENTRIES;
 }
 
+bool Page::hasOverflow() {
+  return overflow_addr == 0x00;
+}
 ofstream& Page::flush(ofstream& indexFile) {
   //cout << "overflow: " << overflow_addr << " counter: " << counter << endl;
   cout << "before: " << indexFile.tellp() << endl;

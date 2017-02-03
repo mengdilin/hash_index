@@ -60,6 +60,7 @@ uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
 
     return key;
 }
+
 uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
   uint32_t bucket_num = hash(key, num_buckets);
   cout << "Bucket num: " << bucket_num << endl;
@@ -102,6 +103,8 @@ void HashIndex::build_index(string path) {
     key_distribution.at(i) = 0;
 
   }
+
+  //initialize primary buckets
   for (int i = 0; i < this->number_buckets; i++) {
     primary_buckets.at(i) = new Page();
 
@@ -115,7 +118,15 @@ void HashIndex::build_index(string path) {
       key_distribution[hash_key]++;
       //cout << hash_key << " ";
       Page* cur_page = primary_buckets[hash_key];
-      cur_page->addEntry(entry);
+      if (!cur_page->isFull()) {
+        cur_page->addEntry(entry);
+      } else {
+        if (cur_page->hasOverflow()) {
+
+        }
+
+      }
+
     }
 
   }

@@ -18,6 +18,7 @@ int main(int argc, char** argv) {
 
   //index.build_index(argv[1]);
   uint64_t test_key = 1737642124184;
+  cout << "find key: " << test_key << endl;
   uint64_t offset = index.search(test_key, "indexFile");
   //uint64_t offset = index.search(test_key);
 

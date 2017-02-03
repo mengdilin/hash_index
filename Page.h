@@ -10,7 +10,6 @@ class Page {
     uint32_t counter;
   private:
     DataEntry data_entry_list[MAX_ENTRIES];
-    //std::vector<DataEntry> data_entry_list;
 
   public:
     Page();
@@ -19,6 +18,7 @@ class Page {
     std::ofstream& flush(std::ofstream&);
     static Page read(std::ifstream&);
     bool isFull();
+    bool hasOverflow();
 
 };
 
