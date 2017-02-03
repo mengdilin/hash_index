@@ -30,7 +30,7 @@ DataEntry DataEntry::read(ifstream& indexFile) {
   //dataEntry.key = *(key);
   //dataEntry.rid = *(rid);
 
-  cout << "(" << *(key) << " , " << dataEntry.rid << ")";
+  cout << "(" << dataEntry.key << " , " << dataEntry.rid << ")";
   return dataEntry;
 }
 
