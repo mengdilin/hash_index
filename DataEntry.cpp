@@ -1,12 +1,22 @@
 #include "DataEntry.h"
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 using namespace std;
+
+DataEntry::DataEntry() {
+  memset(&key, 0, sizeof(key));
+  memset(&rid, 0, sizeof(rid));
+}
 DataEntry::DataEntry(uint64_t key, uint64_t rid) : key(key), rid(rid) {}
 
 ofstream& DataEntry::flush(ofstream& indexFile) {
 
+  uint64_t test = 14732373154;
+  if (key == test) {
+    cout << "key's offset: " << indexFile.tellp() << endl;
+  }
   indexFile.write((char*) &(this->key), sizeof(this->key));
   indexFile.write((char*) &(this->rid), sizeof(this->rid));
 
@@ -30,7 +40,7 @@ DataEntry DataEntry::read(ifstream& indexFile) {
   //dataEntry.key = *(key);
   //dataEntry.rid = *(rid);
 
-  cout << "(" << dataEntry.key << " , " << dataEntry.rid << ")";
+  //cout << "(" << dataEntry.key << " , " << dataEntry.rid << ")";
   return dataEntry;
 }
 

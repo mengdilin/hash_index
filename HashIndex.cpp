@@ -17,27 +17,50 @@ HashIndex::~HashIndex() {
 }
 
 uint32_t HashIndex::hash(uint64_t key) {
-
-  int hashbits = (int)log2(this->number_buckets) - 1;
-  /**
-    Knuth multiplicative hashing does not work :(
-    hash = (value * NUMBER) >> (64 - HASHBITS)
-    key = ((int)(key * HashIndex::KNUTH_NUMBER)) >> (64 - hashbits);
-  **/
-  key ^= key >> 33;
-  key *= 0xff51afd7ed558ccdULL;
-  key ^= key >> 33;
-  key *= 0xc4ceb9fe1a85ec53ULL;
-  key ^= key >> 33;
-  key = key >> (64 - hashbits);
-  cout << "key: " << key;
-  return key % this->number_buckets;
+  return hash(key, this->number_buckets);
 }
 
-uint64_t HashIndex::search(uint64_t key) {
-  return 0;
+uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
+    int hashbits = (int)log2(num_buckets) - 1;
+    /**
+      Knuth multiplicative hashing does not work :(
+      hash = (value * NUMBER) >> (64 - HASHBITS)
+      key = ((int)(key * HashIndex::KNUTH_NUMBER)) >> (64 - hashbits);
+    **/
+
+    /*
+    key ^= key >> 33;
+    key *= 0xff51afd7ed558ccdULL;
+    key ^= key >> 33;
+    key *= 0xc4ceb9fe1a85ec53ULL;
+    key ^= key >> 33;
+    key = key >> (64 - hashbits);
+    //cout << "key: " << key;
+    */
+    key ^= key >> 33;
+    key *= 0xff51afd7ed558ccdULL;
+    key ^= key >> 33;
+    key *= 0xc4ceb9fe1a85ec53ULL;
+    key ^= key >> 33;
+    key = key >> ((64 - (int)log2(num_buckets)) - 1);
+    return key * UINT32_C(2654435761) % num_buckets;;
+}
+uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
+  uint32_t bucket_num = hash(key, num_buckets);
+  cout << "Bucket num: " << bucket_num << endl;
+  cout << "size of unsigned int: " << sizeof(unsigned int) << endl;
+  uint64_t offset = bucket_num * PAGE_SIZE + sizeof(unsigned int);
+  cout << "key: " << key << " offset: " << offset << endl;
+  return offset;
 }
 
+uint64_t HashIndex::search(uint64_t key, string indexFilePath) {
+  ifstream readIndex (indexFilePath, ifstream::binary);
+  int bucket_num;
+  readIndex.read((char *)&bucket_num, sizeof(unsigned int));
+  cout << "read bucket num: " << bucket_num <<endl;
+  return search(key, bucket_num);
+}
 void HashIndex::build_index(string path) {
   vector<DataEntry> entries = this->parse_idx_file(path);
 
@@ -81,11 +104,12 @@ void HashIndex::build_index(string path) {
   int counter = 0;
   ofstream indexFile;
   indexFile.open("indexFile", ios::binary | ios::out);
-  indexFile.write((char *)&(this->number_buckets), sizeof(int));
+  indexFile.write((char *)&(this->number_buckets), sizeof(unsigned int));
   for (int i = 0; i < this->number_buckets; i++) {
     cout << i << " , " << key_distribution.at(i) << endl;
     counter += primary_buckets.at(i)->counter;
     //cout << i << " , " << primary_buckets.at(i)->counter << endl;
+    cout << "page offset: " << indexFile.tellp() << endl;
     primary_buckets.at(i)->flush(indexFile);
   }
   cout << counter << endl;
@@ -99,12 +123,15 @@ void HashIndex::debugRead(string filename) {
   ifstream readIndex(filename, ios::in | ios::binary);
 
   int bucket_num;
-  readIndex.read((char *)&bucket_num, sizeof(int));
+  readIndex.read((char *)&bucket_num, sizeof(unsigned int));
   cout << "num_buckets: " << bucket_num << endl;
+  int count = 0;
   while (bucket_num > 0) {
-    Page::read(readIndex);
+    Page page = Page::read(readIndex);
+    count += page.counter;
     bucket_num--;
   }
+  cout << "total page pair counter: " << count << endl;
 
 }
 

@@ -9,7 +9,8 @@ class Page {
     const static int MAX_ENTRIES = 255;
     uint32_t counter;
   private:
-    std::vector<DataEntry> data_entry_list;
+    DataEntry data_entry_list[MAX_ENTRIES];
+    //std::vector<DataEntry> data_entry_list;
 
   public:
     Page();
