@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
   page.addEntry(entry);
   HashIndex index(0.1);
   index.build_index(argv[1]);
+  HashIndex::debugRead("indexFile");
   /*
   char* input_file = "test.bin";
   if (argc == 2) {

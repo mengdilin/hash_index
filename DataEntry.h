@@ -5,9 +5,8 @@ class DataEntry {
     uint64_t key;
     uint64_t rid;
 
-
 public:
   DataEntry(uint64_t key, uint64_t rid);
-  DataEntry();
-
+  std::ofstream& flush(std::ofstream&);
+  static DataEntry read(std::ifstream&);
 };

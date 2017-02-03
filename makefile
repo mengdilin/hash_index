@@ -12,14 +12,6 @@ all: test
 test: $(OBJS)
 	$(CXX) $(LDFLAGS) -o test $(OBJS) $(LDLIBS)
 
-test.o: test.cpp Page.h DataEntry.h
-
-DataEntry.o: DataEntry.h
-
-Page.o: Page.h DataEntry.h
-
-HashIndex.o: HashIndex.h Page.h
-
 clean:
 	$(RM) $(OBJS)
 
