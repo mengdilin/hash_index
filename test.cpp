@@ -14,10 +14,10 @@ int main(int argc, char** argv) {
   Page page;
   page.addEntry(entry);
 
-  HashIndex index(0.8);
+  HashIndex index(0.1);
 
-  index.build_index(argv[1]);
-  uint64_t test_key = 14732373154;
+  //index.build_index(argv[1]);
+  uint64_t test_key = 1737642124184;
   uint64_t offset = index.search(test_key, "indexFile");
   //uint64_t offset = index.search(test_key);
 

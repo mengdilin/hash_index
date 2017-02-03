@@ -35,11 +35,13 @@ bool Page::isFull() {
 
 ofstream& Page::flush(ofstream& indexFile) {
   //cout << "overflow: " << overflow_addr << " counter: " << counter << endl;
+  cout << "before: " << indexFile.tellp() << endl;
   indexFile.write((char*) &overflow_addr, sizeof(overflow_addr));
   uint32_t pad = 0;
   indexFile.write((char*) &pad, sizeof(pad));
   indexFile.write((char*) &counter, sizeof(counter));
   indexFile.write((char*) &pad, sizeof(pad));
+  cout << "after: " << indexFile.tellp() << endl;
   for (DataEntry entry : data_entry_list) {
     entry.flush(indexFile);
   }

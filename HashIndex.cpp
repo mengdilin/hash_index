@@ -6,6 +6,7 @@
 #include <vector>
 #include <math.h>
 #include <cmath>
+#include <inttypes.h>
 
 using namespace std;
 HashIndex::HashIndex(float load_capacity) {
@@ -14,6 +15,12 @@ HashIndex::HashIndex(float load_capacity) {
 }
 
 HashIndex::~HashIndex() {
+  for (Page* page : primary_buckets) {
+    delete page;
+  }
+  for (Page* page : overflow_pages) {
+    delete page;
+  }
 }
 
 uint32_t HashIndex::hash(uint64_t key) {
@@ -21,6 +28,10 @@ uint32_t HashIndex::hash(uint64_t key) {
 }
 
 uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
+    bool debugprint = false;
+    if (key == 1737642124184) {
+      debugprint = true;
+    }
     int hashbits = (int)log2(num_buckets) - 1;
     /**
       Knuth multiplicative hashing does not work :(
@@ -43,20 +54,28 @@ uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
     key *= 0xc4ceb9fe1a85ec53ULL;
     key ^= key >> 33;
     key = key >> ((64 - (int)log2(num_buckets)) - 1);
-    return key * UINT32_C(2654435761) % num_buckets;;
+    key = key * UINT32_C(2654435761) % num_buckets;;
+    if (debugprint)
+      cout << "hash bucket: " << key << endl;
+
+    return key;
 }
 uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
   uint32_t bucket_num = hash(key, num_buckets);
   cout << "Bucket num: " << bucket_num << endl;
   cout << "size of unsigned int: " << sizeof(unsigned int) << endl;
-  uint64_t offset = bucket_num * PAGE_SIZE + sizeof(unsigned int);
-  cout << "key: " << key << " offset: " << offset << endl;
+  uint64_t offset = ((uint64_t)bucket_num * PAGE_SIZE) + sizeof(unsigned int);
+  cout << "offset: " << offset << endl;
+
+  cout << "page size: " << PAGE_SIZE << endl;
+  cout << "computing: " << bucket_num << "*" << PAGE_SIZE << "+" << sizeof(unsigned int) << endl;
+
   return offset;
 }
 
 uint64_t HashIndex::search(uint64_t key, string indexFilePath) {
   ifstream readIndex (indexFilePath, ifstream::binary);
-  int bucket_num;
+  unsigned int bucket_num;
   readIndex.read((char *)&bucket_num, sizeof(unsigned int));
   cout << "read bucket num: " << bucket_num <<endl;
   return search(key, bucket_num);

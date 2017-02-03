@@ -13,7 +13,7 @@ DataEntry::DataEntry(uint64_t key, uint64_t rid) : key(key), rid(rid) {}
 
 ofstream& DataEntry::flush(ofstream& indexFile) {
 
-  uint64_t test = 14732373154;
+  uint64_t test = 1737642124184;
   if (key == test) {
     cout << "key's offset: " << indexFile.tellp() << endl;
   }
