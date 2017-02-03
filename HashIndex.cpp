@@ -122,7 +122,16 @@ void HashIndex::build_index(string path) {
         cur_page->addEntry(entry);
       } else {
         if (cur_page->hasOverflow()) {
+            Page* overflowPage = overflow_pages.at((cur_page->overflow_addr)-1);
+            overflowPage->addEntry(entry);
+            cout << "hasOverflow at bucket: " << hash_key << " with overflow count: " << overflowPage->counter << " and overflow addr: " << overflowPage->overflow_addr << endl;
 
+        } else {
+            Page* overflowPage = new Page();
+            overflow_pages.push_back(overflowPage);
+            overflowPage->setOverflow(overflow_pages.size());
+            overflowPage->addEntry(entry);
+            cout << "creating new overflow pages at bucket: " << hash_key << " with overflow count: " << overflowPage->counter << " and overflow addr: " << overflowPage->overflow_addr << endl;
         }
 
       }
@@ -136,12 +145,24 @@ void HashIndex::build_index(string path) {
   indexFile.open("indexFile", ios::binary | ios::out);
   indexFile.write((char *)&(this->number_buckets), sizeof(unsigned int));
   for (int i = 0; i < this->number_buckets; i++) {
-    cout << i << " , " << key_distribution.at(i) << endl;
-    counter += primary_buckets.at(i)->counter;
+    cout << "bucket: " << i << " with count: " << key_distribution.at(i) << endl;
+    Page* page = primary_buckets.at(i);
+    counter += page->counter;
+    cout << "overflow addr: " << page->overflow_addr << endl;
+    if (page->hasOverflow()) {
+      cout << "=========has overflow=======" << endl;
+      cout << "overflow page with count: " << overflow_pages.at(page->overflow_addr-1)->counter << endl;
+    }
     //cout << i << " , " << primary_buckets.at(i)->counter << endl;
-    cout << "page offset: " << indexFile.tellp() << endl;
+    //cout << "page offset: " << indexFile.tellp() << endl;
     primary_buckets.at(i)->flush(indexFile);
   }
+
+/*
+  for (Page* page : overflow_pages) {
+    cout << "page: " << page->counter <<endl;
+  }
+*/
   cout << counter << endl;
   indexFile.close();
   cout << "================end=============" << endl;

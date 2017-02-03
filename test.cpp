@@ -14,13 +14,15 @@ int main(int argc, char** argv) {
   Page page;
   page.addEntry(entry);
 
-  HashIndex index(0.1);
+  HashIndex index(1);
 
-  //index.build_index(argv[1]);
+  index.build_index(argv[1]);
   uint64_t test_key = 1737642124184;
   cout << "find key: " << test_key << endl;
   uint64_t offset = index.search(test_key, "indexFile");
   //uint64_t offset = index.search(test_key);
+  bool a = 1 != 0x00;
+  cout <<  a << endl;
 
   cout << "page offset1: " << offset << endl;
   ifstream is ("indexFile", ifstream::binary);

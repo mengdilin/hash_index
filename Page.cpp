@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <assert.h>
 
 using namespace std;
 Page::Page() {
@@ -24,6 +25,7 @@ Page::Page(Page&& other) {
 }
 
 void Page::addEntry(DataEntry entry) {
+  assert(counter < MAX_ENTRIES);
   data_entry_list[counter] = entry;
   counter++;
   //data_entry_list.push_back(entry);
@@ -34,17 +36,20 @@ bool Page::isFull() {
 }
 
 bool Page::hasOverflow() {
-  return overflow_addr == 0x00;
+  return overflow_addr != 0x00;
 }
+
+void Page::setOverflow(uint32_t overflow) {
+  overflow_addr = overflow;
+}
+
 ofstream& Page::flush(ofstream& indexFile) {
   //cout << "overflow: " << overflow_addr << " counter: " << counter << endl;
-  cout << "before: " << indexFile.tellp() << endl;
   indexFile.write((char*) &overflow_addr, sizeof(overflow_addr));
   uint32_t pad = 0;
   indexFile.write((char*) &pad, sizeof(pad));
   indexFile.write((char*) &counter, sizeof(counter));
   indexFile.write((char*) &pad, sizeof(pad));
-  cout << "after: " << indexFile.tellp() << endl;
   for (DataEntry entry : data_entry_list) {
     entry.flush(indexFile);
   }
