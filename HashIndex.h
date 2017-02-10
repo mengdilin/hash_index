@@ -15,7 +15,7 @@ class HashIndex {
 public:
   HashIndex(float load_capacity);
   uint32_t hash(uint64_t);
-  static uint64_t search(uint64_t, std::string);
+  static std::pair<bool,uint64_t> search(uint64_t, std::string);
   void build_index(std::string);
   static void debugRead(std::string);
   std::vector<DataEntry> parse_idx_file(std::string path);

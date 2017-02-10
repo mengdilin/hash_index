@@ -9,20 +9,30 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-  DataEntry entry(1, 2);
-  //cout << entry.key << " " << entry.rid;
   Page page;
-  page.addEntry(entry);
 
   HashIndex index(1);
+  /*
+  for (int i = 0; i < 10; i ++) {
+    DataEntry a(i, i+1);
+    page.addEntry(a);
+  }
+  uint64_t rid;
+  bool found = page.find(1, rid);
+  cout << found << " " << rid << endl;
+  found = page.find(11, rid);
+  cout << found << " " << rid << endl;
+  */
 
   index.build_index(argv[1]);
   uint64_t test_key = 1708146715154;
+  pair<bool,uint64_t> result = index.search(test_key, "indexFile");
+  if (result.first) {
+    cout << "found rid: " << result.second << endl;
+  }
+
+  /*
   cout << "find key: " << test_key << endl;
-
-  //index.debugRead("indexFile");
-
-
   uint64_t offset = index.search(test_key, "indexFile");
   cout << "page offset1: " << offset << endl;
   ifstream is ("indexFile", ifstream::binary);
@@ -36,6 +46,8 @@ int main(int argc, char** argv) {
     is.seekg(offset);
     curPage = Page::read(is);
   }
+  */
+
 
     return 0;
 }

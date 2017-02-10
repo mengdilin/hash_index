@@ -29,7 +29,7 @@ uint32_t HashIndex::hash(uint64_t key) {
 
 uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
     bool debugprint = false;
-    if (key == 1737642124184) {
+    if (key == 1708146715154) {
       debugprint = true;
     }
     int hashbits = (int)log2(num_buckets) - 1;
@@ -74,12 +74,35 @@ uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
   return offset;
 }
 
-uint64_t HashIndex::search(uint64_t key, string indexFilePath) {
+pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
   ifstream readIndex (indexFilePath, ifstream::binary);
   unsigned int bucket_num;
   readIndex.read((char *)&bucket_num, sizeof(unsigned int));
   cout << "read bucket num: " << bucket_num <<endl;
-  return search(key, bucket_num);
+  uint64_t primary_bucket_offset = search(key, bucket_num);
+  ifstream is(indexFilePath, ifstream::binary);
+  is.seekg(primary_bucket_offset);
+  Page curPage = Page::read(is);
+  pair<bool,uint64_t> result = curPage.find(key);
+
+  if (result.first) {
+    return result;
+  }
+  uint64_t offset;
+  while (curPage.hasOverflow()) {
+    cout << "page overflow: " << curPage.overflow_addr << endl;
+    offset = 4 + (4 + curPage.overflow_addr-1) * 4096;
+    cout << "overflow page offset: " << offset << endl;
+    is.seekg(offset);
+    curPage = Page::read(is);
+    result = curPage.find(key);
+    if (result.first) {
+      return result;
+    }
+  }
+  // not found
+  return result;
+
 }
 
 Page* HashIndex::get_overflow_page(Page* cur_page) {
@@ -107,7 +130,7 @@ void HashIndex::add_entry_to_bucket(uint32_t hash_key, DataEntry entry) {
         // go to the last page in the current bucket chain
         Page* overflowPage = get_overflow_page(cur_page);
         overflowPage->addEntry(entry);
-        cout << "hasOverflow at bucket: " << hash_key << " with overflow count: " << overflowPage->counter << " and overflow addr: " << cur_page->overflow_addr << endl;
+        //cout << "hasOverflow at bucket: " << hash_key << " with overflow count: " << overflowPage->counter << " and overflow addr: " << cur_page->overflow_addr << endl;
 
     } else {
         // all pages in the bucket are full. Create a new page and add it to the bucket chain.
@@ -116,7 +139,7 @@ void HashIndex::add_entry_to_bucket(uint32_t hash_key, DataEntry entry) {
 
         cur_page->setOverflow((uint32_t)overflow_pages.size());
         overflowPage->addEntry(entry);
-        cout << "creating new overflow pages at bucket: " << hash_key << " with overflow count: " << overflowPage->counter << " and overflow addr: " << cur_page->overflow_addr << endl;
+        //cout << "creating new overflow pages at bucket: " << hash_key << " with overflow count: " << overflowPage->counter << " and overflow addr: " << cur_page->overflow_addr << endl;
     }
 
   }
@@ -172,9 +195,7 @@ void HashIndex::build_index(string path) {
     cout << "bucket: " << i << " with count: " << key_distribution.at(i) << endl;
 
     counter += page->counter;
-    //cout << "overflow addr: " << page->overflow_addr << endl;
     cout << "primary bucket count: " << page->counter;
-    //cout << "overflow addr: " << page->overflow_addr << endl;
 
     while (page->hasOverflow()) {
       cout << " -> " << get_overflow_page(page)->counter;

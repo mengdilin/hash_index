@@ -21,6 +21,8 @@ class Page {
     bool isFull();
     bool hasOverflow();
     void setOverflow(uint32_t overflow_addr);
+    void sortEntries();
+    std::pair<bool,uint64_t> find(uint64_t);
 
 };
 
