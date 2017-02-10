@@ -14,12 +14,15 @@ Page::Page() {
   //memset((void *)&data_entry_list, 0, sizeof(data_entry_list));
 }
 
+
 Page::Page(Page&& other) {
   overflow_addr = other.overflow_addr;
   counter = other.counter;
+
   for (int i = 0; i < other.counter; i++) {
     data_entry_list[i] = other.data_entry_list[i];
   }
+
   other.overflow_addr = 0;
   other.counter = 0;
 }
@@ -96,9 +99,8 @@ ofstream& Page::flush(ofstream& indexFile) {
 }
 
 
-Page Page::read(std::ifstream& indexFile) {
+void Page::read(std::ifstream& indexFile, Page& page) {
 
-  Page page;
   uint32_t pad;
   indexFile.read ((char *)&page.overflow_addr,sizeof(uint32_t));
 
@@ -117,8 +119,6 @@ Page Page::read(std::ifstream& indexFile) {
     cout << "(" << page.data_entry_list[i].key << " ," << page.data_entry_list[i].rid << " )" << endl;
   }
   */
-
-  return page;
 }
 
 std::ostream& operator<<(std::ostream &strm, const Page &a) {

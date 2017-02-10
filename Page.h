@@ -17,7 +17,7 @@ class Page {
     Page(Page&& other);
     void addEntry(DataEntry);
     std::ofstream& flush(std::ofstream&);
-    static Page read(std::ifstream&);
+    static void read(std::ifstream&, Page&);
     bool isFull();
     bool hasOverflow();
     void setOverflow(uint32_t overflow_addr);

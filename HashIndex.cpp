@@ -82,7 +82,9 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
   uint64_t primary_bucket_offset = search(key, bucket_num);
   ifstream is(indexFilePath, ifstream::binary);
   is.seekg(primary_bucket_offset);
-  Page curPage = Page::read(is);
+  //Page curPage = Page::read(is);
+  Page curPage;
+  Page::read(is, curPage);
   pair<bool,uint64_t> result = curPage.find(key);
 
   if (result.first) {
@@ -94,7 +96,9 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
     offset = 4 + (4 + curPage.overflow_addr-1) * 4096;
     cout << "overflow page offset: " << offset << endl;
     is.seekg(offset);
-    curPage = Page::read(is);
+    //curPage = Page::read(is);
+    Page curPage;
+    Page::read(is, curPage);
     result = curPage.find(key);
     if (result.first) {
       return result;
@@ -231,13 +235,17 @@ void HashIndex::debugRead(string filename) {
   cout << "num_buckets: " << bucket_num << endl;
   int count = 0;
   while (bucket_num > 0) {
-    Page page = Page::read(readIndex);
+    //Page page = Page::read(readIndex);
+    Page page;
+    Page::read(readIndex, page);
     count += page.counter;
     bucket_num--;
   }
   cout << "=======overflow===========" << endl;
   while (!readIndex.eof()) {
-    Page page = Page::read(readIndex);
+    //Page page = Page::read(readIndex);
+    Page page;
+    Page::read(readIndex, page);
     count += page.counter;
   }
   cout << "total page pair counter: " << count << endl;
