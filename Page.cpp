@@ -8,6 +8,7 @@ using namespace std;
 Page::Page() {
   overflow_addr = 0x00;
   counter = 0;
+  overflow_merged = false;
   memset((void *)&data_entry_list, 0, sizeof(data_entry_list));
   //vector<DataEntry> tmp_data_entry_list(MAX_ENTRIES);
   //data_entry_list = tmp_data_entry_list;
@@ -98,6 +99,13 @@ ofstream& Page::flush(ofstream& indexFile) {
   return indexFile;
 }
 
+void Page::mergePage(Page& other) {
+  assert(MAX_ENTRIES - this->counter >= other.counter);
+  for (int i = 0; i < other.counter; i ++) {
+    DataEntry other_entry = other.data_entry_list[i];
+    addEntry(other_entry);
+  }
+}
 
 void Page::read(std::ifstream& indexFile, Page& page) {
 

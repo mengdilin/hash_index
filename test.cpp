@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
   */
 
   index.build_index(argv[1]);
-  uint64_t test_key = 1717836253630;
+  uint64_t test_key = 1708146715154;
   pair<bool,uint64_t> result = index.search(test_key, "indexFile");
   if (result.first) {
     cout << "found rid: " << result.second << endl;

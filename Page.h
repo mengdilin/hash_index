@@ -5,12 +5,15 @@
 
 class Page {
   public:
+    // (total buckets) + overflow page index starting from 0
     uint64_t overflow_addr;
-    const static int MAX_ENTRIES = 255;
-    //const static int MAX_ENTRIES = 2;
+    //const static int MAX_ENTRIES = 255;
+    const static int MAX_ENTRIES = 2;
     uint32_t counter;
-  private:
     DataEntry data_entry_list[MAX_ENTRIES];
+
+    //used for debug print bucket record counts
+    bool overflow_merged;
 
   public:
     Page();
@@ -23,6 +26,6 @@ class Page {
     void setOverflow(uint64_t overflow_addr);
     void sortEntries();
     std::pair<bool,uint64_t> find(uint64_t);
-
+    void mergePage(Page& other);
 };
 
