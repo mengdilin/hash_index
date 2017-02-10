@@ -23,5 +23,6 @@ public:
 private:
   static uint64_t search(uint64_t, unsigned int);
   static uint32_t hash(uint64_t, unsigned int);
-
+  void add_entry_to_bucket(uint32_t, DataEntry);
+  Page* get_overflow_page(Page*);
 };

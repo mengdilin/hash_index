@@ -7,13 +7,9 @@ LDFLAGS=-g -Wall
 SRCS=test.cpp DataEntry.cpp Page.cpp HashIndex.cpp
 OBJS=$(subst .cc,.o,$(SRCS))
 
+.PHONY:
 all: test
 
 test: $(OBJS)
 	$(CXX) $(LDFLAGS) -o test $(OBJS) $(LDLIBS)
 
-clean:
-	$(RM) $(OBJS)
-
-distclean: clean
-	$(RM) test

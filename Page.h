@@ -6,8 +6,8 @@
 class Page {
   public:
     uint32_t overflow_addr;
-    //const static int MAX_ENTRIES = 255;
-    const static int MAX_ENTRIES = 2;
+    const static int MAX_ENTRIES = 255;
+    //const static int MAX_ENTRIES = 2;
     uint32_t counter;
   private:
     DataEntry data_entry_list[MAX_ENTRIES];

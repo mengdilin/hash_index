@@ -17,16 +17,25 @@ int main(int argc, char** argv) {
   HashIndex index(1);
 
   index.build_index(argv[1]);
-  uint64_t test_key = 1737642124184;
+  uint64_t test_key = 1708146715154;
   cout << "find key: " << test_key << endl;
-  uint64_t offset = index.search(test_key, "indexFile");
-  //uint64_t offset = index.search(test_key);
-  bool a = 1 != 0x00;
-  cout <<  a << endl;
 
+  //index.debugRead("indexFile");
+
+
+  uint64_t offset = index.search(test_key, "indexFile");
   cout << "page offset1: " << offset << endl;
   ifstream is ("indexFile", ifstream::binary);
+  cout << "file size: " << is.tellg();
   is.seekg(offset);
-  Page::read(is);
+  Page curPage = Page::read(is);
+  while (curPage.hasOverflow()) {
+    cout << "page overflow: " << curPage.overflow_addr << endl;
+    offset = 4 + (4 + curPage.overflow_addr-1) * 4096;
+    cout << "overflow page offset: " << offset << endl;
+    is.seekg(offset);
+    curPage = Page::read(is);
+  }
+
     return 0;
 }

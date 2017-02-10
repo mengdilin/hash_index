@@ -41,6 +41,8 @@ bool Page::hasOverflow() {
 
 void Page::setOverflow(uint32_t overflow) {
   overflow_addr = overflow;
+  cout << "set overflow addr: " << overflow_addr << endl;
+
 }
 
 ofstream& Page::flush(ofstream& indexFile) {
