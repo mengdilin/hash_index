@@ -5,7 +5,7 @@
 
 class Page {
   public:
-    uint32_t overflow_addr;
+    uint64_t overflow_addr;
     const static int MAX_ENTRIES = 255;
     //const static int MAX_ENTRIES = 2;
     uint32_t counter;
@@ -20,7 +20,7 @@ class Page {
     static void read(std::ifstream&, Page&);
     bool isFull();
     bool hasOverflow();
-    void setOverflow(uint32_t overflow_addr);
+    void setOverflow(uint64_t overflow_addr);
     void sortEntries();
     std::pair<bool,uint64_t> find(uint64_t);
 

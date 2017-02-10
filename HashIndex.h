@@ -10,6 +10,8 @@ class HashIndex {
     std::vector<Page*> overflow_pages;
     float load_capacity;
     static const int PAGE_SIZE = 4096;
+    //static const int PAGE_SIZE = 48;
+
     //static constexpr double KNUTH_NUMBER = 1054997077.39;
 
 public:

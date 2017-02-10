@@ -42,7 +42,7 @@ bool Page::hasOverflow() {
   return overflow_addr != 0x00;
 }
 
-void Page::setOverflow(uint32_t overflow) {
+void Page::setOverflow(uint64_t overflow) {
   overflow_addr = overflow;
   //cout << "set overflow addr: " << overflow_addr << endl;
 
@@ -89,7 +89,7 @@ ofstream& Page::flush(ofstream& indexFile) {
   sortEntries();
   indexFile.write((char*) &overflow_addr, sizeof(overflow_addr));
   uint32_t pad = 0;
-  indexFile.write((char*) &pad, sizeof(pad));
+  //indexFile.write((char*) &pad, sizeof(pad));
   indexFile.write((char*) &counter, sizeof(counter));
   indexFile.write((char*) &pad, sizeof(pad));
   for (DataEntry entry : data_entry_list) {
@@ -102,12 +102,12 @@ ofstream& Page::flush(ofstream& indexFile) {
 void Page::read(std::ifstream& indexFile, Page& page) {
 
   uint32_t pad;
-  indexFile.read ((char *)&page.overflow_addr,sizeof(uint32_t));
+  indexFile.read ((char *)&page.overflow_addr,sizeof(page.overflow_addr));
 
-  indexFile.read ((char *)&pad,sizeof(uint32_t));
+  //indexFile.read ((char *)&pad,sizeof(uint32_t));
 
   //indexFile.seekg(sizeof(uint32_t), indexFile.tellg());
-  indexFile.read((char *)&page.counter, sizeof(uint32_t));
+  indexFile.read((char *)&page.counter, sizeof(page.counter));
   //indexFile.seekg(sizeof(uint32_t), indexFile.tellg());
   indexFile.read ((char *)&pad,sizeof(uint32_t));
 

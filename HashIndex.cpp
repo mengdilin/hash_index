@@ -92,9 +92,11 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
   }
   uint64_t offset;
   while (curPage.hasOverflow()) {
-    cout << "page overflow: " << curPage.overflow_addr << endl;
-    offset = 4 + (4 + curPage.overflow_addr-1) * 4096;
-    cout << "overflow page offset: " << offset << endl;
+    //reset pointer
+    is.seekg(0);
+    //cout << "page overflow: " << curPage.overflow_addr << endl;
+    offset = sizeof(unsigned int) + ((uint64_t)curPage.overflow_addr) * 4096;
+    //cout << "overflow page offset: " << offset << endl;
     is.seekg(offset);
     //curPage = Page::read(is);
     Page curPage;
@@ -104,13 +106,15 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
       return result;
     }
   }
+  cout << "not found" << endl;
   // not found
   return result;
 
 }
 
 Page* HashIndex::get_overflow_page(Page* cur_page) {
-  return this->overflow_pages.at((cur_page->overflow_addr)-1);
+  //cout << "get page at: " << cur_page->overflow_addr-this->number_buckets << endl;
+  return this->overflow_pages.at((cur_page->overflow_addr-this->number_buckets));
 }
 
 void HashIndex::add_entry_to_bucket(uint32_t hash_key, DataEntry entry) {
@@ -141,8 +145,9 @@ void HashIndex::add_entry_to_bucket(uint32_t hash_key, DataEntry entry) {
         Page* overflowPage = new Page();
         overflow_pages.push_back(overflowPage);
 
-        cur_page->setOverflow((uint32_t)overflow_pages.size());
+        cur_page->setOverflow(((uint64_t)this->number_buckets) + overflow_pages.size()-1);
         overflowPage->addEntry(entry);
+
         //cout << "creating new overflow pages at bucket: " << hash_key << " with overflow count: " << overflowPage->counter << " and overflow addr: " << cur_page->overflow_addr << endl;
     }
 
@@ -196,7 +201,7 @@ void HashIndex::build_index(string path) {
 
   for (int i = 0; i < this->number_buckets; i++) {
     Page* page = primary_buckets.at(i);
-    cout << "bucket: " << i << " with count: " << key_distribution.at(i) << endl;
+    //cout << "bucket: " << i << " with count: " << key_distribution.at(i) << endl;
 
     counter += page->counter;
     cout << "primary bucket count: " << page->counter;
@@ -211,7 +216,6 @@ void HashIndex::build_index(string path) {
     primary_buckets.at(i)->flush(indexFile);
   }
   for (int i = 0; i < overflow_pages.size(); i++) {
-    cout << "flushing overflow pages" <<endl;
     overflow_pages.at(i)->flush(indexFile);
   }
 
