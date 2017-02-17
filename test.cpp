@@ -1,4 +1,3 @@
-//#include "def.h"
 #include <fstream>
 #include <iostream>
 #include <inttypes.h>

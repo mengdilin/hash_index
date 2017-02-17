@@ -8,6 +8,7 @@
 #include <cmath>
 #include <inttypes.h>
 #include <functional>
+#include <algorithm>
 
 using namespace std;
 /*
@@ -330,18 +331,23 @@ void HashIndex::build_index(string path, string indexFilePath) {
 
 
     while (page->hasOverflow()) {
-      page = get_overflow_page(page);;
-      if (page == nullptr) {
+      Page* tmp_page = get_overflow_page(page);
+      if (tmp_page == nullptr) {
+        cout << page->overflow_addr << endl;
+        cout << primary_buckets.size() << endl;
         page = primary_buckets.at((int)page->overflow_addr);
         cout << " -> " << page->counter;
         counter += page->counter;
         break;
+      } else {
+        page = tmp_page;
       }
       cout << " -> " << page->counter;
 
       counter += page->counter;
 
     }
+
     cout << endl;
 
     primary_buckets.at(i)->flush(indexFile);
