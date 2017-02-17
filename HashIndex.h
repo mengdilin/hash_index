@@ -31,6 +31,6 @@ private:
   static uint64_t search(uint64_t, unsigned int);
   static uint32_t hash(uint64_t, unsigned int);
   Page* get_overflow_page(Page*);
-  void merge(std::vector<Page*>, std::vector<Page*>);
+  int merge(std::vector<Page*>&, std::vector<Page*>&);
   bool page_has_overflow(Page*);
 };

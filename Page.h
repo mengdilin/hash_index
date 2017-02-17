@@ -11,7 +11,7 @@ class Page {
     //const static int MAX_ENTRIES = 2;
     uint32_t counter;
     DataEntry data_entry_list[MAX_ENTRIES];
-
+    uint32_t hash;
     //used for debug print bucket record counts
     bool overflow_merged;
 

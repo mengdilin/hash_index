@@ -17,7 +17,7 @@ bool DataEntry::compare(const DataEntry &a, const DataEntry &b) {
 
 ofstream& DataEntry::flush(ofstream& indexFile) {
 
-  uint64_t test = 1717836253630;
+  uint64_t test = 1708146715154;
   if (key == test) {
     cout << "key's offset: " << indexFile.tellp() << endl;
   }

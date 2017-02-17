@@ -17,7 +17,6 @@ int main(int argc, char** argv) {
   uint64_t test_key = 1708146715154;
   string indexFileName = "indexFile";
 
-  cout << "argc: " << argc << endl;
   if (argc >= 3) {
     istringstream ss(argv[2]);
     if (!(ss >> test_key)) {
@@ -39,18 +38,26 @@ int main(int argc, char** argv) {
     cout << "found rid: " << result.second << endl;
   }
 
+
+  /* unit test: make sure all keys read in can be found
+  * in the index file
+  */
   /*
   vector<DataEntry> test_data = index.parse_idx_file(argv[1]);
   for (int i = 0; i < test_data.size(); i++) {
     DataEntry test = test_data[i];
-    cout << "looking for key: " << test.key << endl;
+    //cout << "looking for key: " << test.key << endl;
     pair<bool,uint64_t> result = index.search(test.key, indexFileName);
     if (not result.first) {
-    cout << "not found key: " << result.first << endl;
+    cout << "not found key: " << test.key << endl;
+    } else {
+      if (result.second != test.rid) {
+        cout << "error: expected: " << test.key << "," <<test.rid << " but got: " << test.key << "," <<result.second <<endl;
+      }
     }
   }
+  cout << "size: " << test_data.size() <<endl;
   */
-  //index.debugRead(indexFileName);
 
 
 

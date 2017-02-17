@@ -83,6 +83,7 @@ pair<bool,uint64_t> Page::find(uint64_t key) {
     // did not find key in Page
     find_result = make_pair(false, 0);
   } else {
+    //cout << "prev: " << (result-1)->rid << endl;
     find_result = make_pair(true, result->rid);
   }
 
@@ -109,11 +110,11 @@ ofstream& Page::flush(ofstream& indexFile) {
 void Page::mergePage(Page& other) {
 
   assert(MAX_ENTRIES - this->counter >= other.counter);
-  sortEntries();
   for (int i = 0; i < other.counter; i ++) {
     DataEntry other_entry = other.data_entry_list[i];
     addEntry(other_entry);
   }
+  sortEntries();
 }
 
 void Page::read(std::ifstream& indexFile, Page& page) {
