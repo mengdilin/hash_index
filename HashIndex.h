@@ -24,7 +24,7 @@ class HashIndex {
     //static constexpr double KNUTH_NUMBER = 1054997077.39;
 
 public:
-  HashIndex(float load_capacity);
+  HashIndex(float);
   uint32_t hash(uint64_t);
   static std::pair<bool,uint64_t> search(uint64_t, std::string);
   void build_index(std::string, std::string);
