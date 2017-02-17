@@ -15,7 +15,15 @@ Page::Page() {
   //memset((void *)&data_entry_list, 0, sizeof(data_entry_list));
 }
 
-
+Page::Page(vector<DataEntry> entries) {
+  assert(entries.size() <= Page::MAX_ENTRIES);
+  overflow_addr = 0x00;
+  counter = entries.size();
+  overflow_merged = false;
+  for (int i = 0; i < entries.size(); i++) {
+    data_entry_list[i] = entries[i];
+  }
+}
 Page::Page(Page&& other) {
   overflow_addr = other.overflow_addr;
   counter = other.counter;
@@ -87,7 +95,6 @@ void Page::sortEntries() {
 }
 
 ofstream& Page::flush(ofstream& indexFile) {
-  sortEntries();
   indexFile.write((char*) &overflow_addr, sizeof(overflow_addr));
   uint32_t pad = 0;
   //indexFile.write((char*) &pad, sizeof(pad));
@@ -100,7 +107,9 @@ ofstream& Page::flush(ofstream& indexFile) {
 }
 
 void Page::mergePage(Page& other) {
+
   assert(MAX_ENTRIES - this->counter >= other.counter);
+  sortEntries();
   for (int i = 0; i < other.counter; i ++) {
     DataEntry other_entry = other.data_entry_list[i];
     addEntry(other_entry);

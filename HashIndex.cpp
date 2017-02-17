@@ -7,6 +7,7 @@
 #include <math.h>
 #include <cmath>
 #include <inttypes.h>
+#include <functional>
 
 using namespace std;
 /*
@@ -24,9 +25,11 @@ HashIndex::~HashIndex() {
   for (Page* page : primary_buckets) {
     delete page;
   }
+  /*
   for (Page* page : overflow_pages) {
     delete page;
   }
+  */
 }
 
 uint32_t HashIndex::hash(uint64_t key) {
@@ -101,27 +104,24 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
   is.seekg(primary_bucket_offset);
   //Page curPage = Page::read(is);
   Page curPage;
+  uint64_t offset;
   Page::read(is, curPage);
+  while (key > curPage.data_entry_list[curPage.counter-1].key) {
+    if (curPage.hasOverflow()) {
+      //reset pointer
+      is.seekg(0);
+      offset = sizeof(unsigned int) + ((uint64_t)curPage.overflow_addr) * PAGE_SIZE;
+      is.seekg(offset);
+      Page::read(is, curPage);
+    } else {
+      break;
+    }
+  }
+
   pair<bool,uint64_t> result = curPage.find(key);
 
   if (result.first) {
     return result;
-  }
-  uint64_t offset;
-  while (curPage.hasOverflow()) {
-    //reset pointer
-    is.seekg(0);
-    //cout << "page overflow: " << curPage.overflow_addr << endl;
-    offset = sizeof(unsigned int) + ((uint64_t)curPage.overflow_addr) * PAGE_SIZE;
-    //cout << "overflow page offset: " << offset << endl;
-    is.seekg(offset);
-    //curPage = Page::read(is);
-    Page curPage;
-    Page::read(is, curPage);
-    result = curPage.find(key);
-    if (result.first) {
-      return result;
-    }
   }
   cout << "not found" << endl;
   // not found
@@ -135,50 +135,6 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
 Page* HashIndex::get_overflow_page(Page* cur_page) {
   return overflow_map[cur_page];
   //return this->overflow_pages.at((cur_page->overflow_addr-this->number_buckets));
-}
-
-/*
- * adds (key, rid) entry to the bucket corresponding to the hash key
- */
-void HashIndex::add_entry_to_bucket(uint32_t hash_key, DataEntry entry) {
-  Page* cur_page = primary_buckets[hash_key];
-
-
-  if (!cur_page->isFull()) {
-    if (entry.key == 1708146715154) {
-      cout << "added key to primary bucket with key: " << hash_key << endl;
-    }
-    cur_page->addEntry(entry);
-  } else {
-    if (entry.key == 1708146715154) {
-        cout << "added key to overflow bucket with key: " << hash_key << endl;
-
-    }
-    while(page_has_overflow(cur_page) && get_overflow_page(cur_page)->isFull()) {
-      // while current page at bucket is full, go to its overflow page
-      cur_page = get_overflow_page(cur_page);
-    }
-
-    if (page_has_overflow(cur_page)) {
-        // go to the last page in the current bucket chain
-        Page* overflowPage = get_overflow_page(cur_page);
-        overflowPage->addEntry(entry);
-        //cout << "hasOverflow at bucket: " << hash_key << " with overflow count: " << overflowPage->counter << " and overflow addr: " << cur_page->overflow_addr << endl;
-
-    } else {
-        // all pages in the bucket are full. Create a new page and add it to the bucket chain.
-        Page* overflowPage = new Page();
-        overflow_map[cur_page] = overflowPage;
-        overflow_pages.push_back(overflowPage);
-        map_for_prev_page[overflowPage] = cur_page;
-
-        //cur_page->setOverflow(((uint64_t)this->number_buckets) + overflow_pages.size()-1);
-        overflowPage->addEntry(entry);
-
-        //cout << "creating new overflow pages at bucket: " << hash_key << " with overflow count: " << overflowPage->counter << " and overflow addr: " << cur_page->overflow_addr << endl;
-    }
-
-  }
 }
 
 /*
@@ -198,70 +154,66 @@ bool HashIndex::page_has_overflow(Page* page) {
   }
 }
 
-void HashIndex::merge_overflows() {
+void HashIndex::merge(vector<Page*> merge_primary_buckets, vector<Page*> overflow_pages) {
+  //cout << "overflow size: " << overflow_pages.size() << endl;
+  sort(merge_primary_buckets.begin(), merge_primary_buckets.end(),
+    [](const Page* a, const Page* b) -> bool {
+      return a->counter < b->counter;
+    });
 
-  auto i = begin(overflow_pages);
-  while (i != end(overflow_pages)) {
-    Page* page = (*(i));
-    int capacity_needed = page->counter;
-    //cout << "capacity: " << capacity_needed << endl;
-    bool did_merge = merge(capacity_needed, page);
-    if (did_merge) {
-      i = overflow_pages.erase(i);
-    } else {
-      ++i;
-    }
-  }
-}
+  sort(overflow_pages.begin(), overflow_pages.end(),
+    [](const Page* a, const Page* b) -> bool {
+      return a->counter > b->counter;
+    });
 
-bool HashIndex::merge(int capacity_needed, Page* page) {
-  auto i = begin(primary_buckets);
-
-  while (i != end(primary_buckets)) {
-    Page* merge_candidate = *(i);
-    if (Page::MAX_ENTRIES - merge_candidate->counter >= capacity_needed) {
-      //cout << "capacity needed: " << capacity_needed << endl;
-      //cout << "before merge count: " << merge_candidate->counter <<endl;
-      merge_candidate->mergePage(*(page));
-      //cout << "after merge count: " << merge_candidate->counter <<endl;
-
-      int cur_index = i - primary_buckets.begin();
-
-      unordered_map<Page*, Page*>::iterator it;
-      it = map_for_prev_page.find(page);
-      if (it == map_for_prev_page.end()) {
-        cout << "merge: could not find certain overflow page in map :(" << endl;
+  int i = 0;
+  int j = 0;
+  while (i < overflow_pages.size() and j < merge_primary_buckets.size()) {
+    Page* overflow = overflow_pages[i];
+    Page* merge_candidate = merge_primary_buckets[j];
+    while (Page::MAX_ENTRIES - merge_candidate->counter < overflow->counter) {
+      j++;
+      if (j >= merge_primary_buckets.size()) {
+        break;
       }
-      //overflow page's parent now points to merge_candidate;
-      Page* parent = it->second;
-      parent->setOverflow(cur_index);
-      parent->overflow_merged = true;
-      //cout << "set new overflow to: " << cur_index << endl;
-
-      return true;
+      merge_candidate = merge_primary_buckets[j];
     }
-    ++i;
+    if (j >= merge_primary_buckets.size()) {
+      // all overflow pages after this page
+      // need capacity greater than the primary bucket
+      // with the largest empty space.
+      // Stop merging
+      break;
+    }
+    merge_candidate->mergePage(*(overflow));
+    auto parent_result = map_for_prev_page.find(overflow);
+    if (parent_result != map_for_prev_page.end()) {
+      Page* parent = parent_result->second;
+      auto overflow_result = overflow_map.find(parent);
+      if (overflow_result != overflow_map.end()) {
+        overflow_map.erase(overflow_result);
+      } else {
+        cout << "overflow page is not present in overflow_map!?" << endl;
+      }
+      map_for_prev_page.erase(parent_result);
+    } else {
+      cout << "overflow page is not present in map_for_prev_page!?" << endl;
+    }
+    i++;
+    j++;
   }
-  return false;;
-}
 
-void HashIndex::set_pages_overflow_addr() {
-  unordered_map<Page*, Page*>::iterator it;
-  auto i = begin(overflow_pages);
-
-  while (i != end(overflow_pages)) {
-    Page* page = *(i);
-    it = map_for_prev_page.find(page);
-    if (it == map_for_prev_page.end()) {
-      cout << "could not find certain overflow page in map :(" << endl;
-      continue;
+  for (int k = i; k < overflow_pages.size(); k++) {
+    Page* overflow = overflow_pages.at(k);
+    auto parent_result = map_for_prev_page.find(overflow);
+    if (parent_result != map_for_prev_page.end()) {
+      Page* parent = parent_result->second;
+      parent->setOverflow((uint64_t)(k-i));
+      //cout << "k-i: " << k-i << endl;
+      //cout << "overflow: " << parent->overflow_addr << endl;
+    } else {
+      cout << "1overflow page is not present in map_for_prev_page!?" << endl;
     }
-    int cur_index = i - overflow_pages.begin();
-     //cur_page->setOverflow(((uint64_t)this->number_buckets) + overflow_pages.size()-1);
-    Page* parent = it->second;
-    parent->setOverflow(((uint64_t)this->number_buckets)+cur_index);
-    //cout << "set new overflow to: " << ((uint64_t)this->number_buckets)+cur_index << endl;
-    ++i;
   }
 
 }
@@ -285,6 +237,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
   primary_buckets = move(tmp_primary_buckets);
 
   vector<int> key_distribution(this->number_buckets);
+  vector<vector<DataEntry> > sorted_primary_buckets(this->number_buckets);
 
 
   for (int i = 0; i < this->number_buckets; i++) {
@@ -294,8 +247,9 @@ void HashIndex::build_index(string path, string indexFilePath) {
 
   //initialize primary buckets
   for (int i = 0; i < this->number_buckets; i++) {
-    primary_buckets.at(i) = new Page();
-
+    //primary_buckets.at(i) = new Page();
+    vector<DataEntry> bucket;
+    sorted_primary_buckets.at(i) = bucket;
   }
   for (DataEntry entry : entries) {
     //cout << "( " << entry.key << " , " << entry.rid << " )" << endl;
@@ -304,29 +258,72 @@ void HashIndex::build_index(string path, string indexFilePath) {
       cout << "bad hash: " << hash_key << endl;
     } else {
       key_distribution[hash_key]++;
-      add_entry_to_bucket(hash_key, entry);
+      sorted_primary_buckets.at(hash_key).push_back(entry);
+      //add_entry_to_bucket(hash_key, entry);
 
     }
+  }
+  for (auto& bucket : sorted_primary_buckets) {
+      sort(bucket.begin(), bucket.end(), DataEntry::compare);
+  }
+  for (int i = 0; i < sorted_primary_buckets.size(); i++) {
+    vector<DataEntry> bucket = sorted_primary_buckets.at(i);
+    if (bucket.size() <= Page::MAX_ENTRIES) {
+      primary_buckets.at(i) = new Page(bucket);
+      continue;
+    } else {
+      vector<DataEntry> entries(bucket.begin(), bucket.begin()+Page::MAX_ENTRIES);
+      primary_buckets.at(i) = new Page(entries);
+    }
+    // has overflow
+    Page* parent = primary_buckets.at(i);
+    size_t copied_bucket_size = Page::MAX_ENTRIES;
 
+    int overflow_pg = 0;
+    while (copied_bucket_size < bucket.size()) {
+      size_t leng_to_copy = Page::MAX_ENTRIES;
+      //cout << "copied_bucket_size: " << copied_bucket_size << " bucket size: " << bucket.size() << endl;
+      if (bucket.size() - copied_bucket_size < Page::MAX_ENTRIES) {
+        leng_to_copy = (bucket.size() - copied_bucket_size);
+      }
+
+      vector<DataEntry> entries(bucket.begin() + copied_bucket_size, bucket.begin()+copied_bucket_size+leng_to_copy);
+      Page* overflowPage = new Page(entries);
+      overflow_map[parent] = overflowPage;
+      map_for_prev_page[overflowPage] = parent;
+      overflow_pages.push_back(overflowPage);
+      parent = overflowPage;
+      copied_bucket_size += leng_to_copy;
+      overflow_pg ++;
+    }
   }
 
-  merge_overflows();
-  set_pages_overflow_addr();
+
+
+
+  merge(primary_buckets, overflow_pages);
+  cout << "done" <<endl;
+
 
   int counter = 0;
   ofstream indexFile;
   indexFile.open(indexFilePath, ios::binary | ios::out);
   indexFile.write((char *)&(this->number_buckets), sizeof(unsigned int));
 
+  int of_count = 0;
   for (int i = 0; i < this->number_buckets; i++) {
     Page* page = primary_buckets.at(i);
     //cout << "bucket: " << i << " with count: " << key_distribution.at(i) << endl;
 
     counter += page->counter;
     cout << "primary bucket count: " << page->counter;
+    //cout << "overflow: " << page->overflow_addr << endl;
+    auto result = overflow_map.find(page);
+    if (result != overflow_map.end()) {
+      of_count++;
+    }
 
-
-    while (page->hasOverflow() && !page->overflow_merged) {
+    while (page->hasOverflow()) {
       cout << " -> " << get_overflow_page(page)->counter;
       page = get_overflow_page(page);
       counter += page->counter;
@@ -336,13 +333,14 @@ void HashIndex::build_index(string path, string indexFilePath) {
 
     primary_buckets.at(i)->flush(indexFile);
   }
+
+  cout << "overflow count: " <<of_count <<endl;
   for (int i = 0; i < overflow_pages.size(); i++) {
     overflow_pages.at(i)->flush(indexFile);
   }
   cout << counter << endl;
   indexFile.close();
   cout << "================end=============" << endl;
-  //ifstream readIndex ("indexFile", ifstream::binary);
 
 }
 

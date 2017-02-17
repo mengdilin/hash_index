@@ -17,6 +17,7 @@ class Page {
 
   public:
     Page();
+    Page(std::vector<DataEntry>);
     Page(Page&& other);
     void addEntry(DataEntry);
     std::ofstream& flush(std::ofstream&);
