@@ -9,11 +9,17 @@
 #include <inttypes.h>
 
 using namespace std;
+/*
+ * constructor that takes in load_capacity as a variable
+ */
 HashIndex::HashIndex(float load_capacity) {
   this->load_capacity = load_capacity;
   this->number_buckets = 0;
 }
 
+/*
+ * destructor that frees all pages
+ */
 HashIndex::~HashIndex() {
   for (Page* page : primary_buckets) {
     delete page;
@@ -27,6 +33,10 @@ uint32_t HashIndex::hash(uint64_t key) {
   return hash(key, this->number_buckets);
 }
 
+/*
+ * hash function that given a key and number of primary buckets, returns the hash
+ * has some debug print in it.
+ */
 uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
     bool debugprint = false;
     if (key == 1708146715154) {
@@ -61,6 +71,10 @@ uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
     return key;
 }
 
+/*
+ * takes a key and number of total primary buckets and returns the offset
+ * of the page in the index file corresponding to the key
+ */
 uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
   uint32_t bucket_num = hash(key, num_buckets);
   cout << "Bucket num: " << bucket_num << endl;
@@ -74,6 +88,9 @@ uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
   return offset;
 }
 
+/**
+ * searches through the index file and returns rid of a given key
+ */
 pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
   ifstream readIndex (indexFilePath, ifstream::binary);
   unsigned int bucket_num;
@@ -112,11 +129,17 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
 
 }
 
+/*
+ * returns the overflow page of the current page
+ */
 Page* HashIndex::get_overflow_page(Page* cur_page) {
   return overflow_map[cur_page];
   //return this->overflow_pages.at((cur_page->overflow_addr-this->number_buckets));
 }
 
+/*
+ * adds (key, rid) entry to the bucket corresponding to the hash key
+ */
 void HashIndex::add_entry_to_bucket(uint32_t hash_key, DataEntry entry) {
   Page* cur_page = primary_buckets[hash_key];
 
@@ -158,6 +181,12 @@ void HashIndex::add_entry_to_bucket(uint32_t hash_key, DataEntry entry) {
   }
 }
 
+/*
+ * checks if current page has overflow
+ * cannot use Page::hasOverflow() because this function
+ * is used during the index building stage where hasOverflow()
+ * has not been set
+ */
 bool HashIndex::page_has_overflow(Page* page) {
 
   unordered_map<Page*, Page*>::iterator it;
@@ -168,13 +197,14 @@ bool HashIndex::page_has_overflow(Page* page) {
     return true;
   }
 }
+
 void HashIndex::merge_overflows() {
 
   auto i = begin(overflow_pages);
   while (i != end(overflow_pages)) {
     Page* page = (*(i));
     int capacity_needed = page->counter;
-    cout << "capacity: " << capacity_needed << endl;
+    //cout << "capacity: " << capacity_needed << endl;
     bool did_merge = merge(capacity_needed, page);
     if (did_merge) {
       i = overflow_pages.erase(i);
@@ -190,10 +220,10 @@ bool HashIndex::merge(int capacity_needed, Page* page) {
   while (i != end(primary_buckets)) {
     Page* merge_candidate = *(i);
     if (Page::MAX_ENTRIES - merge_candidate->counter >= capacity_needed) {
-      cout << "capacity needed: " << capacity_needed << endl;
-      cout << "before merge count: " << merge_candidate->counter <<endl;
+      //cout << "capacity needed: " << capacity_needed << endl;
+      //cout << "before merge count: " << merge_candidate->counter <<endl;
       merge_candidate->mergePage(*(page));
-      cout << "after merge count: " << merge_candidate->counter <<endl;
+      //cout << "after merge count: " << merge_candidate->counter <<endl;
 
       int cur_index = i - primary_buckets.begin();
 
@@ -206,7 +236,7 @@ bool HashIndex::merge(int capacity_needed, Page* page) {
       Page* parent = it->second;
       parent->setOverflow(cur_index);
       parent->overflow_merged = true;
-      cout << "set new overflow to: " << cur_index << endl;
+      //cout << "set new overflow to: " << cur_index << endl;
 
       return true;
     }
@@ -236,7 +266,10 @@ void HashIndex::set_pages_overflow_addr() {
 
 }
 
-void HashIndex::build_index(string path) {
+/*
+ * builds the index
+ */
+void HashIndex::build_index(string path, string indexFilePath) {
   vector<DataEntry> entries = this->parse_idx_file(path);
 
   // set number_buckets
@@ -282,7 +315,7 @@ void HashIndex::build_index(string path) {
 
   int counter = 0;
   ofstream indexFile;
-  indexFile.open("indexFile", ios::binary | ios::out);
+  indexFile.open(indexFilePath, ios::binary | ios::out);
   indexFile.write((char *)&(this->number_buckets), sizeof(unsigned int));
 
   for (int i = 0; i < this->number_buckets; i++) {
@@ -306,11 +339,6 @@ void HashIndex::build_index(string path) {
   for (int i = 0; i < overflow_pages.size(); i++) {
     overflow_pages.at(i)->flush(indexFile);
   }
-
-  for (Page* page : overflow_pages) {
-    cout << "page: " << page->counter <<endl;
-  }
-
   cout << counter << endl;
   indexFile.close();
   cout << "================end=============" << endl;
@@ -343,6 +371,11 @@ void HashIndex::debugRead(string filename) {
 
 }
 
+/*
+ * parser that expects a file with 3 tab-delimited columns
+ * with the following format: key\tcount\trid where the
+ * middle value count is ignored
+ */
 vector<DataEntry> HashIndex::parse_idx_file(string path) {
   vector<DataEntry> data_entries;
   ifstream input(path);

@@ -1,8 +1,7 @@
 CC=gcc
 CXX=g++
 RM=rm -f
-CPPFLAGS=-g -Wall
-LDFLAGS=-g -Wall
+LDFLAGS=-O2 -g -Wall
 
 SRCS=test.cpp DataEntry.cpp Page.cpp HashIndex.cpp
 OBJS=$(subst .cc,.o,$(SRCS))
