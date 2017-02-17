@@ -26,11 +26,11 @@ HashIndex::~HashIndex() {
   for (Page* page : primary_buckets) {
     delete page;
   }
-  /*
+
   for (Page* page : overflow_pages) {
     delete page;
   }
-  */
+
 }
 
 uint32_t HashIndex::hash(uint64_t key) {
