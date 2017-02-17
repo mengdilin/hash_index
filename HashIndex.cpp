@@ -26,11 +26,11 @@ HashIndex::~HashIndex() {
   for (Page* page : primary_buckets) {
     delete page;
   }
-
+  /*
   for (Page* page : overflow_pages) {
     delete page;
   }
-
+  */
 }
 
 uint32_t HashIndex::hash(uint64_t key) {
@@ -281,7 +281,6 @@ void HashIndex::build_index(string path, string indexFilePath) {
     Page* parent = primary_buckets.at(i);
     size_t copied_bucket_size = Page::MAX_ENTRIES;
 
-    int overflow_pg = 0;
     while (copied_bucket_size < bucket.size()) {
       size_t leng_to_copy = Page::MAX_ENTRIES;
       if (bucket.size() - copied_bucket_size < Page::MAX_ENTRIES) {
@@ -297,14 +296,10 @@ void HashIndex::build_index(string path, string indexFilePath) {
       overflow_pages.push_back(overflowPage);
       parent = overflowPage;
       copied_bucket_size += leng_to_copy;
-      overflow_pg ++;
     }
   }
 
 
-  /*
-   * prepare for merge: sort primary buckets and overflow pages
-   */
   vector<Page*> merge_primary_buckets = primary_buckets;
   sort(merge_primary_buckets.begin(), merge_primary_buckets.end(),
     [](const Page* a, const Page* b) -> bool {
@@ -315,8 +310,6 @@ void HashIndex::build_index(string path, string indexFilePath) {
     [](const Page* a, const Page* b) -> bool {
       return a->counter > b->counter;
     });
-
-  //merge step
   int overflow_merge_start = merge(merge_primary_buckets, overflow_pages);
   cout << "done" <<endl;
 
@@ -326,6 +319,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
   indexFile.open(indexFilePath, ios::binary | ios::out);
   indexFile.write((char *)&(this->number_buckets), sizeof(unsigned int));
 
+  int overflow_count = 0;
   //debug print
   for (int i = 0; i < this->number_buckets; i++) {
     Page* page = primary_buckets.at(i);
@@ -336,23 +330,23 @@ void HashIndex::build_index(string path, string indexFilePath) {
 
 
     while (page->hasOverflow()) {
+      overflow_count++;
       Page* tmp_page = get_overflow_page(page);
       if (tmp_page == nullptr) {
-        cout << page->overflow_addr << endl;
-        cout << primary_buckets.size() << endl;
+	cout << page->overflow_addr << endl;
+	cout << primary_buckets.size() << endl;
         page = primary_buckets.at((int)page->overflow_addr);
         cout << " -> " << page->counter;
         counter += page->counter;
         break;
       } else {
-        page = tmp_page;
+	page = tmp_page;
       }
       cout << " -> " << page->counter;
 
       counter += page->counter;
 
     }
-
     cout << endl;
 
     primary_buckets.at(i)->flush(indexFile);
@@ -365,7 +359,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
   cout << counter << endl;
   indexFile.close();
   cout << "================end=============" << endl;
-
+  cout << "overflow pages: " << overflow_count << endl;
 }
 
 void HashIndex::debugRead(string filename) {

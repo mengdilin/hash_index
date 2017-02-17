@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char** argv) {
   Page page;
 
-  HashIndex index(1);
+  HashIndex index(0.8);
 
   uint64_t test_key = 1708146715154;
   string indexFileName = "indexFile";
@@ -41,7 +41,6 @@ int main(int argc, char** argv) {
   /* unit test: make sure all keys read in can be found
   * in the index file
   */
-  /*
   vector<DataEntry> test_data = index.parse_idx_file(argv[1]);
   for (int i = 0; i < test_data.size(); i++) {
     DataEntry test = test_data[i];
@@ -56,7 +55,6 @@ int main(int argc, char** argv) {
     }
   }
   cout << "size: " << test_data.size() <<endl;
-  */
 
 
 
