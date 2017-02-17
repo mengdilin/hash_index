@@ -302,6 +302,9 @@ void HashIndex::build_index(string path, string indexFilePath) {
   }
 
 
+  /*
+   * prepare for merge: sort primary buckets and overflow pages
+   */
   vector<Page*> merge_primary_buckets = primary_buckets;
   sort(merge_primary_buckets.begin(), merge_primary_buckets.end(),
     [](const Page* a, const Page* b) -> bool {
@@ -312,6 +315,8 @@ void HashIndex::build_index(string path, string indexFilePath) {
     [](const Page* a, const Page* b) -> bool {
       return a->counter > b->counter;
     });
+
+  //merge step
   int overflow_merge_start = merge(merge_primary_buckets, overflow_pages);
   cout << "done" <<endl;
 

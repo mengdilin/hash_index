@@ -11,7 +11,11 @@ class HashIndex {
 
     //used to maintain a deterministic order of overflow pages
     std::vector<Page*> overflow_pages;
+
+    //overflow page -> parent
     std::unordered_map<Page*, Page*> map_for_prev_page;
+
+    //parent -> overflow page
     std::unordered_map<Page*, Page*> overflow_map;
     float load_capacity;
     static const int PAGE_SIZE = 4096;
