@@ -34,7 +34,6 @@ public:
 private:
   static uint64_t search(uint64_t, unsigned int);
   static uint32_t hash(uint64_t, unsigned int);
-  std::unordered_map<Page*,Page*>::const_iterator get_overflow_page(Page*);
   int merge(std::vector<Page*>&, std::vector<Page*>&);
   bool page_has_overflow(Page*);
 };

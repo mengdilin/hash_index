@@ -120,13 +120,6 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
 
 }
 
-/*
- * returns the overflow page of the current page
- */
-unordered_map<Page*,Page*>::const_iterator HashIndex::get_overflow_page(Page* cur_page) {
-  return overflow_map.find(cur_page);
-  //return this->overflow_pages.at((cur_page->overflow_addr-this->number_buckets));
-}
 
 /*
  * checks if current page has overflow
@@ -214,9 +207,22 @@ int HashIndex::merge(vector<Page*>& merge_primary_buckets, vector<Page*>& overfl
     j++;
   }
 
+  int overflow_count = 0;
+  for (int i = 0; i < overflow_pages.size(); i++) {
+      Page* cur_page = overflow_pages.at(i);
+      auto iterator = map_for_prev_page.find(cur_page);
+      if (iterator == map_for_prev_page.end()) {
+        continue;
+      } else {
+        Page* parent = iterator->second;
+        parent->setOverflow((uint64_t)(this->number_buckets+overflow_count));
+        overflow_count++;
+      }
+  }
+
   /*
    * set the overflow address for the overflow pages that are not merged
-   */
+
 
   //set the overflow address of full overflows
   for (int k = 0; k < fulled_overflows; k++) {
@@ -244,6 +250,7 @@ int HashIndex::merge(vector<Page*>& merge_primary_buckets, vector<Page*>& overfl
       cout << "1overflow page is not present in map_for_prev_page!?" << endl;
     }
   }
+  */
   return i;
 }
 
@@ -365,6 +372,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
   cout << "after number of overflow pages in map: " << overflow_map.size() << endl;
 
   cout << "done" <<endl;
+  int overflow_count = 0;
 
 
   int counter = 0;
@@ -408,7 +416,8 @@ void HashIndex::build_index(string path, string indexFilePath) {
   cout << "---------overflow-----------"<<endl;
   cout << "overflow after merge: " << overflow_map.size() << endl;
 
-  int i = 0;
+
+  /*
   while (i < overflow_pages.size() && overflow_pages.at(i)->counter == Page::MAX_ENTRIES) {
    // counter += overflow_pages.at(i)->counter;
     overflow_pages.at(i)->flush(indexFile);
@@ -422,6 +431,17 @@ void HashIndex::build_index(string path, string indexFilePath) {
     counter += overflow_pages.at(i)->counter;
   }
   cout << counter << endl;
+  */
+    for (int i = 0; i < overflow_pages.size(); i++) {
+      Page* cur_page = overflow_pages.at(i);
+      auto iterator = map_for_prev_page.find(cur_page);
+      if (iterator == map_for_prev_page.end()) {
+        continue;
+      } else {
+        counter += cur_page->counter;
+        cur_page->flush(indexFile);
+      }
+  }
   indexFile.close();
   cout << "================end=============" << endl;
 
