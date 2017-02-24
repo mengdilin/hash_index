@@ -11,7 +11,13 @@ using namespace std;
 int main(int argc, char** argv) {
   Page page;
 
-  HashIndex index(1);
+  float load_capacity = 1;
+  if (argc == 5) {
+        string::size_type sz;
+        load_capacity = stof (argv[4],&sz);
+  }
+  cout << "running with capacity: " << load_capacity << endl;
+  HashIndex index(load_capacity);
 
   uint64_t test_key = 1708146715154;
   string indexFileName = "indexFile";

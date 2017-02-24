@@ -97,8 +97,8 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
   Page::read(is, curPage);
 
   while (key > curPage.data_entry_list[curPage.counter-1].key) {
-    cout << "key: " << key << endl;
-    cout << "largest key of page: " << curPage.data_entry_list[curPage.counter-1].key << endl;
+    //cout << "key: " << key << endl;
+    //cout << "largest key of page: " << curPage.data_entry_list[curPage.counter-1].key << endl;
     if (curPage.hasOverflow()) {
       //reset pointer
       is.seekg(0);
@@ -124,8 +124,8 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
 /*
  * returns the overflow page of the current page
  */
-Page* HashIndex::get_overflow_page(Page* cur_page) {
-  return overflow_map[cur_page];
+unordered_map<Page*,Page*>::const_iterator HashIndex::get_overflow_page(Page* cur_page) {
+  return overflow_map.find(cur_page);
   //return this->overflow_pages.at((cur_page->overflow_addr-this->number_buckets));
 }
 
@@ -203,6 +203,7 @@ int HashIndex::merge(vector<Page*>& merge_primary_buckets, vector<Page*>& overfl
 
       if (overflow_result != overflow_map.end()) {
         overflow_map.erase(overflow_result);
+
       } else {
         cout << "overflow page is not present in overflow_map!?" << endl;
       }
@@ -355,8 +356,15 @@ void HashIndex::build_index(string path, string indexFilePath) {
       return a->counter > b->counter;
     });
 
+  cout << "-------------statistic before merge-----------------" << endl;
+  cout << "number of primary buckets: " << merge_primary_buckets.size() << endl;
+  cout << "number of overflow pages in map: " << overflow_map.size() << endl;
+  cout << "number of overflow pages: " << overflow_pages.size() << endl;
+  cout << "---------------end statistic-------------------" << endl;
   //merge step
   int overflow_merge_start = merge(merge_primary_buckets, overflow_pages);
+  cout << "after number of overflow pages in map: " << overflow_map.size() << endl;
+
   cout << "done" <<endl;
 
 
@@ -375,22 +383,22 @@ void HashIndex::build_index(string path, string indexFilePath) {
 
 
     while (page->hasOverflow()) {
-      Page* tmp_page = get_overflow_page(page);
-      if (tmp_page == nullptr) {
+      auto iterator = overflow_map.find(page);
+      if (iterator == overflow_map.end()) {
         //cout << page->overflow_addr << endl;
         //cout << primary_buckets.size() << endl;
         //overflow has been merged with primary buckets
         page = primary_buckets.at((int)page->overflow_addr);
         cout << " merged -> " << (int)page->counter;
-        counter += page->counter;
         break;
       } else {
-        page = tmp_page;
+        page = iterator->second;
+        counter += page->counter;
         cout << " -> " << (int)page->counter;
       }
 
 
-      counter += page->counter;
+      //counter += page->counter;
 
     }
 
@@ -400,14 +408,15 @@ void HashIndex::build_index(string path, string indexFilePath) {
   }
 
   cout << "---------overflow-----------"<<endl;
-  cout << "num pages merged: " << overflow_merge_start << endl;
+  cout << "overflow after merge: " << overflow_map.size() << endl;
 
   int i = 0;
   while (i < overflow_pages.size() && overflow_pages.at(i)->counter == Page::MAX_ENTRIES) {
-    counter += overflow_pages.at(i)->counter;
+   // counter += overflow_pages.at(i)->counter;
     overflow_pages.at(i)->flush(indexFile);
     i++;
   }
+
   cout << "full overflow: " << i << endl;
   for (int i = overflow_merge_start; i < overflow_pages.size(); i++) {
     overflow_pages.at(i)->flush(indexFile);
