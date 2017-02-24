@@ -91,7 +91,6 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
   uint64_t primary_bucket_offset = search(key, bucket_num);
   ifstream is(indexFilePath, ifstream::binary);
   is.seekg(primary_bucket_offset);
-  //Page curPage = Page::read(is);
   Page curPage;
   uint64_t offset;
   Page::read(is, curPage);
