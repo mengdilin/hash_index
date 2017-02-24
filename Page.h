@@ -7,8 +7,8 @@ class Page {
   public:
     // (total buckets) + overflow page index starting from 0
     uint64_t overflow_addr;
-    const static int MAX_ENTRIES = 255;
-    //const static int MAX_ENTRIES = 2;
+    //const static int MAX_ENTRIES = 255;
+    const static int MAX_ENTRIES = 2;
     uint32_t counter;
     DataEntry data_entry_list[MAX_ENTRIES];
     uint32_t hash;
