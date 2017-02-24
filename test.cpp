@@ -37,8 +37,8 @@ int main(int argc, char** argv) {
 
   index.build_index(argv[1], indexFileName);
 
-
-  pair<bool,uint64_t> result = index.search(test_key, indexFileName);
+ ifstream readIndex (indexFileName, ifstream::binary);
+  pair<bool,uint64_t> result = index.search(test_key, readIndex);
   if (result.first) {
     cout << "found rid: " << result.second << endl;
   }
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
   for (int i = 0; i < test_data.size(); i++) {
     DataEntry test = test_data[i];
     //cout << "looking for key: " << test.key << endl;
-    pair<bool,uint64_t> result = index.search(test.key, indexFileName);
+    pair<bool,uint64_t> result = index.search(test.key, readIndex);
     if (not result.first) {
     cout << "not found key: " << test.key << endl;
     } else {

@@ -85,13 +85,12 @@ uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
  * binary search on a page, check that the greatest key in the page
  * is >= the key we are looking for. Else, we go to the overflow page
  */
-pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
-  ifstream readIndex (indexFilePath, ifstream::binary);
+pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
   unsigned int bucket_num;
-  readIndex.read((char *)&bucket_num, sizeof(unsigned int));
+  is.read((char *)&bucket_num, sizeof(unsigned int));
   //cout << "read bucket num: " << bucket_num <<endl;
   uint64_t primary_bucket_offset = search(key, bucket_num);
-  ifstream is(indexFilePath, ifstream::binary);
+  is.seekg(0);
   is.seekg(primary_bucket_offset);
   Page curPage;
   uint64_t offset;
@@ -112,12 +111,13 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, string indexFilePath) {
   }
 
   pair<bool,uint64_t> result = curPage.find(key);
-
+  is.seekg(0);
   if (result.first) {
     return result;
   }
   cout << "not found" << endl;
   // not found
+
   return result;
 
 }

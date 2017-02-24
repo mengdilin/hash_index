@@ -7,10 +7,12 @@ infile = sys.argv[1]
 line_start = "primary bucket count: "
 merge_keyword = " merged"
 overflow_keyword = " -> "
+key_distribution_word = "bucket: "
 with open(infile) as inf:
   content = inf.readlines()
 
 merge_count = 0
+key_distribution = [];
 entry_distribution = []
 overflow_distribution = []
 pages = 0
@@ -25,33 +27,41 @@ for line in content:
     if merge_keyword in line:
       count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(merge_keyword), line))
       merge_count = merge_count + count
-      line = line.replace(merge_keyword, "", 1)
+
+      #print line
+      primary_bucket = line.split(" ")[0] + " "
+      line = primary_bucket+(" ".join([x for x in line.split(merge_keyword) if x.startswith("-> ")]))
+      #print line
+      #print line
     if overflow_keyword in line:
       buckets = line.split(overflow_keyword)
-      buckets = [int(x) for x in buckets]
+      buckets = [int(x) for x in buckets if len(x)!=0]
       pages = pages + len(buckets)
       #print "buckets: ", buckets
       #print "sum: ", sum(buckets)
       entry_distribution.append(sum(buckets))
       overflow_distribution.append(sum(buckets[1:]))
-      '''
-      tmp = sum(buckets[1:])
-      if tmp >= 255:
-        print line
-      '''
       overflows = overflows + len(buckets) - 1
       max_overflow_chain = max(len(buckets) - 1, max_overflow_chain)
     else:
       #print "no overflow: ", int(line)
       entry_distribution.append(int(line))
       pages = pages + 1
+  elif line.startswith(key_distribution_word):
+    key_distribution.append(int(line[len(key_distribution_word):]))
+
 print all(isinstance(x, int) for x in entry_distribution)
 print "pages: " , pages
 print "overflows: ", overflows
 print "merge count: ", merge_count
 print "max overflow chain: ", max_overflow_chain
-#plt.hist(entry_distribution, range=[0, 600], alpha=0.5, bins=50, label="key dist")
-#plt.legend(loc='upper right')
+print "key num min: ", min(key_distribution)
+print "key num max: ", max(key_distribution)
+plt.hist(key_distribution, range=[0, 400], alpha=0.5, bins=50, label="key dist")
+
 #plt.gca().set_yscale("log")
 #plt.show()
+plt.hist(entry_distribution, range=[0, 400], alpha=0.5, bins=50, label="merge dist")
+plt.legend(loc='upper right')
+plt.show()
 
