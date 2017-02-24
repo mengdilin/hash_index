@@ -66,14 +66,11 @@ uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
  * of the page in the index file corresponding to the key
  */
 uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
+  //get the primary bucket of the key
   uint32_t bucket_num = hash(key, num_buckets);
-  //cout << "Bucket num: " << bucket_num << endl;
-  //cout << "size of unsigned int: " << sizeof(unsigned int) << endl;
-  uint64_t offset = ((uint64_t)bucket_num * PAGE_SIZE) + sizeof(unsigned int);
-  //cout << "offset: " << offset << endl;
 
-  //cout << "page size: " << PAGE_SIZE << endl;
-  //cout << "computing: " << bucket_num << "*" << PAGE_SIZE << "+" << sizeof(unsigned int) << endl;
+  //compute the offset: index header size + bucket * page size
+  uint64_t offset = ((uint64_t)bucket_num * PAGE_SIZE) + sizeof(unsigned int);
 
   return offset;
 }
@@ -88,7 +85,6 @@ uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
 pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
   unsigned int bucket_num;
   is.read((char *)&bucket_num, sizeof(unsigned int));
-  //cout << "read bucket num: " << bucket_num <<endl;
   uint64_t primary_bucket_offset = search(key, bucket_num);
   is.seekg(0);
   is.seekg(primary_bucket_offset);
@@ -96,9 +92,9 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
   uint64_t offset;
   Page::read(is, curPage);
 
+  //check if key > largest/last key on current page
   while (key > curPage.data_entry_list[curPage.counter-1].key) {
-    //cout << "key: " << key << endl;
-    //cout << "largest key of page: " << curPage.data_entry_list[curPage.counter-1].key << endl;
+    //go to overflow
     if (curPage.hasOverflow()) {
       //reset pointer
       is.seekg(0);
@@ -109,7 +105,7 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
       break;
     }
   }
-
+  //binary search to find the result
   pair<bool,uint64_t> result = curPage.find(key);
   is.seekg(0);
   if (result.first) {
