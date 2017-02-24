@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
 
   index.build_index(argv[1], indexFileName);
 
+  //initialize the index stream for probing
  ifstream readIndex (indexFileName, ifstream::binary);
   pair<bool,uint64_t> result = index.search(test_key, readIndex);
   if (result.first) {
@@ -47,7 +48,6 @@ int main(int argc, char** argv) {
   /* unit test: make sure all keys read in can be found
   * in the index file
   */
-
   vector<DataEntry> test_data = index.parse_idx_file(argv[1]);
   for (int i = 0; i < test_data.size(); i++) {
     DataEntry test = test_data[i];
