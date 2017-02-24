@@ -51,8 +51,10 @@ uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
     key ^= key >> 33;
     key *= 0xc4ceb9fe1a85ec53ULL;
     key ^= key >> 33;
-    key = key >> ((64 - (int)log2(num_buckets)) - 1);
-    key = key * UINT32_C(2654435761) % num_buckets;;
+    //key = key >> ((64 - (int)log2(num_buckets)) - 1);
+    //key = key * UINT32_C(2654435761) % num_buckets;;
+    key = key % num_buckets;
+
     if (debugprint)
       cout << "hash bucket: " << key << endl;
 
@@ -373,6 +375,12 @@ void HashIndex::build_index(string path, string indexFilePath) {
   cout << "after number of overflow pages in map: " << overflow_map.size() << endl;
 
   cout << "done" <<endl;
+
+  cout << "---------------begin key distribution---------------" << endl;
+  for (int i = 0; i < key_distribution.size(); i++) {
+    cout << "bucket: " << key_distribution.at(i) << endl;
+  }
+  cout << "---------------end key distribution---------------" << endl;
   int overflow_count = 0;
 
 
