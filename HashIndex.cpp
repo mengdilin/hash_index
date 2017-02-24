@@ -175,7 +175,8 @@ int HashIndex::merge(vector<Page*>& merge_primary_buckets, vector<Page*>& overfl
       if (i >= overflow_pages.size()) {
         break;
       }
-      merge_candidate = merge_primary_buckets[j];
+      overflow = overflow_pages.at(i);
+      //merge_candidate = merge_primary_buckets[j];
     }
 
     if (i >= overflow_pages.size()) {
@@ -375,7 +376,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
   int overflow_count = 0;
 
 
-  int counter = 0;
+  uint32_t counter = 0;
   ofstream indexFile;
   indexFile.open(indexFilePath, ios::binary | ios::out);
   indexFile.write((char *)&(this->number_buckets), sizeof(unsigned int));
@@ -384,8 +385,9 @@ void HashIndex::build_index(string path, string indexFilePath) {
   for (int i = 0; i < this->number_buckets; i++) {
     Page* page = primary_buckets.at(i);
     //cout << "bucket: " << i << " with count: " << key_distribution.at(i) << endl;
+
     counter += page->counter;
-    cout << "primary bucket count: " << (int)page->counter;
+    cout << "primary bucket count: " << (uint32_t)page->counter;
     //auto result = overflow_map.find(page);
 
 
@@ -395,12 +397,12 @@ void HashIndex::build_index(string path, string indexFilePath) {
         //cout << page->overflow_addr << endl;
         //cout << primary_buckets.size() << endl;
         //overflow has been merged with primary buckets
-        page = primary_buckets.at((int)page->overflow_addr);
-        cout << " merged -> " << (int)page->counter;
+        page = primary_buckets.at((uint64_t)page->overflow_addr);
+        cout << " merged -> " << (uint32_t)page->counter;
         break;
       } else {
         page = iterator->second;
-        cout << " -> " << (int)page->counter;
+        cout << " -> " << (uint32_t)page->counter;
       }
 
 

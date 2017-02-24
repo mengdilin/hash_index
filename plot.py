@@ -50,8 +50,8 @@ print "pages: " , pages
 print "overflows: ", overflows
 print "merge count: ", merge_count
 print "max overflow chain: ", max_overflow_chain
-plt.hist(entry_distribution, range=[0, 600], alpha=0.5, bins=50, label="key dist")
-plt.legend(loc='upper right')
+#plt.hist(entry_distribution, range=[0, 600], alpha=0.5, bins=50, label="key dist")
+#plt.legend(loc='upper right')
 #plt.gca().set_yscale("log")
-plt.show()
+#plt.show()
 
