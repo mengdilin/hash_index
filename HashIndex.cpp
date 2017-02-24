@@ -392,7 +392,6 @@ void HashIndex::build_index(string path, string indexFilePath) {
         break;
       } else {
         page = iterator->second;
-        counter += page->counter;
         cout << " -> " << (int)page->counter;
       }
 
@@ -413,12 +412,14 @@ void HashIndex::build_index(string path, string indexFilePath) {
   while (i < overflow_pages.size() && overflow_pages.at(i)->counter == Page::MAX_ENTRIES) {
    // counter += overflow_pages.at(i)->counter;
     overflow_pages.at(i)->flush(indexFile);
+    counter += overflow_pages.at(i)->counter;
     i++;
   }
 
   cout << "full overflow: " << i << endl;
   for (int i = overflow_merge_start; i < overflow_pages.size(); i++) {
     overflow_pages.at(i)->flush(indexFile);
+    counter += overflow_pages.at(i)->counter;
   }
   cout << counter << endl;
   indexFile.close();
