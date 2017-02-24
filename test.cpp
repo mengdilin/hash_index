@@ -10,11 +10,8 @@ using namespace std;
 
 int main(int argc, char** argv) {
     Page page;
-    BTree btree(0.8);
+    BTree btree;
     vector<DataEntry> entry = btree.parse_idx_file(argv[1]);
-    vector<Page*> pages = btree.get_leaf_pages(entry);
-    for (auto& page : pages) {
-      cout << page->counter << endl;
-    }
+
     return 0;
 }

@@ -9,18 +9,16 @@ class BTree {
 public:
   static const int PAGE_SIZE = 4096;
 private:
-  std::unordered_map<int, std::vector<Page*> > level_map;
-  float load_capacity;
   int max_level;
-  uint64_t total_records;
-  int fan_out;
+  std::unordered_map<Page*, std::vector<Page>> page_to_vector;
+  std::vector<std::vector<Page*>> btree;
+  uint64_t total_entries;
+  const static int fan_out = Page::MAX_ENTRIES;
 
 public:
- BTree(float);
- std::vector<Page*> build_level(std::vector<Page*> );
+ BTree();
+ std::vector<Page*> build_level(std::vector<DataEntry>);
  std::vector<DataEntry> parse_idx_file(std::string);
- std::vector<Page*> get_leaf_pages(std::vector<DataEntry>);
- void set_max_level(uint64_t);
 
 
 };

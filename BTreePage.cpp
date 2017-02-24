@@ -12,17 +12,18 @@ Page::Page() {
 Page::Page(vector<DataEntry> entries) {
   assert(entries.size()-1 <= Page::MAX_ENTRIES);
   counter = entries.size()-1;
-  vector<DataEntry> tmp(entries.begin(), entries.end()-1);
-
-  data_entry_list = tmp;
-  leftover_key = (entries.end()-1)->key;
-  //cout << "first key: " << entries.begin()->key << endl;
-  //cout << "key: " << data_entry_list.at(counter-1).key << endl;
-  //cout << "leftover: " << leftover_key << endl;
-
+  data_entry_list = move(entries);
 }
 
+Page* Page::getParent() {
+  assert(this->has_parent);
+  return parent;
+}
 
+void Page::setParent(Page* parent) {
+  this->has_parent=true;
+  this->parent = parent;
+}
 void Page::addEntry(DataEntry entry) {
   assert(counter < MAX_ENTRIES);
   data_entry_list[counter] = entry;

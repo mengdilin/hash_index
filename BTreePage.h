@@ -9,13 +9,16 @@ class Page {
     //const static int MAX_ENTRIES = 2;
     std::vector<DataEntry> data_entry_list;
     int counter;
-    uint64_t leftover_key;
+    Page* parent;
+    bool has_parent = false;
+    int cur_level;
 
 
   public:
     Page();
     Page(std::vector<DataEntry>);
-    Page(Page&& other);
+    Page* getParent();
+    void setParent(Page*);
     void addEntry(DataEntry);
     std::ofstream& flush(std::ofstream&);
     static void read(std::ifstream&, Page&);

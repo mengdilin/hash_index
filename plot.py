@@ -40,6 +40,8 @@ for line in content:
         print line
       '''
       overflows = overflows + len(buckets) - 1
+      if (max_overflow_chain < len(buckets) - 1):
+        print line
       max_overflow_chain = max(len(buckets) - 1, max_overflow_chain)
     else:
       #print "no overflow: ", int(line)
