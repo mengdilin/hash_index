@@ -120,23 +120,34 @@ void Page::mergePage(Page& other) {
 void Page::read(std::ifstream& indexFile, Page& page) {
 
   uint32_t pad;
+  /*
   indexFile.read ((char *)&page.overflow_addr,sizeof(page.overflow_addr));
-
-  //indexFile.read ((char *)&pad,sizeof(uint32_t));
-
-  //indexFile.seekg(sizeof(uint32_t), indexFile.tellg());
   indexFile.read((char *)&page.counter, sizeof(page.counter));
-  //indexFile.seekg(sizeof(uint32_t), indexFile.tellg());
   indexFile.read ((char *)&pad,sizeof(uint32_t));
-
-
   indexFile.read((char *)&page.data_entry_list, sizeof(page.data_entry_list));
+  */
+
+  char *buffer = (char *)malloc(4096);
+  indexFile.read(buffer, 4096);
+  memcpy(&page.overflow_addr, buffer, sizeof(page.overflow_addr));
+  memcpy(&page.counter, buffer+sizeof(page.overflow_addr), sizeof(page.counter));
+
+  memcpy(&pad, buffer+sizeof(page.overflow_addr)+sizeof(page.counter), sizeof(pad));
+
+  memcpy(&page.data_entry_list, buffer+sizeof(page.overflow_addr)+sizeof(page.counter)+sizeof(pad), sizeof(page.data_entry_list));
   /*
   cout << "couter: " << page.counter << endl;
   for (int i = 0; i < page.counter; i++) {
     cout << "(" << page.data_entry_list[i].key << " ," << page.data_entry_list[i].rid << " )" << endl;
   }
   */
+
+}
+
+void Page::read(FILE* indexFile, Page& page) {
+  char *buffer = (char *)malloc(4096);
+  // read 4K block into memory
+  fread(buffer, 4096, 1, indexFile);
 }
 
 std::ostream& operator<<(std::ostream &strm, const Page &a) {

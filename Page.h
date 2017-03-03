@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include "DataEntry.h"
+#include <stdlib.h>
+
 
 class Page {
   public:
@@ -22,6 +24,7 @@ class Page {
     void addEntry(DataEntry);
     std::ofstream& flush(std::ofstream&);
     static void read(std::ifstream&, Page&);
+    static void read(FILE*, Page&);
     bool isFull();
     bool hasOverflow();
     void setOverflow(uint64_t overflow_addr);
