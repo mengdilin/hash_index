@@ -9,6 +9,8 @@
 #include <inttypes.h>
 #include <functional>
 #include <algorithm>
+#include <chrono>
+#include <numeric>
 
 using namespace std;
 /*
@@ -85,13 +87,32 @@ uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
 pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
   unsigned int bucket_num;
   is.read((char *)&bucket_num, sizeof(unsigned int));
+    //test performance on a pre-allocated vector
+  auto t1 = chrono::high_resolution_clock::now();
   uint64_t primary_bucket_offset = search(key, bucket_num);
+  auto t2 = chrono::high_resolution_clock::now();
+  auto sum = (t2-t1).count();
+  cout << "compute offset (ns): " << (t2-t1).count() << endl;
+  t1 = chrono::high_resolution_clock::now();
   is.seekg(0);
   is.seekg(primary_bucket_offset);
-  Page curPage;
-  uint64_t offset;
-  Page::read(is, curPage);
+  t2 = chrono::high_resolution_clock::now();
+  cout << "seek to offset (ns): " << (t2-t1).count() << endl;
 
+  t1 = chrono::high_resolution_clock::now();
+  Page curPage;
+  t2 = chrono::high_resolution_clock::now();
+  sum += (t2-t1).count();
+  cout << "page init (ns): " << (t2-t1).count() << endl;
+  uint64_t offset;
+
+  t1 = chrono::high_resolution_clock::now();
+  Page::read(is, curPage);
+  t2 = chrono::high_resolution_clock::now();
+  sum += (t2-t1).count();
+  cout << "page read (ns): " << (t2-t1).count() << endl;
+
+  t1 = chrono::high_resolution_clock::now();
   //check if key > largest/last key on current page
   while (key > curPage.data_entry_list[curPage.counter-1].key) {
     //go to overflow
@@ -105,8 +126,16 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
       break;
     }
   }
+  t2 = chrono::high_resolution_clock::now();
+  cout << "searching loop (ns): " << (t2-t1).count() << endl;
+  sum += (t2-t1).count();
+  t1 = chrono::high_resolution_clock::now();
   //binary search to find the result
   pair<bool,uint64_t> result = curPage.find(key);
+  t2 = chrono::high_resolution_clock::now();
+  sum += (t2-t1).count();
+  cout << "binary search (ns): " << (t2-t1).count() << endl;
+  cout << "total sum: " << sum << endl;
   is.seekg(0);
   if (result.first) {
     return result;
