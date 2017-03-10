@@ -35,7 +35,6 @@ for line in content:
       primary_bucket = line.split(" ")[0] + " "
       line = primary_bucket+(" ".join([x for x in line.split(merge_keyword) if x.startswith("-> ")]))
       #print line
-      #print line
     if overflow_keyword in line:
       buckets = line.split(overflow_keyword)
       buckets = [int(x) for x in buckets if len(x)!=0]
@@ -74,15 +73,20 @@ for key in key_distribution:
 for key in entry_distribution:
   entry_distribution_plot[key-1] += 1
 
-print entry_distribution_plot[230:260]
-#hmean = np.mean(key_distribution)
-#hstd = np.std(key_distribution)
-#pdf = stats.norm.pdf(key_distribution, hmean, hstd)
-#plt.plot(key_distribution, pdf) # including h here is crucial
-#kde = stats.gaussian_kde( key_distribution )
-#dist_space = np.linspace( min(key_distribution), max(key_distribution), 100 )
+print "num pages after merge: ", sum(entry_distribution_plot)
+print "num pages before merge: ", sum(key_distribution_plot)
+print "max key after merge:", len(entry_distribution_plot)
+print "max key before merge:", len(key_distribution_plot)
+
 # plot the results
-before_merge, = plt.plot(range(0,len(key_distribution_plot)), key_distribution_plot, label="before merge")
-after_merge, = plt.plot(range(0,len(entry_distribution_plot)), entry_distribution_plot, label="after merge")
-plt.legend(handles=[after_merge, before_merge])
-plt.show()
+
+fig, ax = plt.subplots()
+ax.scatter(range(0,len(key_distribution_plot)), key_distribution_plot, color='r')
+ax.scatter(range(0,len(entry_distribution_plot)), entry_distribution_plot, color='b')
+
+#before_merge, = plt.plot(range(0,len(key_distribution_plot)), key_distribution_plot, label="before merge")
+#after_merge, = plt.plot(range(0,len(entry_distribution_plot)), entry_distribution_plot, label="after merge")
+#plt.legend([after_merge, before_merge], ['after merge', 'before merge'])
+plt.savefig(sys.argv[2], bbox_inches='tight')
+entry_distribution_plot.sort()
+print entry_distribution_plot[len(entry_distribution_plot)-21:]

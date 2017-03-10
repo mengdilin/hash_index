@@ -2,10 +2,14 @@
 #include <vector>
 #include <unordered_map>
 #include "Page.h"
+#include <stdio.h>
+
 
 class HashIndex {
   public:
     unsigned int number_buckets;
+    double total_page_read_speed = 0;
+    unsigned int total_page_read = 0;
   private:
     std::vector<Page*> primary_buckets;
 
@@ -18,15 +22,15 @@ class HashIndex {
     //parent -> overflow page
     std::unordered_map<Page*, Page*> overflow_map;
     float load_capacity;
-    static const int PAGE_SIZE = 4096;
-    //static const int PAGE_SIZE = 48;
+
 
     //static constexpr double KNUTH_NUMBER = 1054997077.39;
 
 public:
   HashIndex(float load_capacity);
   uint32_t hash(uint64_t);
-  static std::pair<bool,uint64_t> search(uint64_t, std::ifstream&);
+  std::pair<bool,uint64_t> search(uint64_t, std::ifstream&);
+  std::pair<bool,uint64_t> search(uint64_t, FILE*);
   void build_index(std::string, std::string);
   static void debugRead(std::string);
   std::vector<DataEntry> parse_idx_file(std::string path);

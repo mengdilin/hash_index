@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <chrono>
 #include <numeric>
+#include <stdio.h>
 
 using namespace std;
 /*
@@ -72,7 +73,7 @@ uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
   uint32_t bucket_num = hash(key, num_buckets);
 
   //compute the offset: index header size + bucket * page size
-  uint64_t offset = ((uint64_t)bucket_num * PAGE_SIZE) + sizeof(unsigned int);
+  uint64_t offset = ((uint64_t)bucket_num * Page::PAGE_SIZE) + sizeof(unsigned int);
 
   return offset;
 }
@@ -92,25 +93,25 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
   uint64_t primary_bucket_offset = search(key, bucket_num);
   auto t2 = chrono::high_resolution_clock::now();
   auto sum = (t2-t1).count();
-  cout << "compute offset (ns): " << (t2-t1).count() << endl;
+  //cout << "compute offset (ns): " << (t2-t1).count() << endl;
   t1 = chrono::high_resolution_clock::now();
   is.seekg(0);
   is.seekg(primary_bucket_offset);
   t2 = chrono::high_resolution_clock::now();
-  cout << "seek to offset (ns): " << (t2-t1).count() << endl;
+  //cout << "seek to offset (ns): " << (t2-t1).count() << endl;
 
   t1 = chrono::high_resolution_clock::now();
   Page curPage;
   t2 = chrono::high_resolution_clock::now();
   sum += (t2-t1).count();
-  cout << "page init (ns): " << (t2-t1).count() << endl;
+  //cout << "page init (ns): " << (t2-t1).count() << endl;
   uint64_t offset;
 
   t1 = chrono::high_resolution_clock::now();
   Page::read(is, curPage);
   t2 = chrono::high_resolution_clock::now();
   sum += (t2-t1).count();
-  cout << "page read (ns): " << (t2-t1).count() << endl;
+  //cout << "page read (ns): " << (t2-t1).count() << endl;
 
   t1 = chrono::high_resolution_clock::now();
   //check if key > largest/last key on current page
@@ -119,7 +120,7 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
     if (curPage.hasOverflow()) {
       //reset pointer
       is.seekg(0);
-      offset = sizeof(unsigned int) + ((uint64_t)curPage.overflow_addr) * PAGE_SIZE;
+      offset = sizeof(unsigned int) + ((uint64_t)curPage.overflow_addr-1) * Page::PAGE_SIZE;
       is.seekg(offset);
       Page::read(is, curPage);
     } else {
@@ -127,15 +128,17 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
     }
   }
   t2 = chrono::high_resolution_clock::now();
-  cout << "searching loop (ns): " << (t2-t1).count() << endl;
+  //cout << "searching loop (ns): " << (t2-t1).count() << endl;
   sum += (t2-t1).count();
   t1 = chrono::high_resolution_clock::now();
   //binary search to find the result
   pair<bool,uint64_t> result = curPage.find(key);
   t2 = chrono::high_resolution_clock::now();
   sum += (t2-t1).count();
-  cout << "binary search (ns): " << (t2-t1).count() << endl;
-  cout << "total sum: " << sum << endl;
+  //cout << "binary search (ns): " << (t2-t1).count() << endl;
+  //cout << "total sum: " << sum << endl;
+  total_page_read_speed += sum;
+  total_page_read += 1;
   is.seekg(0);
   if (result.first) {
     return result;
@@ -147,6 +150,69 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
 
 }
 
+pair<bool,uint64_t> HashIndex::search(uint64_t key, FILE* is) {
+  unsigned int bucket_num;
+  fread((char *)&bucket_num, sizeof(unsigned int), 1, is);
+    //test performance on a pre-allocated vector
+  auto t1 = chrono::high_resolution_clock::now();
+  uint64_t primary_bucket_offset = search(key, bucket_num);
+  auto t2 = chrono::high_resolution_clock::now();
+  auto sum = (t2-t1).count();
+  //cout << "compute offset (ns): " << (t2-t1).count() << endl;
+  t1 = chrono::high_resolution_clock::now();
+  fseek(is, primary_bucket_offset, SEEK_SET);
+  t2 = chrono::high_resolution_clock::now();
+  //cout << "seek to offset (ns): " << (t2-t1).count() << endl;
+
+  t1 = chrono::high_resolution_clock::now();
+  Page curPage;
+  t2 = chrono::high_resolution_clock::now();
+  sum += (t2-t1).count();
+  //cout << "page init (ns): " << (t2-t1).count() << endl;
+  uint64_t offset;
+
+  t1 = chrono::high_resolution_clock::now();
+  Page::read(is, curPage);
+  t2 = chrono::high_resolution_clock::now();
+  sum += (t2-t1).count();
+  //cout << "page read (ns): " << (t2-t1).count() << endl;
+
+  t1 = chrono::high_resolution_clock::now();
+  //check if key > largest/last key on current page
+  while (key > curPage.data_entry_list[curPage.counter-1].key) {
+    //go to overflow
+    if (curPage.hasOverflow()) {
+      //reset pointer
+
+      offset = sizeof(unsigned int) + ((uint64_t)curPage.overflow_addr-1) * Page::PAGE_SIZE;
+      fseek(is, offset, SEEK_SET);
+      Page::read(is, curPage);
+    } else {
+      break;
+    }
+  }
+  t2 = chrono::high_resolution_clock::now();
+  //cout << "searching loop (ns): " << (t2-t1).count() << endl;
+  sum += (t2-t1).count();
+  t1 = chrono::high_resolution_clock::now();
+  //binary search to find the result
+  pair<bool,uint64_t> result = curPage.find(key);
+  t2 = chrono::high_resolution_clock::now();
+  sum += (t2-t1).count();
+  //cout << "binary search (ns): " << (t2-t1).count() << endl;
+  //cout << "total sum: " << sum << endl;
+  total_page_read_speed += sum;
+  total_page_read += 1;
+  fseek(is, 0, SEEK_SET);
+  if (result.first) {
+    return result;
+  }
+  cout << "not found" << endl;
+  // not found
+
+  return result;
+
+}
 
 /*
  * checks if current page has overflow
@@ -243,7 +309,7 @@ int HashIndex::merge(vector<Page*>& merge_primary_buckets, vector<Page*>& overfl
         continue;
       } else {
         Page* parent = iterator->second;
-        parent->setOverflow((uint64_t)(this->number_buckets+overflow_count));
+        parent->setOverflow((uint64_t)(this->number_buckets+1+overflow_count));
         overflow_count++;
       }
   }
@@ -322,6 +388,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
     } else {
       key_distribution[hash_key]++;
       sorted_primary_buckets.at(hash_key).push_back(entry);
+
     }
   }
 
@@ -336,7 +403,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
     if (bucket.size() <= Page::MAX_ENTRIES) {
       //no overflow page at current bucket
       Page *page = new Page(bucket);
-      page->hash = i;
+      page->hash = i+1;
       primary_buckets.at(i) = page;
 
       continue;
@@ -345,7 +412,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
       //has overflow pages
       vector<DataEntry> entries(bucket.begin(), bucket.begin()+Page::MAX_ENTRIES);
       Page *page = new Page(entries);
-      page->hash = i;
+      page->hash = i+1;
       primary_buckets.at(i) = page;
 
     }
@@ -430,7 +497,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
         //cout << page->overflow_addr << endl;
         //cout << primary_buckets.size() << endl;
         //overflow has been merged with primary buckets
-        page = primary_buckets.at((uint64_t)page->overflow_addr);
+        page = primary_buckets.at((uint64_t)page->overflow_addr-1);
         cout << " merged -> " << (uint32_t)page->counter;
         break;
       } else {
