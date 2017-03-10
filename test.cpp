@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
   cout << "running with capacity: " << load_capacity << endl;
   HashIndex index(load_capacity);
 
-  uint64_t test_key = 1708146715154;
+  uint64_t test_key = 1695745814030836708;
   string indexFileName = "indexFile";
 
   if (argc >= 3) {
@@ -35,25 +35,19 @@ int main(int argc, char** argv) {
   }
 
 
-  index.build_index(argv[1], indexFileName);
+  //index.build_index(argv[1], indexFileName);
 
 
   //initialize the index stream for probing
-  /*
- ifstream readIndex (indexFileName, ifstream::binary);
-  pair<bool,uint64_t> result = index.search(test_key, readIndex);
-  if (result.first) {
-    cout << "found rid: " << result.second << endl;
-  }
-  */
-
-  /* unit test: make sure all keys read in can be found
-  * in the index file
-  */
-  vector<DataEntry> test_data = index.parse_idx_file(argv[1]);
+vector<DataEntry> test_data = index.parse_idx_file(argv[1]);
 
 
   FILE *c_read_index = fopen(indexFileName.c_str(),"rb");
+pair<bool,uint64_t> t_result = index.search(test_key, c_read_index);
+    if (not t_result.first) {
+    cout << "not found key: " << test_key << endl;
+    }
+/* 
   for (int i = 0; i < test_data.size(); i++) {
     DataEntry test = test_data[i];
     //pair<bool,uint64_t> result = index.search(test.key, readIndex);
@@ -68,9 +62,7 @@ int main(int argc, char** argv) {
   }
   cout << "size: " << test_data.size() <<endl;
   cout << "avg page read speed: " << index.total_page_read_speed/index.total_page_read << endl;
-
-
-
+*/
 
     return 0;
 }
