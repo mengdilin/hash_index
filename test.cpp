@@ -5,13 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
-#include "BTree.h"
+#include "BTreeIndex.h"
 using namespace std;
 
 int main(int argc, char** argv) {
-    Page page;
-    BTree btree;
-    vector<DataEntry> entry = btree.parse_idx_file(argv[1]);
-
+    BTreePage page;
+    BTreeIndex btree;
+    vector<DataEntry> entries = btree.parse_idx_file(argv[1]);
+    btree.build_tree(entries);
+    btree.debugPrint();
     return 0;
 }

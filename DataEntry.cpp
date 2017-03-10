@@ -7,13 +7,10 @@ using namespace std;
 
 DataEntry::DataEntry() {
   memset(&key, 0, sizeof(key));
-  memset(&rid, 0, sizeof(rid));
+    memset(&rid, 0, sizeof(rid));
+
 }
 DataEntry::DataEntry(uint64_t key, uint64_t rid) : key(key), rid(rid) {}
-
-bool DataEntry::compare(const DataEntry &a, const DataEntry &b) {
-    return a.key < b.key;
-}
 
 ofstream& DataEntry::flush(ofstream& indexFile) {
 
@@ -31,7 +28,7 @@ ofstream& DataEntry::flush(ofstream& indexFile) {
 }
 
 DataEntry DataEntry::read(ifstream& indexFile) {
-  DataEntry dataEntry(0, 0);
+  DataEntry dataEntry(0,0);
   //uint64_t* rid = NULL;
   char key;
   indexFile >> key;
@@ -40,7 +37,8 @@ DataEntry DataEntry::read(ifstream& indexFile) {
   //indexFile.read((char *) &a, sizeof(unsigned long));
   //cout << key << endl;
   indexFile.read((char *)&dataEntry.key, sizeof(uint64_t));
-  indexFile.read((char *)&dataEntry.rid, sizeof(uint64_t));
+    indexFile.read((char *)&dataEntry.rid, sizeof(uint64_t));
+
   //dataEntry.key = *(key);
   //dataEntry.rid = *(rid);
 
