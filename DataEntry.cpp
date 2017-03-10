@@ -10,6 +10,11 @@ DataEntry::DataEntry() {
     memset(&rid, 0, sizeof(rid));
 
 }
+
+bool DataEntry::compare(const DataEntry &a, const DataEntry &b) {
+    return a.key < b.key;
+}
+
 DataEntry::DataEntry(uint64_t key, uint64_t rid) : key(key), rid(rid) {}
 
 ofstream& DataEntry::flush(ofstream& indexFile) {

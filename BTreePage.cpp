@@ -31,13 +31,13 @@ pair<bool,uint64_t> BTreePage::find(uint64_t key) {
   DataEntry look_for(key, 0);
 
   // lower_bound implements binary search
-  DataEntry* result = lower_bound(
+  auto result = lower_bound(
     keys.begin(),
     keys.end(),
     look_for,
     DataEntry::compare);
   pair <bool,uint64_t> find_result;
-  if (result == data_entry_list + counter) {
+  if (result == keys.end()) {
     // did not find key in Page
     find_result = make_pair(false, 0);
   } else {

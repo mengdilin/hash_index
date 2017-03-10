@@ -23,6 +23,7 @@ class BTreePage {
 
 public:
   BTreePage();
+  pair<bool,uint64_t> find(uint64_t key);
   void setParent(BTreePage*);
   void addKey(DataEntry);
   void addChild(BTreePage*);

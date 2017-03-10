@@ -18,14 +18,15 @@ BTreeIndex::BTreeIndex() {
 }
 
 void BTreeIndex::debugPrint() {
+  vector<BTreePage*> flattened_tree;
   for (int i=0; i < tree.size(); i++) {
     int sum = 0;
     for (int j = 0; j < tree.at(i).size(); j++) {
       vector<DataEntry> keys = tree.at(i).at(j)->keys;
       //cout << keys.size() << '\t';
-
+      flattened_tree.push_back(tree.at(i).at(j));
       for (int k=0; k < keys.size(); k++) {
-        cout << keys.at(k).key << '\t';
+        cout << keys.at(k).key << '\n';
       }
       sum += keys.size();
     }
@@ -35,7 +36,139 @@ void BTreeIndex::debugPrint() {
     cout << "max has: " << pow(BTreePage::fan_out, i)*BTreePage::MAX_KEY_PER_PAGE << endl;
   }
 
+
 }
+
+vector<BTreePage*> BTreeIndex::getFlattenTree(vector<vector<BTreePage*>> &tree) {
+  vector<BTreePage*> flattened_tree;
+
+  for (int i=0; i < tree.size(); i++) {
+    for (int j = 0; j < tree.at(i).size(); j++) {
+      flattened_tree.push_back(tree.at(i).at(j));
+    }
+  }
+  return flattened_tree;
+}
+
+vector<int> BTreeIndex::getFirstPageOfLevels(int level) {
+  vector<int> result;
+  result.push_back(0);
+  result.push_back(1);
+  for (int i = 2; i <= level; level++) {
+    result.push_back(result.at(i-1) + pow(BTreePage::fan_out, i-1));
+  }
+  return result;
+}
+
+int getNumSiblingsAfterMe(
+  int my_level,
+  int my_page_num,
+  vector<int>& first_page_nums,
+  vector<int>& total_page_per_level) {
+  return total_page_per_level[my_level] - (my_page_num - first_page_nums[my_level]);
+}
+
+int getNumChildrenBeforeMe(
+  int parent_level,
+  int parent_index_to_me,
+  int parent_page_num,
+  vector<int>& first_page_nums,
+  vector<int>& total_page_per_level) {
+  int siblings_before_parent = getNumSiblingsAfterMe(
+    parent_level,
+    parent_page_num,
+    first_page_nums,
+    total_page_per_level);
+  return (siblings_before_parent+parent_index_to_me)*BTreePage::fan_out;
+}
+
+int getPageNum(
+  int parent_level,
+  int parent_index_to_me,
+  int parent_page_num,
+  vector<int>& first_page_nums,
+  vector<int>& total_page_per_level) {
+  int num_children_before_me = getNumChildrenBeforeMe(
+    parent_level,
+    parent_index_to_me,
+    parent_page_num,
+    first_page_nums,
+    total_page_per_level);
+  int num_parents_after_my_parent = getNumSiblingsAfterMe(
+    parent_level,
+    parent_page_num,
+    first_page_nums,
+    total_page_per_level);
+  cout << "num children before me: " << num_children_before_me << endl;
+  cout << "num parents after my parent: " << num_parents_after_my_parent << endl;
+  cout << "parent_index_to_me: " << parent_index_to_me << endl;
+  return num_children_before_me+num_parents_after_my_parent+parent_index_to_me; //first page starts at 0
+}
+
+int BTreeIndex::levelProbe(uint64_t key, vector<DataEntry>& level) {
+
+  int count = level.size();
+   while (count>0)
+  {
+    it = first; step=count/2; advance (it,step);
+    if (*it<val) {                 // or: if (comp(*it,val)), for version (2)
+      first=++it;
+      count-=step+1;
+    }
+    else count=step;
+  }
+  return first;
+}
+ pair<bool,uint64_t> BTreeIndex::probe(uint64_t key, vector<BTreePage*>& flattened_tree) {
+   DataEntry look_for(key, 0);
+   BTreePage* root = flattened_tree.at(0);
+   int max_level_num = 3-1;
+   //find the first pos that is > look_for
+   int level = 0;
+   auto result = upper_bound(
+    root->keys.begin(),
+    root->keys.end(),
+    look_for,
+    DataEntry::compare);
+   cout << "finished upper_bound" << endl;
+
+   if (result == root->keys.end()) {
+    cout << "everything is smaller than me: " << result-(root->keys.begin()) << endl;
+   }
+   result = result - 1; //find the last pos that is <= look for
+
+   if (result == root->keys.begin()) {
+    cout << "everything is bigger than me: " << result-(root->keys.begin()) << endl;
+   }
+   vector<int> first_page_nums;
+   int level_built = 10;
+    first_page_nums.push_back(0);
+    first_page_nums.push_back(1);
+
+    for (int i = 2; i <= level_built; i++) {
+      first_page_nums.push_back(first_page_nums.at(i-1) + pow(BTreePage::fan_out, i-1));
+    }
+    cout << "finished building first_page_nums " << endl;
+    vector<int> total_page_per_level;
+    for (int i = 0; i < level_built; i++) {
+      total_page_per_level.push_back(pow(BTreePage::fan_out, i));
+    }
+    cout << "finished building total_page_per_level" << endl;
+
+    int num = getPageNum(
+      level,
+      result - root->keys.begin(),
+      0,
+      first_page_nums,
+      total_page_per_level);
+    cout << "for key: " << key << " we found: " << num << " on level: " << ++level<< endl;
+    if (level != max_level_num) {//not leaf level
+      BTreePage* parent = flattened_tree.at(num);
+    }
+    pair <bool,uint64_t> find_result;
+    return find_result;
+ }
+
 
 void BTreeIndex::addNodeToTree(int level, BTreePage* node) {
    // cout << "tree size:" << tree.size() << endl;

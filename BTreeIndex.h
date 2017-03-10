@@ -21,6 +21,9 @@ public:
   void build_tree(vector<DataEntry>);
   void debugPrint();
   void addNodeToTree(int, BTreePage*);
+  pair<bool,uint64_t> probe(uint64_t, vector<BTreePage*>&);
+  vector<int> getFirstPageOfLevels(int);
+  vector<BTreePage*> getFlattenTree(vector<vector<BTreePage*>>&);
   ~BTreeIndex();
 
 };
