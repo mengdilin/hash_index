@@ -1,7 +1,7 @@
 #include "BTreeIndex.h"
 #include <math.h>
 #include <algorithm>
-
+#include <climits>
 BTreeIndex::~BTreeIndex() {
 
 }
@@ -11,7 +11,10 @@ BTreeIndex::BTreeIndex() {
 
   int i = 0;
   while (i < max_level) {
-    keys_per_level.push_back(pow(BTreePage::fan_out, i)*BTreePage::MAX_KEY_PER_PAGE);
+    int num_nodes = pow(BTreePage::fan_out, i);
+    keys_per_level.push_back(num_nodes*BTreePage::MAX_KEY_PER_PAGE);
+    fanout_per_level.push_back(num_nodes*BTreePage::fan_out);
+
     i++;
     cout << "level with keys: " << keys_per_level[keys_per_level.size()-1] << endl;
   }
@@ -39,12 +42,16 @@ void BTreeIndex::debugPrint() {
 
 }
 
-vector<BTreePage*> BTreeIndex::getFlattenTree(vector<vector<BTreePage*>> &tree) {
-  vector<BTreePage*> flattened_tree;
+vector<vector<DataEntry>>  BTreeIndex::getFlattenTree(vector<vector<BTreePage*>> &tree) {
+  vector<vector<DataEntry>> flattened_tree;
 
   for (int i=0; i < tree.size(); i++) {
+    vector<DataEntry> level;
+    flattened_tree.push_back(level);
     for (int j = 0; j < tree.at(i).size(); j++) {
-      flattened_tree.push_back(tree.at(i).at(j));
+      for (int k = 0; k < (tree.at(i).at(j)->keys).size(); k++) {
+        flattened_tree.at(i).push_back((tree.at(i).at(j)->keys).at(k));
+      }
     }
   }
   return flattened_tree;
@@ -65,7 +72,15 @@ int getNumSiblingsAfterMe(
   int my_page_num,
   vector<int>& first_page_nums,
   vector<int>& total_page_per_level) {
-  return total_page_per_level[my_level] - (my_page_num - first_page_nums[my_level]);
+  return total_page_per_level[my_level] - my_page_num;
+}
+
+int getNumSiblingsBeforeMe(
+  int my_level,
+  int my_page_num,
+  vector<int>& first_page_nums,
+  vector<int>& total_page_per_level) {
+  return my_page_num - first_page_nums[my_level];
 }
 
 int getNumChildrenBeforeMe(
@@ -74,11 +89,12 @@ int getNumChildrenBeforeMe(
   int parent_page_num,
   vector<int>& first_page_nums,
   vector<int>& total_page_per_level) {
-  int siblings_before_parent = getNumSiblingsAfterMe(
+  int siblings_before_parent = getNumSiblingsBeforeMe(
     parent_level,
     parent_page_num,
     first_page_nums,
     total_page_per_level);
+  cout << "sibilings before parent: " << siblings_before_parent << endl;
   return (siblings_before_parent+parent_index_to_me)*BTreePage::fan_out;
 }
 
@@ -104,42 +120,114 @@ int getPageNum(
   cout << "parent_index_to_me: " << parent_index_to_me << endl;
   return num_children_before_me+num_parents_after_my_parent+parent_index_to_me; //first page starts at 0
 }
+/* Binary search routine, will return the range of the probe within a level (as though this is the only
+ * level in the entire tree); additional calcs done outside of this routine to get the actual range */
+int binarysearch(vector<DataEntry>& tree, uint64_t p, int start, int fanout) {
+  int i; int l; int r; int res;
+  l = start; r = start+fanout-1;
+  while (l <= r) {
 
-int BTreeIndex::levelProbe(uint64_t key, vector<DataEntry>& level) {
-
-  int count = level.size();
-   while (count>0)
-  {
-    it = first; step=count/2; advance (it,step);
-    if (*it<val) {                 // or: if (comp(*it,val)), for version (2)
-      first=++it;
-      count-=step+1;
+    i = (l+r)/2;
+    if (tree[i].key == p) { // Branch right on equality
+      // Check for duplicate INT_MAX keys in front of this one, follow the first pointer
+      while (i-1 >= 0 && tree[i-1].key == INT_MAX) {
+        i--;
+      }
+      return i+1;
+    } else {
+        if (p < tree[i].key) {
+        r = i-1;
+      } else {
+        l = i+1;
+      }
     }
-    else count=step;
+
   }
-  return first;
+  // Element not found
+  if (p <= tree[i].key) {
+    while (i-1 >= 0 && tree[i-1].key == INT_MAX) {
+      i--;
+    }
+    res = i;
+  } else {
+    while (i-1 >= 0 && tree[i-1].key == INT_MAX) {
+      i--;
+    }
+    res = i+1;
+  }
+  return res;
 }
- pair<bool,uint64_t> BTreeIndex::probe(uint64_t key, vector<BTreePage*>& flattened_tree) {
+
+
+/* Each probe goes through this rountine, params are probe, capacity of each level, max number of levels,
+ * fanout of each level, this routine returns the correct range of the probe (n+1 ranges given n keys in
+ * the tree) */
+int binary_search(vector<vector<DataEntry>>& tree, uint64_t p, int maxlvl, vector<int>& fanout) {
+  int n; int offset[maxlvl]; int ranges[maxlvl];
+  for (n = 0; n < maxlvl; n++) {
+    offset[n] = 0;
+  }
+  for (n = 0; n < maxlvl; n++) {
+    int r;
+    if (n == 0) { // Root
+      r = binarysearch(tree[n], p, 0, fanout[n]-1);
+      if (n == maxlvl-1) {
+        return r; // For single-level tree, range calculation straightforward
+      } else { // Determine offsets for the next level
+        offset[0] = r;
+        offset[1] = offset[0]*(fanout[1]-1);
+      }
+    } else {
+      /* Use the level's offset (calculated by results of binary search in the parent level)
+       * to figure out which node to conduct binary search on */
+      int start;
+      start = offset[n];
+      r = binarysearch(tree[n], p, start, fanout[n]-1);
+      ranges[n] = r;
+      if (n == maxlvl-1) { // We're done, have to find the range
+        // Use the offset of the nodes in preceding levels to figure out how many to skip
+        int keysInFront;
+          int lev;
+        if (r < fanout[n]-1) {
+          return r;
+        } else {
+          keysInFront = 0;
+          for (lev = 0; lev < maxlvl; lev++) {
+            if (lev == 0){
+              keysInFront += offset[0];
+            } else {
+              keysInFront += ranges[lev];
+            }
+          }
+          return keysInFront;
+        }
+      } else {
+        /* Based on results of this level's binary search, figure out what offset to use
+         * for the next level */
+        int nodesInFront;
+        nodesInFront = start/(fanout[n]-1);
+        int pointersInFront;
+        pointersInFront = (r - start);
+        offset[n+1] = fanout[n]*nodesInFront*(fanout[n+1]-1) + pointersInFront*(fanout[n+1]-1);
+      }
+    }
+  }
+  return p;
+}
+
+
+ pair<bool,uint64_t> BTreeIndex::probe(uint64_t key, vector<vector<DataEntry>>& flattened_tree) {
    DataEntry look_for(key, 0);
-   BTreePage* root = flattened_tree.at(0);
    int max_level_num = 3-1;
    //find the first pos that is > look_for
    int level = 0;
-   auto result = upper_bound(
-    root->keys.begin(),
-    root->keys.end(),
-    look_for,
-    DataEntry::compare);
-   cout << "finished upper_bound" << endl;
+   cout << "starting to search" << endl;
+   int result = binary_search(flattened_tree, key, max_level_num, fanout_per_level);
+   cout << "found: " << result << endl;
+   //int result = binarysearch(root->keys, key, BTreePage::fan_out);
+   /*
+   cout << "got result: " << result << endl;
 
-   if (result == root->keys.end()) {
-    cout << "everything is smaller than me: " << result-(root->keys.begin()) << endl;
-   }
-   result = result - 1; //find the last pos that is <= look for
-
-   if (result == root->keys.begin()) {
-    cout << "everything is bigger than me: " << result-(root->keys.begin()) << endl;
-   }
    vector<int> first_page_nums;
    int level_built = 10;
     first_page_nums.push_back(0);
@@ -157,7 +245,7 @@ int BTreeIndex::levelProbe(uint64_t key, vector<DataEntry>& level) {
 
     int num = getPageNum(
       level,
-      result - root->keys.begin(),
+      result,
       0,
       first_page_nums,
       total_page_per_level);
@@ -165,6 +253,9 @@ int BTreeIndex::levelProbe(uint64_t key, vector<DataEntry>& level) {
     if (level != max_level_num) {//not leaf level
       BTreePage* parent = flattened_tree.at(num);
     }
+    */
+
+
     pair <bool,uint64_t> find_result;
     return find_result;
  }

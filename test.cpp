@@ -15,7 +15,9 @@ int main(int argc, char** argv) {
     vector<DataEntry> entries = btree.parse_idx_file(argv[1]);
     btree.build_tree(entries);
     btree.debugPrint();
-    vector<BTreePage*> flattened_tree = btree.getFlattenTree(btree.tree);
+
+    vector<vector<DataEntry>> flattened_tree = btree.getFlattenTree(btree.tree);
+    cout << "finished flatten" << endl;
     uint64_t test;
     std::istringstream ss(argv[2]);
     if (!(ss >> test))
