@@ -20,6 +20,8 @@ using namespace std;
 HashIndex::HashIndex(float load_capacity) {
   this->load_capacity = load_capacity;
   this->number_buckets = 0;
+  cout << "page size: " << Page::PAGE_SIZE << endl;
+  cout << "page entries: " << Page::MAX_ENTRIES << endl;
 }
 
 /*
@@ -45,21 +47,13 @@ uint32_t HashIndex::hash(uint64_t key) {
  * has some debug print in it.
  */
 uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
-    bool debugprint = false;
-    if (key == 1708146715154) {
-      debugprint = true;
-    }
     key ^= key >> 33;
     key *= 0xff51afd7ed558ccdULL;
     key ^= key >> 33;
     key *= 0xc4ceb9fe1a85ec53ULL;
     key ^= key >> 33;
-    //key = key >> ((64 - (int)log2(num_buckets)) - 1);
-    //key = key * UINT32_C(2654435761) % num_buckets;;
     key = key % num_buckets;
 
-    if (debugprint)
-      cout << "hash bucket: " << key << endl;
 
     return key;
 }
@@ -89,31 +83,15 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
   unsigned int bucket_num;
   is.read((char *)&bucket_num, sizeof(unsigned int));
     //test performance on a pre-allocated vector
-  auto t1 = chrono::high_resolution_clock::now();
   uint64_t primary_bucket_offset = search(key, bucket_num);
-  auto t2 = chrono::high_resolution_clock::now();
-  auto sum = (t2-t1).count();
-  //cout << "compute offset (ns): " << (t2-t1).count() << endl;
-  t1 = chrono::high_resolution_clock::now();
   is.seekg(0);
   is.seekg(primary_bucket_offset);
-  t2 = chrono::high_resolution_clock::now();
-  //cout << "seek to offset (ns): " << (t2-t1).count() << endl;
 
-  t1 = chrono::high_resolution_clock::now();
   Page curPage;
-  t2 = chrono::high_resolution_clock::now();
-  sum += (t2-t1).count();
-  //cout << "page init (ns): " << (t2-t1).count() << endl;
   uint64_t offset;
 
-  t1 = chrono::high_resolution_clock::now();
   Page::read(is, curPage);
-  t2 = chrono::high_resolution_clock::now();
-  sum += (t2-t1).count();
-  //cout << "page read (ns): " << (t2-t1).count() << endl;
 
-  t1 = chrono::high_resolution_clock::now();
   //check if key > largest/last key on current page
   while (key > curPage.data_entry_list[curPage.counter-1].key) {
     //go to overflow
@@ -127,18 +105,8 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
       break;
     }
   }
-  t2 = chrono::high_resolution_clock::now();
-  //cout << "searching loop (ns): " << (t2-t1).count() << endl;
-  sum += (t2-t1).count();
-  t1 = chrono::high_resolution_clock::now();
   //binary search to find the result
   pair<bool,uint64_t> result = curPage.find(key);
-  t2 = chrono::high_resolution_clock::now();
-  sum += (t2-t1).count();
-  //cout << "binary search (ns): " << (t2-t1).count() << endl;
-  //cout << "total sum: " << sum << endl;
-  total_page_read_speed += sum;
-  total_page_read += 1;
   is.seekg(0);
   if (result.first) {
     return result;
@@ -456,14 +424,16 @@ void HashIndex::build_index(string path, string indexFilePath) {
     [](const Page* a, const Page* b) -> bool {
       return a->counter > b->counter;
     });
-
+/*
   cout << "-------------statistic before merge-----------------" << endl;
   cout << "number of primary buckets: " << merge_primary_buckets.size() << endl;
   cout << "number of overflow pages in map: " << overflow_map.size() << endl;
   cout << "number of overflow pages: " << overflow_pages.size() << endl;
   cout << "---------------end statistic-------------------" << endl;
+*/
   //merge step
   int overflow_merge_start = merge(merge_primary_buckets, overflow_pages);
+/*
   cout << "after number of overflow pages in map: " << overflow_map.size() << endl;
 
   cout << "done" <<endl;
@@ -473,6 +443,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
     cout << "bucket: " << key_distribution.at(i) << endl;
   }
   cout << "---------------end key distribution---------------" << endl;
+*/
   int overflow_count = 0;
 
 
@@ -484,39 +455,34 @@ void HashIndex::build_index(string path, string indexFilePath) {
   //debug print
   for (int i = 0; i < this->number_buckets; i++) {
     Page* page = primary_buckets.at(i);
-    //cout << "bucket: " << i << " with count: " << key_distribution.at(i) << endl;
 
     counter += page->counter;
-    cout << "primary bucket count: " << (uint32_t)page->counter;
-    //auto result = overflow_map.find(page);
+//    cout << "primary bucket count: " << (uint32_t)page->counter;
 
 
     while (page->hasOverflow()) {
       auto iterator = overflow_map.find(page);
       if (iterator == overflow_map.end()) {
-        //cout << page->overflow_addr << endl;
-        //cout << primary_buckets.size() << endl;
         //overflow has been merged with primary buckets
         page = primary_buckets.at((uint64_t)page->overflow_addr-1);
-        cout << " merged -> " << (uint32_t)page->counter;
+        //cout << " merged -> " << (uint32_t)page->counter;
         break;
       } else {
         page = iterator->second;
-        cout << " -> " << (uint32_t)page->counter;
+        //cout << " -> " << (uint32_t)page->counter;
       }
 
 
-      //counter += page->counter;
 
     }
 
-    cout << endl;
+//    cout << endl;
 
     primary_buckets.at(i)->flush(indexFile);
   }
 
-  cout << "---------overflow-----------"<<endl;
-  cout << "overflow after merge: " << overflow_map.size() << endl;
+//  cout << "---------overflow-----------"<<endl;
+//  cout << "overflow after merge: " << overflow_map.size() << endl;
 
 
   /*
@@ -545,7 +511,7 @@ void HashIndex::build_index(string path, string indexFilePath) {
       }
   }
   indexFile.close();
-  cout << "================end=============" << endl;
+//  cout << "================end=============" << endl;
 
 }
 

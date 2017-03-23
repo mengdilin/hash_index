@@ -9,9 +9,11 @@ class Page {
   public:
     // (total buckets) + overflow page index starting from 0
     uint64_t overflow_addr;
-    const static int MAX_ENTRIES = 255;
+    //const static int MAX_ENTRIES = 255;
     //const static int MAX_ENTRIES = 2;
-    static const int PAGE_SIZE = 4096;
+    static const int PAGE_SIZE = 512;
+    static constexpr int MAX_ENTRIES = (Page::PAGE_SIZE-2*sizeof(uint64_t))/(2*sizeof(uint64_t));
+
     //static const int PAGE_SIZE = 48;
     uint32_t counter;
     DataEntry data_entry_list[MAX_ENTRIES];
