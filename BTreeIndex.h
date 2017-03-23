@@ -12,19 +12,21 @@ class BTreeIndex {
   public:
     BTreePage root;
     vector<vector<BTreePage*>> tree;
-    vector<int> keys_per_level;
-    vector<int> fanout_per_level;
+    vector<uint64_t> keys_per_level;
+    vector<uint64_t> fanout_per_level;
     unsigned int max_level = 19; //arbitrarily set
 
 public:
   BTreeIndex();
   vector<DataEntry> parse_idx_file(string);
   void build_tree(vector<DataEntry>);
+  void setPageOffset();
   void debugPrint();
+  void BfsDebugPrint();
+  void debugPrint(BTreePage*);
   void addNodeToTree(int, BTreePage*);
-  pair<bool,uint64_t> probe(uint64_t, vector<vector<DataEntry>>&);
-  vector<int> getFirstPageOfLevels(int);
-  vector<vector<DataEntry>> getFlattenTree(vector<vector<BTreePage*>>&);
+  void probe(uint64_t key, vector<BTreePage*> stream);
+  vector<BTreePage*> get_simulated_stream();
   ~BTreeIndex();
 
 };

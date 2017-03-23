@@ -8,15 +8,19 @@ using namespace std;
 
 class BTreePage {
   public:
-    constexpr static unsigned int PAGE_SIZE = 40;
+    constexpr static unsigned int PAGE_SIZE = 128;
 
-    constexpr static unsigned int MAX_KEY_PER_PAGE = (PAGE_SIZE*1.0/(sizeof(uint64_t))-1)/2.0;
+    //page_size/16 -1 (1 for counter + extra rid)
+    constexpr static unsigned int MAX_KEY_PER_PAGE = PAGE_SIZE*1.0/(2*sizeof(uint64_t))-1;
     constexpr static unsigned int fan_out = MAX_KEY_PER_PAGE+1;
     //const static unsigned int PAGE_SIZE = 4096;
+    uint64_t pageNum = 0;
+    int numChildRefs = 0;
     vector<BTreePage*> children;
-    vector<DataEntry> keys;
+    vector<uint64_t> keys;
+    vector<uint64_t> rids;
     BTreePage* parent;
-    unsigned int counter = 0;
+    uint64_t counter = 0;
     unsigned int level = -1;
 
     //static constexpr double KNUTH_NUMBER = 1054997077.39;
@@ -25,7 +29,7 @@ public:
   BTreePage();
   pair<bool,uint64_t> find(uint64_t key);
   void setParent(BTreePage*);
-  void addKey(DataEntry);
+  void addKey(uint64_t key);
   void addChild(BTreePage*);
   bool isFull();
   ~BTreePage();

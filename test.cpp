@@ -14,14 +14,11 @@ int main(int argc, char** argv) {
     BTreeIndex btree;
     vector<DataEntry> entries = btree.parse_idx_file(argv[1]);
     btree.build_tree(entries);
-    btree.debugPrint();
+    //btree.BfsDebugPrint();
+    for (int i = 0; i < 1000; i++){
+      cout << "key: " << i << endl;
+      btree.probe(i,btree.get_simulated_stream());
+    }
 
-    vector<vector<DataEntry>> flattened_tree = btree.getFlattenTree(btree.tree);
-    cout << "finished flatten" << endl;
-    uint64_t test;
-    std::istringstream ss(argv[2]);
-    if (!(ss >> test))
-     std::cout << "failed" << std::endl;
-    btree.probe(test, flattened_tree);
     return 0;
 }

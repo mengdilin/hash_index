@@ -28,21 +28,29 @@ Iter binary_find(Iter begin, Iter end, T val)
 }
 
 pair<bool,uint64_t> BTreePage::find(uint64_t key) {
-  DataEntry look_for(key, 0);
 
   // lower_bound implements binary search
   auto result = lower_bound(
     keys.begin(),
     keys.end(),
-    look_for,
-    DataEntry::compare);
+    key);
   pair <bool,uint64_t> find_result;
   if (result == keys.end()) {
     // did not find key in Page
-    find_result = make_pair(false, 0);
+    find_result = make_pair(true, rids.at(rids.size()-1));
   } else {
-    //cout << "prev: " << (result-1)->rid << endl;
-    find_result = make_pair(true, result->rid);
+    /*
+    cout << "found index: " << result-keys.begin() << endl;
+    cout << "key for that index: " << keys.at((result-keys.begin())) << endl;
+    cout << "rid size: " << rids.size() << endl;
+    cout << "found rid: " << rids.at(result-keys.begin()) << endl;
+
+    for (int i = 0; i < keys.size(); i++) {
+      cout << keys.at(i) << " \t";
+    }
+    cout << endl;
+    */
+    find_result = make_pair(true,  rids.at(result-keys.begin()));
   }
 
   return find_result;
@@ -53,7 +61,7 @@ void BTreePage::setParent(BTreePage* p) {
   this->parent = p;
 }
 
-void BTreePage::addKey(DataEntry key) {
+void BTreePage::addKey(uint64_t key) {
   assert(keys.size() < MAX_KEY_PER_PAGE);
   keys.push_back(key);
 }
