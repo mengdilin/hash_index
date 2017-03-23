@@ -4,6 +4,7 @@
 #include <climits>
 #include <queue>
 #include <cassert>
+#include <fstream>
 
 BTreeIndex::~BTreeIndex() {
 
@@ -53,21 +54,7 @@ void BTreeIndex::setPageOffset() {
 void BTreeIndex::debugPrint() {
   debugPrint(tree.at(0).at(0));
 }
-void BTreeIndex::BfsDebugPrint() {
-  queue<BTreePage*> myqueue;
-  myqueue.push(tree.at(0).at(0));
-  while(!myqueue.empty()) {
-    BTreePage* page = myqueue.front();
-    myqueue.pop();
-    cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
-    for(int i = 0; i < page->children.size(); i++) {
-      cout << "child num: " << page->children.at(i)->pageNum << " \t";
-      assert(page->children.at(i)->pageNum == page->rids.at(i));
-      myqueue.push(page->children.at(i));
-    }
-    cout << endl;
-  }
-}
+
 
 vector<BTreePage*> BTreeIndex::get_simulated_stream() {
   vector<BTreePage*> stream;
@@ -102,6 +89,41 @@ void BTreeIndex::probe(uint64_t key, vector<BTreePage*> stream) {
     result = curPage->find(key);
     //cout << "level: " << level << endl;
     //cout << "tree level: " << tree.size() << endl;
+  }
+}
+void BTreeIndex::BfsDebugPrint() {
+  queue<BTreePage*> myqueue;
+  myqueue.push(tree.at(0).at(0));
+  while(!myqueue.empty()) {
+    BTreePage* page = myqueue.front();
+    myqueue.pop();
+    cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
+    for(int i = 0; i < page->children.size(); i++) {
+      cout << "child num: " << page->children.at(i)->pageNum << " \t";
+      assert(page->children.at(i)->pageNum == page->rids.at(i));
+      myqueue.push(page->children.at(i));
+    }
+    cout << endl;
+  }
+}
+void BTreeIndex::flush(string indexFilePath) {
+  ofstream indexFile;
+  indexFile.open(indexFilePath, ios::binary | ios::out);
+  auto size = tree.size();
+  indexFile.write((char *)&size, sizeof(size));
+  queue<BTreePage*> myqueue;
+  myqueue.push(tree.at(0).at(0));
+  while(!myqueue.empty()) {
+    BTreePage* page = myqueue.front();
+    myqueue.pop();
+    page->flush(indexFile);
+    cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
+    for(int i = 0; i < page->children.size(); i++) {
+      cout << "child num: " << page->children.at(i)->pageNum << " \t";
+      assert(page->children.at(i)->pageNum == page->rids.at(i));
+      myqueue.push(page->children.at(i));
+    }
+    cout << endl;
   }
 }
 void BTreeIndex::debugPrint(BTreePage* page) {
@@ -236,8 +258,8 @@ vector<DataEntry> BTreeIndex::parse_idx_file(string path) {
     }
 
     //ignore count for now
-    start = end + field_delim.length();
-    end = row.find(field_delim, start);
+    //start = end + field_delim.length();
+    //end = row.find(field_delim, start);
 
     //read in rid
     start = end + field_delim.length();

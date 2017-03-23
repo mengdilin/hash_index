@@ -1,5 +1,8 @@
 #include "BTreePage.h"
 #include <cassert>
+#include <fstream>
+#include <iostream>
+
 using namespace std;
 
 BTreePage::BTreePage() {
@@ -14,7 +17,16 @@ void BTreePage::addChild(BTreePage* c) {
 BTreePage::~BTreePage() {
 
 }
+ofstream& BTreePage::flush(ofstream& indexFile) {
+  uint64_t counter = keys.size();
+  indexFile.write((char*) &counter, sizeof(counter));
 
+  uint64_t *key_array = &keys[0];
+  indexFile.write((char*)key_array, MAX_KEY_PER_PAGE * sizeof(uint64_t));
+  uint64_t *rid_array = &rids[0];
+  indexFile.write((char*)rid_array, (MAX_KEY_PER_PAGE + 1)*sizeof(uint64_t));
+  return indexFile;
+}
 template<class Iter, class T>
 Iter binary_find(Iter begin, Iter end, T val)
 {

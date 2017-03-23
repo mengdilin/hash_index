@@ -20,7 +20,6 @@ class BTreePage {
     vector<uint64_t> keys;
     vector<uint64_t> rids;
     BTreePage* parent;
-    uint64_t counter = 0;
     unsigned int level = -1;
 
     //static constexpr double KNUTH_NUMBER = 1054997077.39;
@@ -32,5 +31,6 @@ public:
   void addKey(uint64_t key);
   void addChild(BTreePage*);
   bool isFull();
+  ofstream& flush(ofstream&);
   ~BTreePage();
 };
