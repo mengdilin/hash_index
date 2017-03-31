@@ -43,6 +43,7 @@ cout << "index build time: " << (t2-t1).count() << endl;
   //initialize the index stream for probing
 vector<DataEntry> test_data = index.parse_idx_file(argv[1]);
 
+
 t1 = chrono::high_resolution_clock::now();
   FILE *c_read_index = fopen(indexFileName.c_str(),"rb");
 /*
