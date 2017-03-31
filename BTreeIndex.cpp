@@ -429,8 +429,8 @@ vector<DataEntry> BTreeIndex::parse_idx_file(string path) {
     }
 
     //ignore count for now
-    //start = end + field_delim.length();
-    //end = row.find(field_delim, start);
+    start = end + field_delim.length();
+    end = row.find(field_delim, start);
 
     //read in rid
     start = end + field_delim.length();
