@@ -28,7 +28,7 @@ void BTreeIndex::setPageOffset() {
   uint64_t pageNum = 0;
   BTreePage* root =(tree.at(0).at(0));
   root->pageNum = pageNum++;
-  cout << "root level has: " << tree.at(0).size() << " nodes and first node has: " << root->keys.size() << " keys" <<endl;
+  //cout << "root level has: " << tree.at(0).size() << " nodes and first node has: " << root->keys.size() << " keys" <<endl;
   for (int i=1; i < tree.size(); i++) {
     int sum = 0;
     for (int j = 0; j < tree.at(i).size(); j++) {
@@ -72,7 +72,7 @@ void BTreeIndex::flush(string indexFilePath) {
   ofstream indexFile;
   indexFile.open(indexFilePath, ios::binary | ios::out);
   uint64_t size = tree.size();
-  cout << "tree size: " << size << endl;
+  //cout << "tree size: " << size << endl;
   indexFile.write((char *)&size, sizeof(size));
   queue<BTreePage*> myqueue;
   myqueue.push(tree.at(0).at(0));
@@ -81,7 +81,7 @@ void BTreeIndex::flush(string indexFilePath) {
     BTreePage* page = myqueue.front();
     myqueue.pop();
     page->flush(indexFile);
-    cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
+    //cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
     for(int i = 0; i < page->children.size(); i++) {
       //cout << "child num: " << page->children.at(i)->pageNum << " \t";
       assert(page->children.at(i)->pageNum == page->rids.at(i));

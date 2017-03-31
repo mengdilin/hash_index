@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     BTreeIndex btree;
     vector<DataEntry> entries = btree.parse_idx_file(argv[1]);
     btree.build_tree(entries);
-    btree.BfsDebugPrint();
+    //btree.BfsDebugPrint();
 
 
     string index_path = "indexFile";
