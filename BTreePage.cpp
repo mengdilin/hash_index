@@ -79,23 +79,23 @@ void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {
   uint64_t tmp_keys[MAX_KEY_PER_PAGE];
   fread(&tmp_keys, sizeof(uint64_t)*(MAX_KEY_PER_PAGE), 1, indexFile);
 
-  /*
+
   cout << "read keys: ";
   for (int i = 0; i < MAX_KEY_PER_PAGE; i++) {
     cout << tmp_keys[i] << ",";
   }
   cout << endl;
-  */
+
 
   page.keys.assign(tmp_keys, tmp_keys+counter);
 
-  /*
+
   cout << "keys: ";
   for (auto& key : page.keys) {
     cout << key << " ,";
   }
   cout << endl;
-  */
+
 
   uint64_t tmp_rids[MAX_KEY_PER_PAGE+2];
 
@@ -109,7 +109,7 @@ void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {
     fread(&tmp_rids, sizeof(uint64_t)*(MAX_KEY_PER_PAGE+1), 1, indexFile);
     page.rids.assign(tmp_rids, tmp_rids+counter);
   }
-  /*
+
   cout << "read rids: ";
   for (int i = 0; i < MAX_KEY_PER_PAGE+1; i++) {
     cout << tmp_rids[i] << ",";
@@ -123,20 +123,23 @@ void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {
     cout << "read key size: " << page.keys.size() << endl;
 
     cout << "read rid size: " << page.rids.size() << endl;
-  */
+
 
 }
 
 pair<bool,uint64_t> BTreePage::find(uint64_t key) {
 
   // lower_bound implements binary search
+  //first element in the range [first,last)
+  //which does not compare less than val.
   auto result = lower_bound(
     keys.begin(),
     keys.end(),
     key);
   pair <bool,uint64_t> find_result;
   if (result == keys.end()) {
-    // did not find key in Page
+    // key is greater than largest key in page
+    //return the right child of the last key
     find_result = make_pair(true, rids.at(rids.size()-1));
   } else {
     /*
@@ -150,7 +153,14 @@ pair<bool,uint64_t> BTreePage::find(uint64_t key) {
     }
     cout << endl;
     */
-    find_result = make_pair(true,  rids.at(result-keys.begin()));
+    if (key < *result) {
+      //if key < cur_key, return left child of cur key
+      find_result = make_pair(true, rids.at(result-keys.begin()));
+    } else {
+      //if key == cur_key, return right child of cur key
+      find_result = make_pair(true,  rids.at(result-keys.begin()+1));
+
+    }
   }
 
   return find_result;

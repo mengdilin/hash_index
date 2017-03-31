@@ -19,12 +19,15 @@ int main(int argc, char** argv) {
 
     string index_path = "indexFile";
 
+    int key = 3;
     btree.flush(index_path);
-    FILE *c_read_index = fopen(index_path.c_str(),"rb");
-    for (int i = 0; i < 1; i++){
-      cout << "key: " << i << endl;
-      btree.probe(i,c_read_index);
+    if (argc == 3) {
+        key = atoi(argv[2]);
     }
-    btree.BfsDebugPrint();
+    FILE *c_read_index = fopen(index_path.c_str(),"rb");
+    btree.probe(key,c_read_index);
+
+    //btree.BfsDebugPrint();
+
     return 0;
 }

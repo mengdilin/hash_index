@@ -190,20 +190,24 @@ void BTreeIndex::probe(uint64_t key, FILE* indexFile) {
 
 
     if (level == tree_size-1) {
-      //cout << "reached max level" << endl;
-      //cout << "key: " << key << endl;
-      //cout << "page num: " << result.second << endl;
+      cout << "reached max level" << endl;
+      cout << "key: " << key << endl;
+      cout << "page num: " << result.second << endl;
       fseek(indexFile, result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t), SEEK_SET);
       BTreePage::read(indexFile, curPage, true);
       //curPage = stream.at(result.second);
-      //cout << "binary find" << endl;
+      cout << "binary find" << endl;
       cout << binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin() <<endl;
 
-      /*
+
       for (int i =0; i < curPage.keys.size(); i++) {
         cout << curPage.keys.at(i) << "\t";
       }
-      */
+      cout << endl;
+      for (int i =0; i < curPage.rids.size(); i++) {
+        cout << curPage.rids.at(i) << "\t";
+      }
+
 
       cout << endl;
       break;
