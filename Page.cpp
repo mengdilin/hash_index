@@ -135,6 +135,8 @@ void Page::read(std::ifstream& indexFile, Page& page) {
 }
 
 void Page::read(FILE* indexFile, Page& page) {
+
+  /*
   char *buffer = (char *)malloc(PAGE_SIZE);
   // read 4K block into memory
   fread(buffer, PAGE_SIZE, 1, indexFile);
@@ -145,17 +147,26 @@ void Page::read(FILE* indexFile, Page& page) {
   memcpy(&pad, buffer+sizeof(page.overflow_addr)+sizeof(page.counter), sizeof(pad));
 
   memcpy(&page.data_entry_list, buffer+sizeof(page.overflow_addr)+sizeof(page.counter)+sizeof(pad), sizeof(page.data_entry_list));
+  free(buffer);
+
+  */
+
+
+  uint32_t pad;
+  fread(&page.overflow_addr, sizeof(page.overflow_addr), 1, indexFile);
+  fread(&page.counter, sizeof(page.counter), 1, indexFile);
+  fread(&pad, sizeof(pad), 1, indexFile);
+  fread(&page.data_entry_list, sizeof(page.data_entry_list), 1, indexFile);
 
   /*
-  cout << "couter: " << page.counter << endl;
+  cout << "overflow_addr: " << page.overflow_addr << " counter: " << page.counter << endl;
   for (int i = 0; i < page.counter; i++) {
     cout << "(" << page.data_entry_list[i].key << " ," << page.data_entry_list[i].rid << " )" << endl;
   }
   */
-  free(buffer);
-
 
 }
+
 
 std::ostream& operator<<(std::ostream &strm, const Page &a) {
   return strm << "counter: " << a.counter;

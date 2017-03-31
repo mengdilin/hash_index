@@ -121,31 +121,31 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
 pair<bool,uint64_t> HashIndex::search(uint64_t key, FILE* is) {
   unsigned int bucket_num;
   fread((char *)&bucket_num, sizeof(unsigned int), 1, is);
-    //test performance on a pre-allocated vector
-  auto t1 = chrono::high_resolution_clock::now();
+  //test performance on a pre-allocated vector
+  //auto t1 = chrono::high_resolution_clock::now();
   uint64_t primary_bucket_offset = search(key, bucket_num);
-  auto t2 = chrono::high_resolution_clock::now();
-  auto sum = (t2-t1).count();
+  //auto t2 = chrono::high_resolution_clock::now();
+  //auto sum = (t2-t1).count();
   //cout << "compute offset (ns): " << (t2-t1).count() << endl;
-  t1 = chrono::high_resolution_clock::now();
+  //t1 = chrono::high_resolution_clock::now();
   fseek(is, primary_bucket_offset, SEEK_SET);
-  t2 = chrono::high_resolution_clock::now();
+  //t2 = chrono::high_resolution_clock::now();
   //cout << "seek to offset (ns): " << (t2-t1).count() << endl;
 
-  t1 = chrono::high_resolution_clock::now();
+  //t1 = chrono::high_resolution_clock::now();
   Page curPage;
-  t2 = chrono::high_resolution_clock::now();
-  sum += (t2-t1).count();
+  //t2 = chrono::high_resolution_clock::now();
+  //sum += (t2-t1).count();
   //cout << "page init (ns): " << (t2-t1).count() << endl;
   uint64_t offset;
 
-  t1 = chrono::high_resolution_clock::now();
+  //t1 = chrono::high_resolution_clock::now();
   Page::read(is, curPage);
-  t2 = chrono::high_resolution_clock::now();
-  sum += (t2-t1).count();
+  //t2 = chrono::high_resolution_clock::now();
+  //sum += (t2-t1).count();
   //cout << "page read (ns): " << (t2-t1).count() << endl;
 
-  t1 = chrono::high_resolution_clock::now();
+  //t1 = chrono::high_resolution_clock::now();
   //check if key > largest/last key on current page
   while (key > curPage.data_entry_list[curPage.counter-1].key) {
     //go to overflow
@@ -159,18 +159,18 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, FILE* is) {
       break;
     }
   }
-  t2 = chrono::high_resolution_clock::now();
+  //t2 = chrono::high_resolution_clock::now();
   //cout << "searching loop (ns): " << (t2-t1).count() << endl;
-  sum += (t2-t1).count();
-  t1 = chrono::high_resolution_clock::now();
+  //sum += (t2-t1).count();
+  //t1 = chrono::high_resolution_clock::now();
   //binary search to find the result
   pair<bool,uint64_t> result = curPage.find(key);
-  t2 = chrono::high_resolution_clock::now();
-  sum += (t2-t1).count();
+  //t2 = chrono::high_resolution_clock::now();
+  //sum += (t2-t1).count();
   //cout << "binary search (ns): " << (t2-t1).count() << endl;
   //cout << "total sum: " << sum << endl;
-  total_page_read_speed += sum;
-  total_page_read += 1;
+  //total_page_read_speed += sum;
+  //total_page_read += 1;
   fseek(is, 0, SEEK_SET);
   if (result.first) {
     return result;

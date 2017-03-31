@@ -64,7 +64,9 @@ pair<bool,uint64_t> t_result = index.search(test_key, c_read_index);
       }
     }
   }
-t2 = chrono::high_resolution_clock::now();
-cout << "index probe time: " << (t2-t1).count() << endl;
+	t2 = chrono::high_resolution_clock::now();
+	cout << "index probe time: " << (t2-t1).count() << endl;
+  cout << "average per probe: " << (t2-t1).count() / test_data.size() << endl;
+	cout << "hello" << endl;
     return 0;
 }
