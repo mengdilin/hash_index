@@ -74,29 +74,29 @@ void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {
   fread(&counter, sizeof(counter), 1, indexFile);
   //fread(&counter, sizeof(counter), 1, indexFile);
 
-  cout << "counter: " << counter << endl;
+  //cout << "counter: " << counter << endl;
 
   uint64_t tmp_keys[MAX_KEY_PER_PAGE];
   fread(&tmp_keys, sizeof(uint64_t)*(MAX_KEY_PER_PAGE), 1, indexFile);
 
-
+  /*
   cout << "read keys: ";
   for (int i = 0; i < MAX_KEY_PER_PAGE; i++) {
     cout << tmp_keys[i] << ",";
   }
   cout << endl;
-
+  */
 
   page.keys.assign(tmp_keys, tmp_keys+counter);
 
-
+  /*
   cout << "keys: ";
   for (auto& key : page.keys) {
     cout << key << " ,";
   }
   cout << endl;
 
-
+  */
   uint64_t tmp_rids[MAX_KEY_PER_PAGE+2];
 
   if (not is_leaf) {
@@ -109,7 +109,7 @@ void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {
     fread(&tmp_rids, sizeof(uint64_t)*(MAX_KEY_PER_PAGE+1), 1, indexFile);
     page.rids.assign(tmp_rids, tmp_rids+counter);
   }
-
+  /*
   cout << "read rids: ";
   for (int i = 0; i < MAX_KEY_PER_PAGE+1; i++) {
     cout << tmp_rids[i] << ",";
@@ -123,7 +123,7 @@ void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {
     cout << "read key size: " << page.keys.size() << endl;
 
     cout << "read rid size: " << page.rids.size() << endl;
-
+  */
 
 }
 

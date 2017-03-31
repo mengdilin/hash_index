@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <sstream>
+#include <utility>
 #include "BTreePage.h"
 
 using namespace std;
@@ -29,7 +30,7 @@ public:
   void flush(string);
   void probe(uint64_t key, vector<BTreePage*> stream);
   vector<BTreePage*> get_simulated_stream();
-  void probe(uint64_t, FILE* );
+  pair<bool, uint64_t> probe(uint64_t, FILE* );
   ~BTreeIndex();
 
 };

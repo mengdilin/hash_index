@@ -164,45 +164,61 @@ void BTreeIndex::probe(uint64_t key, FILE* indexFile) {
 
 */
 
-void BTreeIndex::probe(uint64_t key, FILE* indexFile) {
-  cout << "key: " << key << endl;
+pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
+  //cout << "key: " << key << endl;
   int level = 1;
   uint64_t tree_size;
   fread(&tree_size, sizeof(tree_size), 1, indexFile);
+  /*
   cout << "tree size: " << tree_size << endl;
   for (auto &level : tree) {
     cout <<"level nodes: " << level.size() << endl;
   }
-  cout << tree.size() << endl;
+  */
+  //cout << tree.size() << endl;
 
   BTreePage curPage;
   if (tree_size > 1) {
     BTreePage::read(indexFile, curPage, false);
   } else {
     BTreePage::read(indexFile, curPage, true);
-    auto result = curPage.find(key);
-    //check result
-    return;
+    int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
+    if (found_index == curPage.keys.size()) {
+      fseek(indexFile, 0, SEEK_SET);
+      return make_pair(false, 0);
+    } else {
+      fseek(indexFile, 0, SEEK_SET);
+      return make_pair(true, curPage.rids.at(found_index));
+    }
   }
 
   auto result = curPage.find(key);
-  while(result.first && level < tree_size) {
+  while(level < tree_size) {
     //cout << "child numer: " << result.second << endl;
     //cout << "key: " << key << endl;
 
 
     if (level == tree_size-1) {
+      /*
       cout << "reached max level" << endl;
       cout << "key: " << key << endl;
       cout << "page num: " << result.second << endl;
+      */
       fseek(indexFile, result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t), SEEK_SET);
       BTreePage::read(indexFile, curPage, true);
       //curPage = stream.at(result.second);
-      cout << "binary find" << endl;
+      //cout << "binary find" << endl;
       int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
-      cout << "found index: " << found_index <<endl;
+      if (found_index == curPage.keys.size()) {
+          fseek(indexFile, 0, SEEK_SET);
+        return make_pair(false, 0);
+      } else {
+        fseek(indexFile, 0, SEEK_SET);
+        return make_pair(true, curPage.rids.at(found_index));
+      }
+      //cout << "found index: " << found_index <<endl;
 
-
+      /*
       for (int i =0; i < curPage.keys.size(); i++) {
         cout << curPage.keys.at(i) << "\t";
         if (curPage.keys.at(i) == key) {
@@ -210,6 +226,7 @@ void BTreeIndex::probe(uint64_t key, FILE* indexFile) {
           found_index = i;
         }
       }
+
       cout << endl;
       for (int i =0; i < curPage.rids.size(); i++) {
         cout << curPage.rids.at(i) << "\t";
@@ -219,6 +236,8 @@ void BTreeIndex::probe(uint64_t key, FILE* indexFile) {
       cout << endl;
       cout << "found value: " << curPage.rids.at(found_index) << endl;
       break;
+      */
+
     }
     level++;
     fseek(indexFile, result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t), SEEK_SET);
