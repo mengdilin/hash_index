@@ -82,12 +82,13 @@ void BTreeIndex::flush(string indexFilePath) {
     page->flush(indexFile);
     cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
     for(int i = 0; i < page->children.size(); i++) {
-      cout << "child num: " << page->children.at(i)->pageNum << " \t";
+      //cout << "child num: " << page->children.at(i)->pageNum << " \t";
       assert(page->children.at(i)->pageNum == page->rids.at(i));
       myqueue.push(page->children.at(i));
     }
     cout << endl;
   }
+
     cout << "size of root keys: " << tree.at(0).at(0)->keys.size() << endl;
   for (auto& key : tree.at(0).at(0)->keys) {
     cout << key << endl;
@@ -304,11 +305,12 @@ void BTreeIndex::debugPrint(BTreePage* page) {
 }
 
 void BTreeIndex::addNodeToTree(int level, BTreePage* node) {
+  /*
     cout << "tree size:" << tree.size() << endl;
        cout << "insert:" << max_level-level << endl;
         cout << "Lvl:" << level << endl;
 
-
+  */
   tree.at(max_level-level).push_back(node);
 }
 

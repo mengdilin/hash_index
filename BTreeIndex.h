@@ -14,7 +14,7 @@ class BTreeIndex {
     vector<vector<BTreePage*>> tree;
     vector<uint64_t> keys_per_level;
     vector<uint64_t> fanout_per_level;
-    unsigned int max_level = 19; //arbitrarily set
+    unsigned int max_level = 20; //fits 824633720832 keys at leaf
 
 public:
   BTreeIndex();
