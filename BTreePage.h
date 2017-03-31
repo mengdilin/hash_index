@@ -33,6 +33,6 @@ public:
   void addChild(BTreePage*);
   bool isFull();
   ofstream& flush(ofstream&);
-  static void read(FILE*, BTreePage&);
+  static void read(FILE*, BTreePage&, bool);
   ~BTreePage();
 };
