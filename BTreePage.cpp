@@ -2,6 +2,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <iostream>
 
 using namespace std;
 
@@ -20,12 +21,51 @@ BTreePage::~BTreePage() {
 ofstream& BTreePage::flush(ofstream& indexFile) {
   uint64_t counter = keys.size();
   indexFile.write((char*) &counter, sizeof(counter));
+  //indexFile.write((char*)&pageNum, sizeof(pageNum));
 
-  uint64_t *key_array = &keys[0];
-  indexFile.write((char*)key_array, MAX_KEY_PER_PAGE * sizeof(uint64_t));
+  //uint64_t *key_array = &keys[0];
+  for (auto& key : keys) {
+    cout << "writing: " << key << endl;
+    indexFile.write((char*) &key, sizeof(uint64_t));
+  }
+  uint64_t pad = 0;
+  if (counter < MAX_KEY_PER_PAGE) {
+    //cout << "here" << endl;
+    indexFile.write((char*) &pad, sizeof(uint64_t));
+    counter ++;
+  }
+  //indexFile.write((char*)key_array, MAX_KEY_PER_PAGE * sizeof(uint64_t));
   uint64_t *rid_array = &rids[0];
-  indexFile.write((char*)rid_array, (MAX_KEY_PER_PAGE + 1)*sizeof(uint64_t));
+
+  for (auto& rid : rids) {
+    indexFile.write((char*) &rid, sizeof(uint64_t));
+  }
+  int size_of_rids = rids.size();
+  if (size_of_rids < MAX_KEY_PER_PAGE + 1) {
+    //cout << "here" << endl;
+    indexFile.write((char*) &pad, sizeof(uint64_t));
+    size_of_rids ++;
+  }
+
+  //indexFile.write((char*)rid_array, (MAX_KEY_PER_PAGE + 1)*sizeof(uint64_t));
   return indexFile;
+}
+
+void BTreePage::read(FILE* indexFile, BTreePage& page) {
+  uint64_t counter;
+  fread(&counter, sizeof(counter), 1, indexFile);
+
+  cout << "counter: " << counter << endl;
+
+  uint64_t tmp_keys[MAX_KEY_PER_PAGE];
+  fread(&tmp_keys, sizeof(tmp_keys), 1, indexFile);
+  for (int i = 0; i < MAX_KEY_PER_PAGE; i ++) {
+    cout << tmp_keys[i] << endl;
+  }
+  page.keys.assign(tmp_keys, tmp_keys+counter);
+  uint64_t tmp_rids[MAX_KEY_PER_PAGE+1];
+  fread(&tmp_rids, sizeof(tmp_rids), 1, indexFile);
+  page.rids.assign(tmp_rids, tmp_rids+counter+1);
 }
 template<class Iter, class T>
 Iter binary_find(Iter begin, Iter end, T val)

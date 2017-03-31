@@ -25,9 +25,11 @@ public:
   void BfsDebugPrint();
   void debugPrint(BTreePage*);
   void addNodeToTree(int, BTreePage*);
+  void test_page_read(FILE*);
   void flush(string);
   void probe(uint64_t key, vector<BTreePage*> stream);
   vector<BTreePage*> get_simulated_stream();
+  void probe(uint64_t, FILE* );
   ~BTreeIndex();
 
 };

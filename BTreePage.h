@@ -22,6 +22,7 @@ class BTreePage {
     BTreePage* parent;
     unsigned int level = -1;
 
+
     //static constexpr double KNUTH_NUMBER = 1054997077.39;
 
 public:
@@ -32,5 +33,6 @@ public:
   void addChild(BTreePage*);
   bool isFull();
   ofstream& flush(ofstream&);
+  static void read(FILE*, BTreePage&);
   ~BTreePage();
 };

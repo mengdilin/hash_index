@@ -67,15 +67,87 @@ vector<BTreePage*> BTreeIndex::get_simulated_stream() {
 }
 
 
-void BTreeIndex::probe(uint64_t key, vector<BTreePage*> stream) {
-  //cout << "key: " << key << endl;
+/*
+void BTreeIndex::flush(string indexFilePath) {
+  ofstream indexFile;
+  indexFile.open(indexFilePath, ios::binary | ios::out);
+  uint64_t size = tree.size();
+  indexFile.write((char *)&size, sizeof(size));
+  queue<BTreePage*> myqueue;
+  myqueue.push(tree.at(0).at(0));
+
+  while(!myqueue.empty()) {
+    BTreePage* page = myqueue.front();
+    myqueue.pop();
+    page->flush(indexFile);
+    cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
+    for(int i = 0; i < page->children.size(); i++) {
+      cout << "child num: " << page->children.at(i)->pageNum << " \t";
+      assert(page->children.at(i)->pageNum == page->rids.at(i));
+      myqueue.push(page->children.at(i));
+    }
+    cout << endl;
+  }
+    cout << "size of root keys: " << tree.at(0).at(0)->keys.size() << endl;
+  for (auto& key : tree.at(0).at(0)->keys) {
+    cout << key << endl;
+  }
+}
+*/
+void BTreeIndex::flush(string indexFilePath) {
+  vector<BTreePage*> stream;
+  ofstream indexFile;
+  indexFile.open(indexFilePath, ios::binary | ios::out);
+  uint64_t size = tree.size();
+  indexFile.write((char *)&size, sizeof(size));
+  for (int i = 0; i < tree.size(); i++) {
+    for (int j = 0; j < tree.at(i).size(); j++) {
+      //stream.push_back(tree.at(i).at(j));
+      tree.at(i).at(j)->flush(indexFile);
+    }
+  }
+}
+
+
+void BTreeIndex::probe(uint64_t key, FILE* indexFile) {
+  cout << "key: " << key << endl;
   int level = 1;
-  uint64_t pageNum = 0;
+  uint64_t tree_size;
+  fread(&tree_size, sizeof(tree_size), 1, indexFile);
+  BTreePage curPage;
+  BTreePage::read(indexFile, curPage);
+  auto result = curPage.find(key);
+  while(result.first) {
+
+    fseek(indexFile, result.second * BTreePage::PAGE_SIZE, SEEK_SET);
+    BTreePage::read(indexFile, curPage);
+    if (level == tree_size-1) {
+      cout << "reached max level" << endl;
+      //curPage = stream.at(result.second);
+
+      for (int i =0; i < curPage.keys.size(); i++) {
+        cout << curPage.keys.at(i) << "\t";
+      }
+      cout << endl;
+      break;
+    }
+    level++;
+    //cout << "total pages: " << stream.size() << endl;
+
+    //curPage = stream.at(result.second);
+    result = curPage.find(key);
+    //cout << "level: " << level << endl;
+    //cout << "tree level: " << tree.size() << endl;
+  }
+}
+void BTreeIndex::probe(uint64_t key, vector<BTreePage*> stream) {
+  cout << "key: " << key << endl;
+  int level = 1;
   BTreePage* curPage = stream.at(0);
   auto result = curPage->find(key);
   while(result.first) {
     if (level == tree.size()-1) {
-      //cout << "reached max level" << endl;
+      cout << "reached max level" << endl;
       curPage = stream.at(result.second);
       for (int i =0; i < curPage->keys.size(); i++) {
         cout << curPage->keys.at(i) << "\t";
@@ -106,13 +178,15 @@ void BTreeIndex::BfsDebugPrint() {
     cout << endl;
   }
 }
+/*
 void BTreeIndex::flush(string indexFilePath) {
   ofstream indexFile;
   indexFile.open(indexFilePath, ios::binary | ios::out);
-  auto size = tree.size();
+  uint64_t size = tree.size();
   indexFile.write((char *)&size, sizeof(size));
   queue<BTreePage*> myqueue;
   myqueue.push(tree.at(0).at(0));
+
   while(!myqueue.empty()) {
     BTreePage* page = myqueue.front();
     myqueue.pop();
@@ -125,7 +199,23 @@ void BTreeIndex::flush(string indexFilePath) {
     }
     cout << endl;
   }
+    cout << "size of root keys: " << tree.at(0).at(0)->keys.size() << endl;
+  for (auto& key : tree.at(0).at(0)->keys) {
+    cout << key << endl;
+  }
 }
+*/
+void BTreeIndex::test_page_read(FILE* indexFile) {
+  uint64_t tree_size;
+  fread(&tree_size, sizeof(tree_size), 1, indexFile);
+  BTreePage page;
+  BTreePage::read(indexFile, page);
+  cout << "size of keys: " << page.keys.size() << endl;
+  for (auto& key : page.keys) {
+    cout << key << endl;
+  }
+}
+
 void BTreeIndex::debugPrint(BTreePage* page) {
   if (page == nullptr) {
     cout << " encountered null " << endl;

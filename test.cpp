@@ -19,6 +19,11 @@ int main(int argc, char** argv) {
       cout << "key: " << i << endl;
       btree.probe(i,btree.get_simulated_stream());
     }
-
+    /*
+    string index_path = "indexFile";
+    btree.flush(index_path);
+    FILE *c_read_index = fopen(index_path.c_str(),"rb");
+    btree.test_page_read(c_read_index);
+    */
     return 0;
 }
