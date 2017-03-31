@@ -199,11 +199,16 @@ void BTreeIndex::probe(uint64_t key, FILE* indexFile) {
       BTreePage::read(indexFile, curPage, true);
       //curPage = stream.at(result.second);
       cout << "binary find" << endl;
-      cout << binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin() <<endl;
+      int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
+      cout << "found index: " << found_index <<endl;
 
 
       for (int i =0; i < curPage.keys.size(); i++) {
         cout << curPage.keys.at(i) << "\t";
+        if (curPage.keys.at(i) == key) {
+          cout << "new found index: " << i << endl;
+          found_index = i;
+        }
       }
       cout << endl;
       for (int i =0; i < curPage.rids.size(); i++) {
@@ -212,6 +217,7 @@ void BTreeIndex::probe(uint64_t key, FILE* indexFile) {
 
 
       cout << endl;
+      cout << "found value: " << curPage.rids.at(found_index) << endl;
       break;
     }
     level++;

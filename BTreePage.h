@@ -8,7 +8,7 @@ using namespace std;
 
 class BTreePage {
   public:
-    constexpr static unsigned int PAGE_SIZE = 4096;
+    constexpr static unsigned int PAGE_SIZE = 64;
 
     //page_size/16 -1 (1 for counter + extra rid)
     constexpr static unsigned int MAX_KEY_PER_PAGE = PAGE_SIZE*1.0/(2*sizeof(uint64_t))-1;
