@@ -29,13 +29,17 @@ int main(int argc, char** argv) {
 
 
     string index_path = "indexFile";
+    if (argc >= 3) {
+       index_path = argv[2];
+       cout << "running with index path: " << index_path << endl;
+    }
 
     btree.flush(index_path);
 
 
     uint64_t key = 3;
-    if (argc == 3) {
-        istringstream ss(argv[2]);
+    if (argc >= 4) {
+        istringstream ss(argv[3]);
         if (!(ss >> key)) {
             cout << "set key failed" << endl;
         }
@@ -52,7 +56,6 @@ int main(int argc, char** argv) {
     }
     auto t2 = chrono::high_resolution_clock::now();
     cout << "avg nanosec per probe: " << (t2-t1).count()/entries.size() << endl;
-    //print_error_if_failed(result, key, )
 
     //btree.BfsDebugPrint();
 
