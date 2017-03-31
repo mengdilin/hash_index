@@ -11,7 +11,7 @@ build_time = {}
 probe_time_y = []
 build_time_y = []
 page_size = [64, 128, 256, 512, 1024, 2048, 4096]
-capacities = [80, 90, 100];
+capacities = [80, 90, 100, 70, 60];
 for size in page_size:
   probe_time[size] = []
   build_time[size] = []
@@ -26,8 +26,8 @@ for file in os.listdir("./data_perf"):
     for item in capacities:
       if str(item) in file:
         capacity = item
-    probe_time[size].append((capacity,int(content[-1][len(probe_flag):])/1000000000))
-    build_time[size].append((capacity,(int(content[-2][len(build_flag):])/1000000000)))
+    probe_time[size].append((capacity,float(int(content[-1][len(probe_flag):])/1000000000.0)/231595031))
+    build_time[size].append((capacity,float((int(content[-2][len(build_flag):])/1000000000.0)/231595031)))
     print content[-2][len(build_flag):]
 #fig, ax = plt.subplots()
 for key in probe_time:
