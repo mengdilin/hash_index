@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
     btree.flush(index_path);
 
 
-    uint64_t key = 3;
+    uint64_t key =40;
     if (argc >= 4) {
         istringstream ss(argv[3]);
         if (!(ss >> key)) {

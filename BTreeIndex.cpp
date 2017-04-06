@@ -119,9 +119,9 @@ Iter binary_find(Iter begin, Iter end, T val)
     Iter i = lower_bound(begin, end, val);
 
     if (i != end && !(val < *i))
-        return i; // found
+        return i; // actual value found
     else
-        return end; // not found
+        return i-1; // actual value not found. return largest value smaller than val
 }
 
 /*
@@ -182,6 +182,8 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
     BTreePage::read(indexFile, curPage, false);
   } else {
     BTreePage::read(indexFile, curPage, true);
+
+
     int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
     if (found_index == curPage.keys.size()) {
       fseek(indexFile, 0, SEEK_SET);
@@ -190,6 +192,7 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
       fseek(indexFile, 0, SEEK_SET);
       return make_pair(true, curPage.rids.at(found_index));
     }
+
   }
 
   auto result = curPage.find(key);
@@ -210,6 +213,7 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
       //cout << "binary find" << endl;
       int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
       if (found_index == curPage.keys.size()) {
+        cout << "found index: " << found_index << endl;
           fseek(indexFile, 0, SEEK_SET);
         return make_pair(false, 0);
       } else {
