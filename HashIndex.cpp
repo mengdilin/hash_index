@@ -12,7 +12,7 @@
 #include <chrono>
 #include <numeric>
 #include <stdio.h>
-
+#include <unistd.h>
 using namespace std;
 /*
  * constructor that takes in load_capacity as a variable
@@ -172,16 +172,60 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, FILE* is) {
   //total_page_read_speed += sum;
   //total_page_read += 1;
   fseek(is, 0, SEEK_SET);
+  /*
   if (result.first) {
     return result;
   }
-  cout << "not found" << endl;
+  */
+
+  //cout << "not found" << endl;
   // not found
 
   return result;
 
 }
 
+pair<bool,uint64_t> HashIndex::search(uint64_t key, int is) {
+  unsigned int bucket_num;
+  pread(is, (void *)&bucket_num, sizeof(unsigned int), 0);
+  //test performance on a pre-allocated vector
+  uint64_t primary_bucket_offset = search(key, bucket_num);
+
+  //fseek(is, primary_bucket_offset, SEEK_SET);
+
+  Page curPage;
+  uint64_t offset;
+  Page::read(is, curPage, primary_bucket_offset);
+
+  //check if key > largest/last key on current page
+  while (key > curPage.data_entry_list[curPage.counter-1].key) {
+    //go to overflow
+    if (curPage.hasOverflow()) {
+      //reset pointer
+
+      offset = sizeof(unsigned int) + ((uint64_t)curPage.overflow_addr-1) * Page::PAGE_SIZE;
+      Page::read(is, curPage, offset);
+    } else {
+      break;
+    }
+  }
+
+  //binary search to find the result
+  pair<bool,uint64_t> result = curPage.find(key);
+
+  //fseek(is, 0, SEEK_SET);
+  /*
+  if (result.first) {
+    return result;
+  }
+  */
+
+  //cout << "not found" << endl;
+  // not found
+
+  return result;
+
+}
 /*
  * checks if current page has overflow
  * cannot use Page::hasOverflow() because this function

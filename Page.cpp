@@ -4,14 +4,13 @@
 #include <cstring>
 #include <assert.h>
 #include <algorithm>
+#include <unistd.h>
 using namespace std;
 Page::Page() {
   overflow_addr = 0x00;
   counter = 0;
   overflow_merged = false;
-  memset((void *)&data_entry_list, 0, sizeof(data_entry_list));
-  //vector<DataEntry> tmp_data_entry_list(MAX_ENTRIES);
-  //data_entry_list = tmp_data_entry_list;
+
   //memset((void *)&data_entry_list, 0, sizeof(data_entry_list));
 }
 
@@ -19,12 +18,20 @@ Page::Page(vector<DataEntry> entries) {
   assert(entries.size() <= Page::MAX_ENTRIES);
   overflow_addr = 0x00;
   counter = entries.size();
+  data_entry_list = (DataEntry *)malloc(sizeof(DataEntry)*MAX_ENTRIES);
   overflow_merged = false;
   for (int i = 0; i < entries.size(); i++) {
     data_entry_list[i] = entries[i];
   }
 }
+Page::~Page() {
+ if (buffer != nullptr) {
+    free(buffer);
+  } else {
+    free(data_entry_list);
+  }
 
+}
 void Page::addEntry(DataEntry entry) {
   assert(counter < MAX_ENTRIES);
   data_entry_list[counter] = entry;
@@ -90,9 +97,14 @@ ofstream& Page::flush(ofstream& indexFile) {
   //indexFile.write((char*) &pad, sizeof(pad));
   indexFile.write((char*) &counter, sizeof(counter));
   indexFile.write((char*) &pad, sizeof(pad));
+  for (int i = 0; i < MAX_ENTRIES; i++) {
+    data_entry_list[i].flush(indexFile);
+  }
+  /*
   for (DataEntry entry : data_entry_list) {
     entry.flush(indexFile);
   }
+  */
   return indexFile;
 }
 
@@ -134,7 +146,16 @@ void Page::read(std::ifstream& indexFile, Page& page) {
 
 }
 
+void Page::read(int indexFile, Page& page, uint64_t offset) {
+  page.buffer = (uint8_t *)malloc(PAGE_SIZE);
+  pread(indexFile, page.buffer, PAGE_SIZE, offset);
+  page.overflow_addr = *((uint64_t*)page.buffer);
+  page.counter = *((uint64_t*)&page.buffer[8]);
+  page.data_entry_list = (DataEntry*)&page.buffer[16];
+
+}
 void Page::read(FILE* indexFile, Page& page) {
+  page.buffer = (uint8_t *)malloc(PAGE_SIZE);
 
   /*
   char *buffer = (char *)malloc(PAGE_SIZE);
@@ -151,20 +172,17 @@ void Page::read(FILE* indexFile, Page& page) {
 
   */
 
-
+  /*
   uint32_t pad;
   fread(&page.overflow_addr, sizeof(page.overflow_addr), 1, indexFile);
   fread(&page.counter, sizeof(page.counter), 1, indexFile);
   fread(&pad, sizeof(pad), 1, indexFile);
   fread(&page.data_entry_list, sizeof(page.data_entry_list), 1, indexFile);
-
-  /*
-  cout << "overflow_addr: " << page.overflow_addr << " counter: " << page.counter << endl;
-  for (int i = 0; i < page.counter; i++) {
-    cout << "(" << page.data_entry_list[i].key << " ," << page.data_entry_list[i].rid << " )" << endl;
-  }
   */
-
+  fread(page.buffer, PAGE_SIZE, 1, indexFile);
+  page.overflow_addr = *((uint64_t*)page.buffer);
+  page.counter = *((uint64_t*)&page.buffer[8]);
+  page.data_entry_list = (DataEntry*)&page.buffer[16];
 }
 
 

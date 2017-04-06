@@ -46,6 +46,7 @@ vector<DataEntry> test_data = index.parse_idx_file(argv[1]);
 
 t1 = chrono::high_resolution_clock::now();
   FILE *c_read_index = fopen(indexFileName.c_str(),"rb");
+  int fd = fileno(c_read_index);
 /*
 pair<bool,uint64_t> t_result = index.search(test_key, c_read_index);
     if (not t_result.first) {
@@ -56,7 +57,8 @@ pair<bool,uint64_t> t_result = index.search(test_key, c_read_index);
   for (int i = 0; i < test_data.size(); i++) {
     DataEntry test = test_data[i];
     //pair<bool,uint64_t> result = index.search(test.key, readIndex);
-    pair<bool,uint64_t> result = index.search(test.key, c_read_index);
+    //pair<bool,uint64_t> result = index.search(test.key, c_read_index);
+    pair<bool,uint64_t> result = index.search(test.key, fd);
     if (not result.first) {
     cout << "not found key: " << test.key << endl;
     } else {

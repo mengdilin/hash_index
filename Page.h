@@ -16,18 +16,22 @@ class Page {
 
     //static const int PAGE_SIZE = 48;
     uint32_t counter;
-    DataEntry data_entry_list[MAX_ENTRIES];
+    DataEntry* data_entry_list = nullptr;
+    uint8_t* buffer = nullptr;
     uint32_t hash;
     //used for debug print bucket record counts
     bool overflow_merged;
 
+
   public:
     Page();
     Page(std::vector<DataEntry>);
+    ~Page();
     void addEntry(DataEntry);
     std::ofstream& flush(std::ofstream&);
     static void read(std::ifstream&, Page&);
     static void read(FILE*, Page&);
+    static void read(int, Page&, uint64_t);
 
     bool isFull();
     bool hasOverflow();
