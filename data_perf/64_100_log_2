@@ -1,0 +1,9 @@
+running with capacity: 1
+page size: 64
+page entries: 3
+set key failed
+running with 0 key
+index build time: 450743255820
+index probe time: 289196545104
+average per probe: 1674
+hello

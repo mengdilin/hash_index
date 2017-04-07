@@ -16,19 +16,22 @@ for size in page_size:
   probe_time[size] = []
   build_time[size] = []
 for file in os.listdir("./data_perf"):
-  with open("./data_perf/"+file) as inf:
-    content = inf.readlines()
-    size = 4096
-    for item in page_size:
-      if file.startswith(str(item)):
-        size = item
-    capacity = 0
-    for item in capacities:
-      if str(item) in file:
-        capacity = item
-    probe_time[size].append((capacity,float(int(content[-1][len(probe_flag):])/1000000000.0)/231595031))
-    build_time[size].append((capacity,float((int(content[-2][len(build_flag):])/1000000000.0)/231595031)))
-    print content[-2][len(build_flag):]
+  if file.endswith("log_2"):
+    print file
+    with open("./data_perf/"+file) as inf:
+      content = inf.readlines()
+      size = 4096
+      for item in page_size:
+        if file.startswith(str(item)):
+          size = item
+      capacity = 0
+      for item in capacities:
+        if str(item) in file:
+          capacity = item
+      entry_size = 172705571
+      probe_time[size].append((capacity,int(content[-2][len("average per probe: "):])))
+      build_time[size].append((capacity,float((int(content[-4][len(build_flag):]))/entry_size)))
+      #print content[-2][len(build_flag):]
 #fig, ax = plt.subplots()
 for key in probe_time:
   print "page size: " , key
