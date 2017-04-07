@@ -12,6 +12,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <string>
+#include <cmath>
 #include "BTreeIndex.h"
 using namespace std;
 
@@ -30,9 +33,50 @@ int main(int argc, char** argv) {
         bin_file_path = argv[1];
         cout << "running with index path: " << bin_file_path << endl;
     }
-    int bin_file = open(bin_file_path, O_RDONLY);
+    int bin_file = open(bin_file_path.c_str(), O_RDONLY);
+    /*
+Within each 4K chunk in data.bin
+64bit key:
+32bit count  = number of DNA segments hashed to this key
+32bit length = length of DNA stream containing all compressed DNA segments
+reflags array with length ceiling(count/8)
+byte array "offsets" with length count
+byte stream with length length.
+Thus, the next key in 4K chunk is at: cur_offset + sizeof(key) + sizeof(count) + sizeof(length) + ceiling(count/8) + count + length
+
+    */
     uint64_t key;
-    pread(is, (void *)&key, sizeof(key), 0);
+    off_t initial = 494369494;
+    ssize_t size_read = pread(bin_file, (void *)&key, sizeof(key), 494369494) + initial;
+    cout << "key: " << key << endl;
+    uint32_t count;
+    size_read += pread(bin_file, (void *)&count, sizeof(count), size_read);
+    cout << "count: " << count << endl;
+
+    uint32_t length;
+    size_read += pread(bin_file, (void *)&length, sizeof(length), size_read);
+    cout << "length: " << length << endl;
+
+    off_t new_offset = sizeof(key) + sizeof(count) + sizeof(length) + ceil(count/8) + count + length;
+    cout << "new_offset: " << new_offset << endl;
+    size_read = pread(bin_file, (void *)&key, sizeof(key), new_offset) + new_offset;
+    int i = 10;
+
+    while (i-- > 0) {
+   cout << "key: " << key << endl;
+    uint32_t count;
+    size_read += pread(bin_file, (void *)&count, sizeof(count), size_read);
+    cout << "count: " << count << endl;
+
+    uint32_t length;
+    size_read += pread(bin_file, (void *)&length, sizeof(length), size_read);
+    cout << "length: " << length << endl;
+
+    off_t new_offset = sizeof(key) + sizeof(count) + sizeof(length) + ceil(count/8) + count + length;
+    cout << "new_offset: " << new_offset << endl;
+    size_read = pread(bin_file, (void *)&key, sizeof(key), new_offset) + new_offset;
+
+    }
 
 }
 /*

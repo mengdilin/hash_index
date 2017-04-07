@@ -253,6 +253,7 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
     //cout << "level: " << level << endl;
     //cout << "tree level: " << tree.size() << endl;
   }
+  return make_pair(false, 0);
 }
 
 /*
