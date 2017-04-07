@@ -8,6 +8,10 @@
 #include <utility>
 #include <chrono>
 #include <numeric>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "BTreeIndex.h"
 using namespace std;
 
@@ -20,6 +24,18 @@ void print_error_if_failed(pair<bool, uint64_t>& result, uint64_t& key, uint64_t
         }
     }
 }
+int main(int argc, char** argv) {
+    string bin_file_path = "4096_data.bin";
+    if (argc >= 2) {
+        bin_file_path = argv[1];
+        cout << "running with index path: " << bin_file_path << endl;
+    }
+    int bin_file = open(bin_file_path, O_RDONLY);
+    uint64_t key;
+    pread(is, (void *)&key, sizeof(key), 0);
+
+}
+/*
 int main(int argc, char** argv) {
     BTreePage page;
     BTreeIndex btree;
@@ -61,3 +77,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+*/

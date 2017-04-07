@@ -430,10 +430,12 @@ void BTreeIndex::build_tree(vector<DataEntry> entries) {
  * middle value count is ignored
  */
 vector<DataEntry> BTreeIndex::parse_idx_file(string path) {
+  int leaf_chunk_size = 4096; //leaf level rids should be 4k chunk apart
   vector<DataEntry> data_entries;
   ifstream input(path);
   char const row_delim = '\n';
   string const field_delim = "\t";
+  uint64_t rid = 0;
   for (string row; getline(input, row, row_delim);) {
     istringstream ss(row);
 
@@ -467,7 +469,11 @@ vector<DataEntry> BTreeIndex::parse_idx_file(string path) {
     } else {
       //cout << entry.rid << " |" << endl;
     }
-    data_entries.push_back(entry);
+    if (entry.rid - rid >= leaf_chunk_size) {
+      data_entries.push_back(entry);
+      rid = entry.rid;
+    }
+
   }
 
 
