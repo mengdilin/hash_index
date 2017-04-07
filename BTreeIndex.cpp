@@ -124,10 +124,16 @@ Iter binary_find(Iter begin, Iter end, T val)
     // Finds the lower bound in at most log(last - first) + 1 comparisons
     Iter i = lower_bound(begin, end, val);
 
-    if (i != end && !(val < *i))
-        return i; // actual value found
-    else
+    if (i != end && !(val < *i)) {
+      //cout << "binary_find found value" << endl;
+      return i; // actual value found
+    }
+    else {
+            //cout << "binary_find not found value" << endl;
+
         return i-1; // actual value not found. return largest value smaller than val
+
+    }
 }
 
 /*
@@ -210,8 +216,6 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
     size_read += ceil((float)count/8.0) + count + length ;
     new_offset += old_offset;
       cout << "new absolute offset: " << new_offset << endl;
-
-
   }
   if (local_key == key) {
     cout << "found key: " << local_key << endl;
@@ -221,6 +225,87 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
     return make_pair(false, 0);
   }
 
+}
+
+pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, int indexFile, int binFile) {
+  //cout << "key: " << key << endl;
+  int level = 1;
+  uint64_t tree_size;
+  off_t size_read = pread(indexFile, (void *)&tree_size, sizeof(tree_size), 0);
+  /*
+  cout << "tree size: " << tree_size << endl;
+  for (auto &level : tree) {
+    cout <<"level nodes: " << level.size() << endl;
+  }
+  */
+  //cout << tree.size() << endl;
+
+  BTreePage curPage;
+  if (tree_size > 1) {
+    BTreePage::read(indexFile, curPage, false, size_read);
+  } else {
+    BTreePage::read(indexFile, curPage, true, size_read);
+    int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
+    uint64_t offset = curPage.rids.at(found_index);
+    cout << "got rid: " << offset << endl;
+
+    return probe_bin(key, binFile, offset);
+  }
+
+  auto result = curPage.find(key);
+  while(level < tree_size) {
+    //cout << "child numer: " << result.second << endl;
+    //cout << "key: " << key << endl;
+
+
+    if (level == tree_size-1) {
+      /*
+      cout << "reached max level" << endl;
+      cout << "key: " << key << endl;
+      cout << "page num: " << result.second << endl;
+      */
+      BTreePage::read(indexFile, curPage, true, (off_t)result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t));
+      //curPage = stream.at(result.second);
+      //cout << "binary find" << endl;
+      int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
+      uint64_t offset = curPage.rids.at(found_index);
+      cout << "got rid: " << offset << endl;
+      return probe_bin(key, binFile, offset);
+
+
+      //cout << "found index: " << found_index <<endl;
+
+      /*
+      for (int i =0; i < curPage.keys.size(); i++) {
+        cout << curPage.keys.at(i) << "\t";
+        if (curPage.keys.at(i) == key) {
+          cout << "new found index: " << i << endl;
+          found_index = i;
+        }
+      }
+
+      cout << endl;
+      for (int i =0; i < curPage.rids.size(); i++) {
+        cout << curPage.rids.at(i) << "\t";
+      }
+
+
+      cout << endl;
+      cout << "found value: " << curPage.rids.at(found_index) << endl;
+      break;
+      */
+
+    }
+    level++;
+    BTreePage::read(indexFile, curPage, false, (off_t)result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t));
+    //cout << "total pages: " << stream.size() << endl;
+
+    //curPage = stream.at(result.second);
+    result = curPage.find(key);
+    //cout << "level: " << level << endl;
+    //cout << "tree level: " << tree.size() << endl;
+  }
+  return make_pair(false, 0);
 }
 
 pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
@@ -271,14 +356,10 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
       //curPage = stream.at(result.second);
       //cout << "binary find" << endl;
       int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
-      if (found_index == curPage.keys.size()) {
-        cout << "found index: " << found_index << endl;
-          fseek(indexFile, 0, SEEK_SET);
-        return make_pair(false, 0);
-      } else {
-        fseek(indexFile, 0, SEEK_SET);
-        return make_pair(true, curPage.rids.at(found_index));
-      }
+
+      fseek(indexFile, 0, SEEK_SET);
+      return make_pair(true, curPage.rids.at(found_index));
+
       //cout << "found index: " << found_index <<endl;
 
       /*

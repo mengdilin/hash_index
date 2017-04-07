@@ -34,5 +34,7 @@ public:
   bool isFull();
   ofstream& flush(ofstream&);
   static void read(FILE*, BTreePage&, bool);
+  static void read(int, BTreePage&, bool, off_t);
+
   ~BTreePage();
 };

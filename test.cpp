@@ -28,6 +28,7 @@ void print_error_if_failed(pair<bool, uint64_t>& result, uint64_t& key, uint64_t
         }
     }
 }
+ /*
 int main(int argc, char** argv) {
     string bin_file_path = "4096_data.bin";
     if (argc >= 2) {
@@ -59,7 +60,7 @@ off_t offset =0;
     cout << "not found offset" << endl;
   }
     //int bin_file = open(bin_file_path.c_str(), O_RDONLY);
-  /*
+
     uint64_t key;
     off_t initial = 0;
     ssize_t size_read = pread(bin_file, (void *)&key, sizeof(key), initial) + initial;
@@ -96,11 +97,12 @@ off_t offset =0;
     size_read = pread(bin_file, (void *)&key, sizeof(key), new_offset) + new_offset;
 
     }
-    */
+
   return 0;
 
 }
-/*
+ */
+
 int main(int argc, char** argv) {
     BTreePage page;
     BTreeIndex btree;
@@ -125,15 +127,35 @@ int main(int argc, char** argv) {
             cout << "set key failed" << endl;
         }
     }
+    string data_bin_path = "/dev/shm/genome/v0/data.bin";
+    if (argc >= 5) {
+        istringstream ss(argv[4]);
+        cout << "running with data bin path: " << data_bin_path << endl;
+    }
     cout << "probe key: " << key << endl;
     FILE *c_read_index = fopen(index_path.c_str(),"rb");
-    auto result = btree.probe(key,c_read_index);
-    cout << "got value: " << result.second << endl;
+    FILE *c_bin_file = fopen(data_bin_path.c_str(), "rb");
+    int index_fd = fileno(c_read_index);
+    int data_bin_fd = fileno(c_bin_file);
+    auto result = btree.probe(key,index_fd, data_bin_fd);
+    if (result.first) {
+        cout << "got value: " << result.second << endl;
+
+    } else {
+        cout << "not found: " << key << endl;
+    }
     auto t1 = chrono::high_resolution_clock::now();
     for (auto& entry : entries) {
 
-        auto result = btree.probe(entry.key,c_read_index);
+        auto result = btree.probe(entry.key,index_fd, data_bin_fd);
         print_error_if_failed(result, entry.key, entry.rid);
+        /*
+        if (result.first) {
+            cout << "found key: " << entry.key << " with rid: " << result.second << endl;
+        } else {
+            cout << "not found key: " << entry.key << endl;
+        }
+        */
     }
     auto t2 = chrono::high_resolution_clock::now();
     cout << "avg nanosec per probe: " << (t2-t1).count()/entries.size() << endl;
@@ -142,4 +164,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-*/
+

@@ -3,6 +3,13 @@
 #include <fstream>
 #include <iostream>
 #include <iostream>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string>
+#include <math.h>       /* ceil */
 
 using namespace std;
 
@@ -67,6 +74,28 @@ ofstream& BTreePage::flush(ofstream& indexFile) {
     cout << "total keys written: " << counter << endl;
   }
   return indexFile;
+}
+
+void BTreePage::read(int indexFile, BTreePage& page, bool is_leaf, off_t offset) {
+  uint64_t counter;
+  off_t size_read = pread(indexFile, (void *)&counter, sizeof(counter), offset) + offset;
+
+
+  uint64_t tmp_keys[MAX_KEY_PER_PAGE];
+  size_read += pread(indexFile, (void *)&tmp_keys, sizeof(uint64_t)*(MAX_KEY_PER_PAGE), size_read);
+
+  page.keys.assign(tmp_keys, tmp_keys+counter);
+
+  uint64_t tmp_rids[MAX_KEY_PER_PAGE+2];
+
+  if (not is_leaf) {
+    size_read += pread(indexFile,(void *)&tmp_rids,sizeof(uint64_t)*(MAX_KEY_PER_PAGE+1),size_read);
+    page.rids.assign(tmp_rids, tmp_rids+counter+1);
+  } else {
+    //cout << "leaf rids read: " << MAX_KEY_PER_PAGE +1 << endl;
+    size_read += pread(indexFile,(void *)&tmp_rids,sizeof(uint64_t)*(MAX_KEY_PER_PAGE+1),size_read);
+    page.rids.assign(tmp_rids, tmp_rids+counter);
+  }
 }
 
 void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {

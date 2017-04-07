@@ -31,6 +31,8 @@ public:
   void probe(uint64_t key, vector<BTreePage*> stream);
   vector<BTreePage*> get_simulated_stream();
   pair<bool, uint64_t> probe(uint64_t, FILE* );
+  pair<bool, uint64_t> probe(uint64_t, int, int);
+
   pair<bool, uint64_t> probe_bin(uint64_t, int, off_t);
   ~BTreeIndex();
 
