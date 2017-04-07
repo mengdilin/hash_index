@@ -14,7 +14,8 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string>
-#include <cmath>
+#include <math.h>       /* ceil */
+
 #include "BTreeIndex.h"
 using namespace std;
 
@@ -33,22 +34,35 @@ int main(int argc, char** argv) {
         bin_file_path = argv[1];
         cout << "running with index path: " << bin_file_path << endl;
     }
-    FILE *c_read_index = fopen(bin_file_path.c_str(),"rb");
-    int bin_file = fileno(c_read_index);
-    /*
-Within each 4K chunk in data.bin
-64bit key:
-32bit count  = number of DNA segments hashed to this key
-32bit length = length of DNA stream containing all compressed DNA segments
-reflags array with length ceiling(count/8)
-byte array "offsets" with length count
-byte stream with length length.
-Thus, the next key in 4K chunk is at: cur_offset + sizeof(key) + sizeof(count) + sizeof(length) + ceiling(count/8) + count + length
+  FILE *c_read_index = fopen(bin_file_path.c_str(),"rb");
+  int bin_file = fileno(c_read_index);
+  BTreeIndex btree;
+  uint64_t key =0;
+    if (argc >= 3) {
+        istringstream ss(argv[2]);
+        if (!(ss >> key)) {
+            cout << "set key failed" << endl;
+        }
+    }
 
-    */
+off_t offset =0;
+    if (argc >= 4) {
+        istringstream ss(argv[3]);
+        if (!(ss >> offset)) {
+            cout << "set offset failed" << endl;
+        }
+    }
+  auto result = btree.probe_bin(key, bin_file, offset);
+  if (result.first) {
+    cout << "found offset: " << result.second << endl;
+  } else {
+    cout << "not found offset" << endl;
+  }
+    //int bin_file = open(bin_file_path.c_str(), O_RDONLY);
+  /*
     uint64_t key;
-    off_t initial = 494369494;
-    ssize_t size_read = pread(bin_file, (void *)&key, sizeof(key), 494369494) + initial;
+    off_t initial = 0;
+    ssize_t size_read = pread(bin_file, (void *)&key, sizeof(key), initial) + initial;
     cout << "key: " << key << endl;
     uint32_t count;
     size_read += pread(bin_file, (void *)&count, sizeof(count), size_read);
@@ -58,11 +72,11 @@ Thus, the next key in 4K chunk is at: cur_offset + sizeof(key) + sizeof(count) +
     size_read += pread(bin_file, (void *)&length, sizeof(length), size_read);
     cout << "length: " << length << endl;
 
-    off_t new_offset = sizeof(key) + sizeof(count) + sizeof(length) + ceil(count/8) + count + length;
+    off_t new_offset = sizeof(key) + sizeof(count) + sizeof(length) + ceil((float)count/8.0) + count + length ;
     cout << "new_offset: " << new_offset << endl;
     size_read = pread(bin_file, (void *)&key, sizeof(key), new_offset) + new_offset;
     int i = 10;
-
+    off_t old_offset = new_offset;
     while (i-- > 0) {
    cout << "key: " << key << endl;
     uint32_t count;
@@ -73,11 +87,17 @@ Thus, the next key in 4K chunk is at: cur_offset + sizeof(key) + sizeof(count) +
     size_read += pread(bin_file, (void *)&length, sizeof(length), size_read);
     cout << "length: " << length << endl;
 
-    off_t new_offset = sizeof(key) + sizeof(count) + sizeof(length) + ceil(count/8) + count + length;
-    cout << "new_offset: " << new_offset << endl;
+    off_t new_offset = sizeof(key) + sizeof(count) + sizeof(length) + ceil((float)count/8.0) + count + length;
+    cout << "new relative offset: " << new_offset << endl;
+    cout << "new actual offset: " << new_offset+old_offset << endl;
+    cout << "ceil(count: " << ceil((float)count/8.0) << endl;
+    new_offset += old_offset;
+    old_offset = new_offset;
     size_read = pread(bin_file, (void *)&key, sizeof(key), new_offset) + new_offset;
 
     }
+    */
+  return 0;
 
 }
 /*

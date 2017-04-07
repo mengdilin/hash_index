@@ -5,7 +5,13 @@
 #include <queue>
 #include <cassert>
 #include <fstream>
-
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string>
+#include <math.h>       /* ceil */
 BTreeIndex::~BTreeIndex() {
 
 }
@@ -163,6 +169,59 @@ void BTreeIndex::probe(uint64_t key, FILE* indexFile) {
 }
 
 */
+pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t offset) {
+  uint8_t buffer[4096];
+  pread(indexFile, (void *)&buffer, 4096, offset);
+  off_t new_offset;
+  off_t old_offset = offset;
+  uint64_t local_key = *((uint64_t *)&buffer[0]);
+  if (local_key == key) {
+    return make_pair(true, offset);
+  }
+  cout << "local key: " << local_key << endl;
+  uint32_t count = *((uint32_t *)&buffer[sizeof(local_key)]);
+  cout << "count: " << count << endl;
+  uint32_t length = *((uint32_t *)&buffer[sizeof(local_key)+sizeof(count)]);
+  cout << "length: " << length << endl;
+  new_offset = sizeof(local_key) + sizeof(count) + sizeof(length) + ceil((float)count/8.0) + count + length ;
+  off_t size_read = new_offset;
+  off_t old_size_read = 0;
+  cout << "new relative offset: " << new_offset << endl;
+  new_offset += offset;
+  cout << "new absolute offset: " << new_offset << endl;
+  ssize_t header_leng = sizeof(uint64_t) + 2*sizeof(uint32_t);
+
+  while (local_key != key and size_read <= 4096 - header_leng) {
+    old_offset = new_offset;
+    old_size_read = size_read;
+    local_key = *((uint64_t *)&buffer[size_read]);
+    cout << "local key: " << local_key << endl;
+    size_read += sizeof(local_key);
+    count = *((uint32_t *)&buffer[size_read]);
+  cout << "count: " << count << endl;
+
+    size_read += sizeof(count);
+    length = *((uint32_t *)&buffer[size_read]);
+    cout << "length: " << length << endl;
+
+    size_read += sizeof(length);
+    new_offset = sizeof(local_key) + sizeof(count) + sizeof(length) + ceil((float)count/8.0) + count + length ;
+      cout << "new relative offset: " << new_offset << endl;
+    size_read += ceil((float)count/8.0) + count + length ;
+    new_offset += old_offset;
+      cout << "new absolute offset: " << new_offset << endl;
+
+
+  }
+  if (local_key == key) {
+    cout << "found key: " << local_key << endl;
+
+    return make_pair(true, old_size_read+offset);
+  } else {
+    return make_pair(false, 0);
+  }
+
+}
 
 pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
   //cout << "key: " << key << endl;
