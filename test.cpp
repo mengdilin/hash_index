@@ -33,7 +33,8 @@ int main(int argc, char** argv) {
         bin_file_path = argv[1];
         cout << "running with index path: " << bin_file_path << endl;
     }
-    int bin_file = open(bin_file_path.c_str(), O_RDONLY);
+    FILE *c_read_index = fopen(bin_file_path.c_str(),"rb");
+    int bin_file = fileno(c_read_index);
     /*
 Within each 4K chunk in data.bin
 64bit key:
