@@ -7,7 +7,7 @@
 
 class Page {
   public:
-    // (total buckets) + overflow page index starting from 0
+    // (total primary buckets) + overflow page count starting from 1
     uint64_t overflow_addr;
 
     static const int PAGE_SIZE = 64;

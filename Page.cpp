@@ -7,7 +7,7 @@
 #include <unistd.h>
 using namespace std;
 Page::Page() {
-  overflow_addr = 0x00;
+  overflow_addr = 0x00; //overflow_addr of 0 means no overflow
   counter = 0;
   overflow_merged = false;
 }
@@ -81,14 +81,21 @@ pair<bool,uint64_t> Page::find(uint64_t key) {
   return find_result;
 }
 
+/*
+ * Helper function used when merging a page with another page
+ * all entries in the same page must be sorted
+ */
 void Page::sortEntries() {
   sort(data_entry_list, data_entry_list + counter, DataEntry::compare);
 }
 
+/*
+ * Helper function used during index building stage.
+ * flushes a page to index file
+ */
 ofstream& Page::flush(ofstream& indexFile) {
   indexFile.write((char*) &overflow_addr, sizeof(overflow_addr));
   uint32_t pad = 0;
-  //indexFile.write((char*) &pad, sizeof(pad));
   indexFile.write((char*) &counter, sizeof(counter));
   indexFile.write((char*) &pad, sizeof(pad));
   for (int i = 0; i < MAX_ENTRIES; i++) {
@@ -97,6 +104,10 @@ ofstream& Page::flush(ofstream& indexFile) {
   return indexFile;
 }
 
+/*
+ * Helper function used during index building stage.
+ * merging a page with another page.
+ */
 void Page::mergePage(Page& other) {
 
   assert(MAX_ENTRIES - this->counter >= other.counter);
@@ -107,6 +118,9 @@ void Page::mergePage(Page& other) {
   sortEntries();
 }
 
+/*
+ * OLD: reading a page into memory using ifstream
+ */
 void Page::read(std::ifstream& indexFile, Page& page) {
 
   uint32_t pad;
@@ -118,39 +132,22 @@ void Page::read(std::ifstream& indexFile, Page& page) {
 
 }
 
+/*
+ * OLD: reading a page into memory using pread
+ */
 void Page::read(int indexFile, Page& page, uint64_t offset) {
   page.buffer = (uint8_t *)malloc(PAGE_SIZE);
   pread(indexFile, page.buffer, PAGE_SIZE, offset);
   page.overflow_addr = *((uint64_t*)page.buffer);
   page.counter = *((uint64_t*)&page.buffer[8]);
   page.data_entry_list = (DataEntry*)&page.buffer[16];
-
 }
+/*
+ * Helper function used during probing stage.
+ * reading a page into memory using fread
+ */
 void Page::read(FILE* indexFile, Page& page) {
   page.buffer = (uint8_t *)malloc(PAGE_SIZE);
-
-  /*
-  char *buffer = (char *)malloc(PAGE_SIZE);
-  // read 4K block into memory
-  fread(buffer, PAGE_SIZE, 1, indexFile);
-  uint32_t pad;
-  memcpy(&page.overflow_addr, buffer, sizeof(page.overflow_addr));
-  memcpy(&page.counter, buffer+sizeof(page.overflow_addr), sizeof(page.counter));
-
-  memcpy(&pad, buffer+sizeof(page.overflow_addr)+sizeof(page.counter), sizeof(pad));
-
-  memcpy(&page.data_entry_list, buffer+sizeof(page.overflow_addr)+sizeof(page.counter)+sizeof(pad), sizeof(page.data_entry_list));
-  free(buffer);
-
-  */
-
-  /*
-  uint32_t pad;
-  fread(&page.overflow_addr, sizeof(page.overflow_addr), 1, indexFile);
-  fread(&page.counter, sizeof(page.counter), 1, indexFile);
-  fread(&pad, sizeof(pad), 1, indexFile);
-  fread(&page.data_entry_list, sizeof(page.data_entry_list), 1, indexFile);
-  */
   fread(page.buffer, PAGE_SIZE, 1, indexFile);
   page.overflow_addr = *((uint64_t*)page.buffer);
   page.counter = *((uint64_t*)&page.buffer[8]);

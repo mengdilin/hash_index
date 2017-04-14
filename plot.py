@@ -31,8 +31,6 @@ for file in os.listdir("./data_perf"):
       entry_size = 172705571
       probe_time[size].append((capacity,int(content[-2][len("average per probe: "):])))
       build_time[size].append((capacity,float((int(content[-4][len(build_flag):]))/entry_size)))
-      #print content[-2][len(build_flag):]
-#fig, ax = plt.subplots()
 for key in probe_time:
   print "page size: " , key
   probe_time[key] = sorted(probe_time[key], key=lambda k: k[1])
@@ -40,15 +38,4 @@ for key in probe_time:
 
   print "probe time: " ,  probe_time[key]
   print "build time: " ,  build_time[key]
-  #ax.scatter(probe_time[key][1], probe_time[key][0], color='r', label=str(key))
-#plt.show()
-
-
-#ax.scatter(range(0,len(entry_distribution_plot)), entry_distribution_plot, color='b')
-
-
-#plt.hist(entry_distribution, range=[0, 600], alpha=0.5, bins=50, label="key dist")
-#plt.legend(loc='upper right')
-#plt.gca().set_yscale("log")
-#plt.show()
 

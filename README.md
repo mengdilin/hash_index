@@ -2,7 +2,7 @@
 make all
 ## To run
 ### To build the index
-./test "input data file" placeholder_arg "output index file" "loading capacity"
+./test `<data_file_path>` placeholder_arg '<index_file_path>' '<loading_capacity>'
 ### To perform probe on a datafile
-./test "input data file" placeholder_arg "input index file"
+./test `<data_file_path>` placeholder_arg '<index_file_path>' '<loading_capacity>'
 

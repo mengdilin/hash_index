@@ -276,6 +276,7 @@ int HashIndex::merge(vector<Page*>& merge_primary_buckets, vector<Page*>& overfl
         continue;
       } else {
         Page* parent = iterator->second;
+        //overflow = total primary buckets + 1 + current overflow count
         parent->setOverflow((uint64_t)(this->number_buckets+1+overflow_count));
         overflow_count++;
       }

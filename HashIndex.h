@@ -7,6 +7,11 @@
 /* Format of HashIndex: unsigned int, Page, Page, Page, Page
  * unsigned int indicates the number of primary buckets in the hash index.
  * Page is a data structure defined in Page.h and Page.cpp
+ * Pages are synonymous with buckets. The entries in a primary page and its
+ * overflow pages are sorted in ascending order such that the entry with the
+ * smallest key for the hash is always the first entry in the primary page and
+ * the entry with the largest key for the hash is always the last entry in the
+ * primary/overflow page
  */
 class HashIndex {
   public:
@@ -33,6 +38,8 @@ public:
   uint32_t hash(uint64_t);
   std::pair<bool,uint64_t> search(uint64_t, std::ifstream&);
   std::pair<bool,uint64_t> search(uint64_t, FILE*);
+
+  //fastest probing method using pread
   std::pair<bool,uint64_t> search(uint64_t, int);
   void build_index(std::string, std::string);
   std::vector<DataEntry> parse_idx_file(std::string path);
