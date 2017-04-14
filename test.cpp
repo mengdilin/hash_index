@@ -28,82 +28,88 @@ void print_error_if_failed(pair<bool, uint64_t>& result, uint64_t& key, uint64_t
         }
     }
 }
- /*
-int main(int argc, char** argv) {
-    string bin_file_path = "4096_data.bin";
-    if (argc >= 2) {
-        bin_file_path = argv[1];
-        cout << "running with index path: " << bin_file_path << endl;
+
+void probe_file(string dataIdxFilePath, string dataBinFilePath, string indexFilePath) {
+    BTreeIndex btree;
+    vector<DataEntry> all_entries = btree.parse_idx_file_get_all(dataIdxFilePath);
+    FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
+    FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
+    int index_fd = fileno(c_read_index);
+    int data_bin_fd = fileno(c_bin_file);
+    auto t1 = chrono::high_resolution_clock::now();
+    for (auto& entry : all_entries) {
+        auto result = btree.probe(entry.key,index_fd, data_bin_fd);
+        print_error_if_failed(result, entry.key, entry.rid);
     }
-  FILE *c_read_index = fopen(bin_file_path.c_str(),"rb");
-  int bin_file = fileno(c_read_index);
-  BTreeIndex btree;
-  uint64_t key =0;
-    if (argc >= 3) {
-        istringstream ss(argv[2]);
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "avg nanosec per probe: " << (t2-t1).count()/all_entries.size() << endl;
+}
+
+void probe_key(uint64_t key, string dataBinFilePath, string indexFilePath) {
+    BTreeIndex btree;
+    FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
+    FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
+    int index_fd = fileno(c_read_index);
+    int data_bin_fd = fileno(c_bin_file);
+    auto result = btree.probe(key,index_fd, data_bin_fd);
+    if (result.first) {
+        cout << "got rid: " << result.second << endl;
+
+    } else {
+        cout << "not found: " << key << endl;
+    }
+}
+
+void build_index(string dataIdxFilePath, string indexFilePath) {
+    BTreeIndex btree;
+    vector<DataEntry> entries = btree.parse_idx_file(dataIdxFilePath);
+    auto t1 = chrono::high_resolution_clock::now();
+    btree.build_tree(entries);
+    btree.flush(indexFilePath);
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "time used in building (ns): " << (t2-t1).count() << endl;
+}
+int main(int argc, char** argv) {
+    if (argc < 3) {
+        cerr << "use: ./test <arg> <mode> <arg>..." << endl;
+        exit(1);
+    }
+    string mode = argv[2];
+    if (mode == "-build") {
+        if (argc < 4) {
+            cerr << "use ./test <data_file_path> -build <index_file_path>" << endl;
+            exit(1);
+        }
+        string indexFilePath = argv[3];
+        string dataIdxFilePath = argv[1];
+        build_index(dataIdxFilePath, indexFilePath);
+    } else if (mode == "-probe_file") {
+        if (argc < 5) {
+            cerr << "use ./test <data_file_path> -probe_file <index_file_path> <binary_data_file_path>" << endl;
+            exit(1);
+        }
+        string indexFilePath = argv[3];
+        string dataIdxFilePath = argv[1];
+        string dataBinFilePath = argv[4];
+        probe_file(dataIdxFilePath, dataBinFilePath, indexFilePath);
+    } else if (mode == "-probe_key") {
+        if (argc < 5) {
+            cerr << "use ./test <key> -probe_file <index_file_path> <binary_data_file_path>" << endl;
+            exit(1);
+        }
+        uint64_t key;
+        istringstream ss(argv[1]);
         if (!(ss >> key)) {
             cout << "set key failed" << endl;
+            exit(1);
         }
+        string indexFilePath = argv[3];
+        string dataBinFilePath = argv[4];
+        probe_key(key, dataBinFilePath, indexFilePath);
+    } else {
+        cerr << "mode: " << mode << " not supported" << endl;
     }
-
-off_t offset =0;
-    if (argc >= 4) {
-        istringstream ss(argv[3]);
-        if (!(ss >> offset)) {
-            cout << "set offset failed" << endl;
-        }
-    }
-  auto result = btree.probe_bin(key, bin_file, offset);
-  if (result.first) {
-    cout << "found offset: " << result.second << endl;
-  } else {
-    cout << "not found offset" << endl;
-  }
-    //int bin_file = open(bin_file_path.c_str(), O_RDONLY);
-
-    uint64_t key;
-    off_t initial = 0;
-    ssize_t size_read = pread(bin_file, (void *)&key, sizeof(key), initial) + initial;
-    cout << "key: " << key << endl;
-    uint32_t count;
-    size_read += pread(bin_file, (void *)&count, sizeof(count), size_read);
-    cout << "count: " << count << endl;
-
-    uint32_t length;
-    size_read += pread(bin_file, (void *)&length, sizeof(length), size_read);
-    cout << "length: " << length << endl;
-
-    off_t new_offset = sizeof(key) + sizeof(count) + sizeof(length) + ceil((float)count/8.0) + count + length ;
-    cout << "new_offset: " << new_offset << endl;
-    size_read = pread(bin_file, (void *)&key, sizeof(key), new_offset) + new_offset;
-    int i = 10;
-    off_t old_offset = new_offset;
-    while (i-- > 0) {
-   cout << "key: " << key << endl;
-    uint32_t count;
-    size_read += pread(bin_file, (void *)&count, sizeof(count), size_read);
-    cout << "count: " << count << endl;
-
-    uint32_t length;
-    size_read += pread(bin_file, (void *)&length, sizeof(length), size_read);
-    cout << "length: " << length << endl;
-
-    off_t new_offset = sizeof(key) + sizeof(count) + sizeof(length) + ceil((float)count/8.0) + count + length;
-    cout << "new relative offset: " << new_offset << endl;
-    cout << "new actual offset: " << new_offset+old_offset << endl;
-    cout << "ceil(count: " << ceil((float)count/8.0) << endl;
-    new_offset += old_offset;
-    old_offset = new_offset;
-    size_read = pread(bin_file, (void *)&key, sizeof(key), new_offset) + new_offset;
-
-    }
-
-  return 0;
-
-}
- */
-
-int main(int argc, char** argv) {
+    /*
     BTreePage page;
     BTreeIndex btree;
     vector<DataEntry> entries = btree.parse_idx_file(argv[1]);
@@ -130,7 +136,7 @@ int main(int argc, char** argv) {
     }
     string data_bin_path = "/dev/shm/genome/v0/data.bin";
     if (argc >= 5) {
-        istringstream ss(argv[4]);
+        data_bin_path = argv[4];
         cout << "running with data bin path: " << data_bin_path << endl;
     }
     cout << "probe key: " << key << endl;
@@ -146,17 +152,17 @@ int main(int argc, char** argv) {
     } else {
         cout << "not found: " << key << endl;
     }
-/*
+
     auto t1 = chrono::high_resolution_clock::now();
     for (auto& entry : all_entries) {
-        cout << "key: " << entry.key << endl;
+        //cout << "key: " << entry.key << endl;
         auto result = btree.probe(entry.key,index_fd, data_bin_fd);
         print_error_if_failed(result, entry.key, entry.rid);
     }
     auto t2 = chrono::high_resolution_clock::now();
     cout << "avg nanosec per probe: " << (t2-t1).count()/entries.size() << endl;
     //btree.BfsDebugPrint();
-*/
+    */
     return 0;
 }
 
