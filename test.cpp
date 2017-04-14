@@ -42,7 +42,7 @@ void probe_file(string dataIdxFilePath, string dataBinFilePath, string indexFile
         print_error_if_failed(result, entry.key, entry.rid);
     }
     auto t2 = chrono::high_resolution_clock::now();
-    cout << "avg nanosec per probe: " << (t2-t1).count()/all_entries.size() << endl;
+    cout << "avg microsec per probe: " << chrono::duration_cast<chrono::microseconds>(t2-t1).count()/all_entries.size() << endl;
 }
 
 void probe_key(uint64_t key, string dataBinFilePath, string indexFilePath) {
@@ -67,7 +67,7 @@ void build_index(string dataIdxFilePath, string indexFilePath) {
     btree.build_tree(entries);
     btree.flush(indexFilePath);
     auto t2 = chrono::high_resolution_clock::now();
-    cout << "time used in building (ns): " << (t2-t1).count() << endl;
+    cout << "time used in building (microsec): " << chrono::duration_cast<chrono::microseconds>(t2-t1).count() << endl;
 }
 int main(int argc, char** argv) {
     if (argc < 3) {
