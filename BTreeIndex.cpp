@@ -197,7 +197,13 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
   //cout << "new absolute offset: " << new_offset << endl;
   ssize_t header_leng = sizeof(uint64_t) + 2*sizeof(uint32_t);
 
-    local_key = *((uint64_t *)&buffer[size_read]);
+  if (size_read > 4096 - header_leng) {
+      pread(indexFile, (void *)&local_key, sizeof(local_key), new_offset);
+      //cout << "actual key read: " << local_key << endl;
+
+  } else {
+      local_key = *((uint64_t *)&buffer[size_read]);
+  }
 
     size_read += sizeof(local_key);
 while (local_key != key and size_read <= 4096 - header_leng) {
