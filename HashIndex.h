@@ -4,27 +4,29 @@
 #include "Page.h"
 #include <stdio.h>
 
-
+/* Format of HashIndex: unsigned int, Page, Page, Page, Page
+ * unsigned int indicates the number of primary buckets in the hash index.
+ * Page is a data structure defined in Page.h and Page.cpp
+ */
 class HashIndex {
   public:
+    //number of primary buckets in the index
     unsigned int number_buckets;
-    double total_page_read_speed = 0;
-    unsigned int total_page_read = 0;
+
   private:
+    //a vector of all primary buckets/Pages
     std::vector<Page*> primary_buckets;
 
     //used to maintain a deterministic order of overflow pages
     std::vector<Page*> overflow_pages;
 
-    //overflow page -> parent
+    //used to maintain overflow page -> parent relationship in index building
     std::unordered_map<Page*, Page*> map_for_prev_page;
 
-    //parent -> overflow page
+    //used to maintain parent -> overflow page relationship in index building
     std::unordered_map<Page*, Page*> overflow_map;
     float load_capacity;
 
-
-    //static constexpr double KNUTH_NUMBER = 1054997077.39;
 
 public:
   HashIndex(float load_capacity);
@@ -33,7 +35,6 @@ public:
   std::pair<bool,uint64_t> search(uint64_t, FILE*);
   std::pair<bool,uint64_t> search(uint64_t, int);
   void build_index(std::string, std::string);
-  static void debugRead(std::string);
   std::vector<DataEntry> parse_idx_file(std::string path);
   ~HashIndex();
 private:
