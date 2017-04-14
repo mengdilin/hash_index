@@ -15,7 +15,7 @@ void build_index(string dataFilePath, string indexFileName, float load_capacity)
     HashIndex index(load_capacity);
     index.build_index(dataFilePath, indexFileName);
     auto t2 = chrono::high_resolution_clock::now();
-    cout << "index build time (ns): " << (t2-t1).count() << endl;
+    cout << "index build time (ns): " << chrono::duration_cast<chrono::nanoseconds>(t2-t1).count() << endl;
 }
 
 void probe_file(string dataFilePath, string indexFileName, float load_capacity) {
@@ -36,8 +36,8 @@ void probe_file(string dataFilePath, string indexFileName, float load_capacity) 
         }
     }
     auto t2 = chrono::high_resolution_clock::now();
-    cout << "index probe time (ns): " << (t2-t1).count() << endl;
-    cout << "average per probe (ns): " << (t2-t1).count() / test_data.size() << endl;
+    cout << "index probe time (ns): " << chrono::duration_cast<chrono::nanoseconds>(t2-t1).count() << endl;
+    cout << "average per probe (ns): " << (chrono::duration_cast<chrono::nanoseconds>(t2-t1).count()) / test_data.size() << endl;
 }
 
 void probe_key(uint64_t test_key, string indexFileName, float load_capacity) {
