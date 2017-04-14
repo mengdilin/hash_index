@@ -10,8 +10,6 @@ Page::Page() {
   overflow_addr = 0x00;
   counter = 0;
   overflow_merged = false;
-
-  //memset((void *)&data_entry_list, 0, sizeof(data_entry_list));
 }
 
 Page::Page(vector<DataEntry> entries) {
@@ -25,18 +23,17 @@ Page::Page(vector<DataEntry> entries) {
   }
 }
 Page::~Page() {
+
  if (buffer != nullptr) {
     free(buffer);
   } else {
     free(data_entry_list);
   }
-
 }
 void Page::addEntry(DataEntry entry) {
   assert(counter < MAX_ENTRIES);
   data_entry_list[counter] = entry;
   counter++;
-  //data_entry_list.push_back(entry);
 }
 
 bool Page::isFull() {
@@ -49,7 +46,6 @@ bool Page::hasOverflow() {
 
 void Page::setOverflow(uint64_t overflow) {
   overflow_addr = overflow;
-  //cout << "set overflow addr: " << overflow_addr << endl;
 
 }
 
@@ -79,7 +75,6 @@ pair<bool,uint64_t> Page::find(uint64_t key) {
     // did not find key in Page
     find_result = make_pair(false, 0);
   } else {
-    //cout << "prev: " << (result-1)->rid << endl;
     find_result = make_pair(true, result->rid);
   }
 
@@ -87,7 +82,6 @@ pair<bool,uint64_t> Page::find(uint64_t key) {
 }
 
 void Page::sortEntries() {
-  //Now we call the sort function
   sort(data_entry_list, data_entry_list + counter, DataEntry::compare);
 }
 
@@ -100,11 +94,6 @@ ofstream& Page::flush(ofstream& indexFile) {
   for (int i = 0; i < MAX_ENTRIES; i++) {
     data_entry_list[i].flush(indexFile);
   }
-  /*
-  for (DataEntry entry : data_entry_list) {
-    entry.flush(indexFile);
-  }
-  */
   return indexFile;
 }
 
@@ -126,23 +115,6 @@ void Page::read(std::ifstream& indexFile, Page& page) {
   indexFile.read((char *)&page.counter, sizeof(page.counter));
   indexFile.read ((char *)&pad,sizeof(uint32_t));
   indexFile.read((char *)&page.data_entry_list, sizeof(page.data_entry_list));
-
-
-  /*
-  char *buffer = (char *)malloc(PAGE_SIZE);
-  indexFile.read(buffer, PAGE_SIZE);
-  memcpy(&page.overflow_addr, buffer, sizeof(page.overflow_addr));
-  memcpy(&page.counter, buffer+sizeof(page.overflow_addr), sizeof(page.counter));
-
-  memcpy(&pad, buffer+sizeof(page.overflow_addr)+sizeof(page.counter), sizeof(pad));
-
-  memcpy(&page.data_entry_list, buffer+sizeof(page.overflow_addr)+sizeof(page.counter)+sizeof(pad), sizeof(page.data_entry_list));
-
-  cout << "couter: " << page.counter << endl;
-  for (int i = 0; i < page.counter; i++) {
-    cout << "(" << page.data_entry_list[i].key << " ," << page.data_entry_list[i].rid << " )" << endl;
-  }
-  */
 
 }
 

@@ -9,16 +9,19 @@ class Page {
   public:
     // (total buckets) + overflow page index starting from 0
     uint64_t overflow_addr;
-    //const static int MAX_ENTRIES = 255;
-    //const static int MAX_ENTRIES = 2;
+
     static const int PAGE_SIZE = 64;
     static constexpr int MAX_ENTRIES = (Page::PAGE_SIZE-2*sizeof(uint64_t))/(2*sizeof(uint64_t));
 
-    //static const int PAGE_SIZE = 48;
-    uint32_t counter;
+    uint32_t counter; //number of data entries in this page
+    uint32_t hash; //address of this page. Used when setting overflow addresses
+
+    /* data_entry_list is only used during index building stage*/
     DataEntry* data_entry_list = nullptr;
+
+    /* buffer is only used during probing stage*/
     uint8_t* buffer = nullptr;
-    uint32_t hash;
+
     //used for debug print bucket record counts
     bool overflow_merged;
 
