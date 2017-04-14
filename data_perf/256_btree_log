@@ -1,0 +1,47 @@
+MAX_KEY_PER_PAGE: 15
+level with keys: 15
+level with keys: 240
+level with keys: 3840
+level with keys: 61440
+level with keys: 983040
+level with keys: 15728640
+level with keys: 251658240
+level with keys: 4026531840
+level with keys: 64424509440
+level with keys: 1030792151040
+level with keys: 16492674416640
+level with keys: 263882790666240
+level with keys: 4222124650659840
+level with keys: 67553994410557440
+level with keys: 1080863910568919040
+level with keys: 17293822569102704640
+level with keys: 0
+level with keys: 0
+level with keys: 0
+level with keys: 0
+max level: 5
+root level has: 1 nodes and first node has: 4 keys
+tree size: 6
+time used in building (ns): 709501803
+MAX_KEY_PER_PAGE: 15
+level with keys: 15
+level with keys: 240
+level with keys: 3840
+level with keys: 61440
+level with keys: 983040
+level with keys: 15728640
+level with keys: 251658240
+level with keys: 4026531840
+level with keys: 64424509440
+level with keys: 1030792151040
+level with keys: 16492674416640
+level with keys: 263882790666240
+level with keys: 4222124650659840
+level with keys: 67553994410557440
+level with keys: 1080863910568919040
+level with keys: 17293822569102704640
+level with keys: 0
+level with keys: 0
+level with keys: 0
+level with keys: 0
+avg nanosec per probe: 8684

@@ -1,9 +1,0 @@
-running with capacity: 0.6
-page size: 128
-page entries: 7
-set key failed
-running with 0 key
-num buckets: 55141672
-entry size: 231595031
-index build time: 480389396169
-index probe time: 614512994384
