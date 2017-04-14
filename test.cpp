@@ -106,6 +106,16 @@ int main(int argc, char** argv) {
         string indexFilePath = argv[3];
         string dataBinFilePath = argv[4];
         probe_key(key, dataBinFilePath, indexFilePath);
+    } else if (mode=="-all") {
+        if (argc < 5) {
+            cerr << "use ./test <data_file_path> -probe_file <index_file_path> <binary_data_file_path>" << endl;
+            exit(1);
+        }
+        string indexFilePath = argv[3];
+        string dataIdxFilePath = argv[1];
+        string dataBinFilePath = argv[4];
+        build_index(dataIdxFilePath, indexFilePath);
+        probe_file(dataIdxFilePath, dataBinFilePath, indexFilePath);
     } else {
         cerr << "mode: " << mode << " not supported" << endl;
     }
