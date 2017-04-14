@@ -20,6 +20,7 @@ class BTreeIndex {
 public:
   BTreeIndex();
   vector<DataEntry> parse_idx_file(string);
+  vector<DataEntry> parse_idx_file_get_all(string);
   void build_tree(vector<DataEntry>);
   void setPageOffset();
   void debugPrint();

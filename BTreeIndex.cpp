@@ -50,10 +50,10 @@ void BTreeIndex::setPageOffset() {
         cout << "parent is null" << endl;
       }
     }
-    cout << endl;
-    cout << "level: " << i <<" with keys: " << sum <<" and with num nodes: " << tree.at(i).size() << endl;
+    //cout << endl;
+    //cout << "level: " << i <<" with keys: " << sum <<" and with num nodes: " << tree.at(i).size() << endl;
 
-    cout << "max keys: " << pow(BTreePage::fan_out, i)*BTreePage::MAX_KEY_PER_PAGE << " max nodes: " <<  pow(BTreePage::fan_out, i)<< endl;
+    //cout << "max keys: " << pow(BTreePage::fan_out, i)*BTreePage::MAX_KEY_PER_PAGE << " max nodes: " <<  pow(BTreePage::fan_out, i)<< endl;
   }
 }
 
@@ -87,19 +87,20 @@ void BTreeIndex::flush(string indexFilePath) {
     BTreePage* page = myqueue.front();
     myqueue.pop();
     page->flush(indexFile);
-    cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
+    //cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
     for(int i = 0; i < page->children.size(); i++) {
       //cout << "child num: " << page->children.at(i)->pageNum << " \t";
       assert(page->children.at(i)->pageNum == page->rids.at(i));
       myqueue.push(page->children.at(i));
     }
-    cout << endl;
+    //cout << endl;
   }
-
+/*
     cout << "size of root keys: " << tree.at(0).at(0)->keys.size() << endl;
   for (auto& key : tree.at(0).at(0)->keys) {
     cout << key << endl;
   }
+*/
 }
 
 /*
@@ -117,7 +118,6 @@ void BTreeIndex::flush(string indexFilePath) {
   }
 }
 */
-
 template<class Iter, class T>
 Iter binary_find(Iter begin, Iter end, T val)
 {
@@ -130,8 +130,7 @@ Iter binary_find(Iter begin, Iter end, T val)
     }
     else {
             //cout << "binary_find not found value" << endl;
-
-        return i-1; // actual value not found. return largest value smaller than val
+        return i-1; // actual value not found. return smallest value larger than val
 
     }
 }
@@ -184,43 +183,65 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
   if (local_key == key) {
     return make_pair(true, offset);
   }
-  cout << "local key: " << local_key << endl;
+  //cout << "local key: " << local_key << endl;
   uint32_t count = *((uint32_t *)&buffer[sizeof(local_key)]);
-  cout << "count: " << count << endl;
+  //cout << "count: " << count << endl;
   uint32_t length = *((uint32_t *)&buffer[sizeof(local_key)+sizeof(count)]);
-  cout << "length: " << length << endl;
+  //cout << "length: " << length << endl;
   new_offset = sizeof(local_key) + sizeof(count) + sizeof(length) + ceil((float)count/8.0) + count + length ;
   off_t size_read = new_offset;
   off_t old_size_read = 0;
-  cout << "new relative offset: " << new_offset << endl;
+
+  //cout << "new relative offset: " << new_offset << endl;
   new_offset += offset;
-  cout << "new absolute offset: " << new_offset << endl;
+  //cout << "new absolute offset: " << new_offset << endl;
   ssize_t header_leng = sizeof(uint64_t) + 2*sizeof(uint32_t);
 
-  while (local_key != key and size_read <= 4096 - header_leng) {
+    local_key = *((uint64_t *)&buffer[size_read]);
+
+    size_read += sizeof(local_key);
+while (local_key != key and size_read <= 4096 - header_leng) {
+
+
     old_offset = new_offset;
     old_size_read = size_read;
-    local_key = *((uint64_t *)&buffer[size_read]);
-    cout << "local key: " << local_key << endl;
-    size_read += sizeof(local_key);
+    //cout << "local key: " << local_key << endl;
     count = *((uint32_t *)&buffer[size_read]);
-  cout << "count: " << count << endl;
+    //cout << "count: " << count << endl;
 
     size_read += sizeof(count);
     length = *((uint32_t *)&buffer[size_read]);
-    cout << "length: " << length << endl;
+    //cout << "length: " << length << endl;
 
     size_read += sizeof(length);
     new_offset = sizeof(local_key) + sizeof(count) + sizeof(length) + ceil((float)count/8.0) + count + length ;
-      cout << "new relative offset: " << new_offset << endl;
+    //cout << "new relative offset: " << new_offset << endl;
     size_read += ceil((float)count/8.0) + count + length ;
     new_offset += old_offset;
-      cout << "new absolute offset: " << new_offset << endl;
+    /*
+    cout << "new absolute offset: " << new_offset << endl;
+    cout << "size read: " << size_read << endl;
+    cout << "offset: " << offset << endl;
+    cout << "diff: " << (new_offset - size_read - offset) << endl;
+    cout << "break pt: " << (4096 - header_leng) << endl;
+    */
+
+
+    if (size_read > 4096 - header_leng) {
+      pread(indexFile, (void *)&local_key, sizeof(local_key), new_offset);
+      //cout << "actual key read: " << local_key << endl;
+
+    } else {
+      local_key = *((uint64_t *)&buffer[size_read]);
+    }
+    //cout << "local key" << local_key << endl;
+    size_read += sizeof(local_key);
+
   }
   if (local_key == key) {
-    cout << "found key: " << local_key << endl;
+    //cout << "found key: " << local_key << endl;
 
-    return make_pair(true, old_size_read+offset);
+    return make_pair(true, size_read+offset-sizeof(local_key));
   } else {
     return make_pair(false, 0);
   }
@@ -246,8 +267,19 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, int indexFile, int binFile)
   } else {
     BTreePage::read(indexFile, curPage, true, size_read);
     int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
+cout << "found index: " << found_index << endl;
+    if (found_index == - 1) {
+      for (auto key : curPage.keys) {
+        cout << key << "\t";
+      }
+      cout << endl;
+    }
+    cout << "found_index: " << found_index << endl;
     uint64_t offset = curPage.rids.at(found_index);
-    cout << "got rid: " << offset << endl;
+    if (key == 844468738445) {
+      cout << "offset for key: " << key << " is " << offset << endl;
+   }
+    //cout << "got rid: " << offset << endl;
 
     return probe_bin(key, binFile, offset);
   }
@@ -268,8 +300,16 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, int indexFile, int binFile)
       //curPage = stream.at(result.second);
       //cout << "binary find" << endl;
       int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
+    cout << "found_index: " << found_index << endl;
+cout << "found index: " << found_index << endl;
+    if (found_index == - 1) {
+      for (auto key : curPage.keys) {
+        cout << key << "\t";
+      }
+      cout << endl;
+    }
       uint64_t offset = curPage.rids.at(found_index);
-      cout << "got rid: " << offset << endl;
+      //cout << "got rid: " << offset << endl;
       return probe_bin(key, binFile, offset);
 
 
@@ -505,8 +545,10 @@ void BTreeIndex::build_tree(vector<DataEntry> entries) {
   addNodeToTree(leaf->level, leaf);
 
   for (int i = 0; i < entries.size(); i++) {
+
     if (!leaf->isFull()) {
       //cout << "leaf not full. add entry: " << i << endl;
+
       leaf->addKey(entries.at(i).key);
       leaf->rids.push_back(entries.at(i).rid);
     } else {
@@ -557,6 +599,7 @@ void BTreeIndex::build_tree(vector<DataEntry> entries) {
         tmp->setParent(newChild);
         newChild = tmp;
       }
+
       //cout << "add entry: " << i << " to level: " << newChild->level << endl;
       newChild->addKey(entries.at(i).key); //add current entry to the leaf
       newChild->rids.push_back(entries.at(i).rid);
@@ -565,6 +608,7 @@ void BTreeIndex::build_tree(vector<DataEntry> entries) {
   }
   setPageOffset();
 }
+
 /*
  * parser that expects a file with 3 tab-delimited columns
  * with the following format: key\tcount\trid where the
@@ -610,11 +654,64 @@ vector<DataEntry> BTreeIndex::parse_idx_file(string path) {
     } else {
       //cout << entry.rid << " |" << endl;
     }
-    if (entry.rid - rid >= leaf_chunk_size) {
+    if (entry.rid - rid >= leaf_chunk_size || entry.rid == 0 ) { //rid == 0 means first rid
+
       data_entries.push_back(entry);
       rid = entry.rid;
     }
 
+  }
+
+
+  return data_entries;
+}
+
+/*
+ * parser that expects a file with 3 tab-delimited columns
+ * with the following format: key\tcount\trid where the
+ * middle value count is ignored
+ */
+vector<DataEntry> BTreeIndex::parse_idx_file_get_all(string path) {
+  int leaf_chunk_size = 4096; //leaf level rids should be 4k chunk apart
+  vector<DataEntry> data_entries;
+  ifstream input(path);
+  char const row_delim = '\n';
+  string const field_delim = "\t";
+  for (string row; getline(input, row, row_delim);) {
+    istringstream ss(row);
+
+    //read in key
+    auto start = 0U;
+    auto end = row.find(field_delim);
+    DataEntry entry (0, 0);
+    ss.clear();
+    ss.str(row.substr(start, end - start));
+    if (!(ss >> entry.key)) {
+      cout << "read key failed" << endl;
+      cout << row.substr(start, end - start) << endl;
+      continue;
+    } else {
+      //cout << "| " << entry.key << " ";
+    }
+
+    //ignore count for now
+    start = end + field_delim.length();
+    end = row.find(field_delim, start);
+
+    //read in rid
+    start = end + field_delim.length();
+    end = row.find(field_delim, start);
+    ss.clear();
+    ss.str(row.substr(start, end - start));
+    if (!(ss >> entry.rid)) {
+      cout << "read rid failed" << endl;
+      cout << row.substr(start, end - start) << endl;
+      continue;
+    } else {
+      //cout << entry.rid << " |" << endl;
+    }
+
+    data_entries.push_back(entry);
   }
 
 

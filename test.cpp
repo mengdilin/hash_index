@@ -118,6 +118,7 @@ int main(int argc, char** argv) {
     }
 
     btree.flush(index_path);
+    vector<DataEntry> all_entries = btree.parse_idx_file_get_all(argv[1]);
 
 
     uint64_t key =40;
@@ -138,30 +139,24 @@ int main(int argc, char** argv) {
     int index_fd = fileno(c_read_index);
     int data_bin_fd = fileno(c_bin_file);
     auto result = btree.probe(key,index_fd, data_bin_fd);
+    cout << "here" << endl;;
     if (result.first) {
         cout << "got value: " << result.second << endl;
 
     } else {
         cout << "not found: " << key << endl;
     }
+/*
     auto t1 = chrono::high_resolution_clock::now();
-    for (auto& entry : entries) {
-
+    for (auto& entry : all_entries) {
+        cout << "key: " << entry.key << endl;
         auto result = btree.probe(entry.key,index_fd, data_bin_fd);
         print_error_if_failed(result, entry.key, entry.rid);
-        /*
-        if (result.first) {
-            cout << "found key: " << entry.key << " with rid: " << result.second << endl;
-        } else {
-            cout << "not found key: " << entry.key << endl;
-        }
-        */
     }
     auto t2 = chrono::high_resolution_clock::now();
     cout << "avg nanosec per probe: " << (t2-t1).count()/entries.size() << endl;
-
     //btree.BfsDebugPrint();
-
+*/
     return 0;
 }
 

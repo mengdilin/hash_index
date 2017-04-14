@@ -8,7 +8,7 @@ using namespace std;
 
 class BTreePage {
   public:
-    constexpr static unsigned int PAGE_SIZE = 64;
+    constexpr static unsigned int PAGE_SIZE = 4096;
 
     //page_size/16 -1 (1 for counter + extra rid)
     constexpr static unsigned int MAX_KEY_PER_PAGE = PAGE_SIZE*1.0/(2*sizeof(uint64_t))-1;
@@ -20,7 +20,7 @@ class BTreePage {
     vector<uint64_t> keys;
     vector<uint64_t> rids;
     BTreePage* parent;
-    unsigned int level = -1;
+    unsigned int level = 0;
 
 
     //static constexpr double KNUTH_NUMBER = 1054997077.39;
