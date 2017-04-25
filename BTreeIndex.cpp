@@ -114,26 +114,33 @@ Iter binary_find(Iter begin, Iter end, T val)
 
     }
 }
-  pair<bool, uint64_t> BTreeIndex::range_probe_bin_gt(uint64_t key, int indexFile, off_t offset) {
-    auto result = probe_bin(key, indexFile, offset);
-    if (result.first) { //if true
 
-
-    }
+vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_gt(uint64_t key, int indexFile, int dataBinFile, off_t bin_file_end) {
+    auto result = probe(key,indexFile, dataBinFile);
+    off_t rid = (off_t)result.second;
+    return range_probe_bin(dataBinFile, rid, bin_file_end);
   }
 
-vector<pair<uint64_t, uint64_t>> BTreeIndex::probe_bin(int indexFile, off_t offset, off_t end_offset) {
-  cout << "begin offset: " << offset << " and end offset: " << end_offset << endl;
+vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_lt(uint64_t key, int indexFile, int dataBinFile) {
+    auto result = probe(key,indexFile, dataBinFile);
+    off_t rid = (off_t)result.second;
+    auto pairs = range_probe_bin(dataBinFile, (off_t)0, rid);
+    pairs.push_back(make_pair(key, rid));
+    return pairs;
+  }
+
+vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_bin(int indexFile, off_t offset, off_t end_offset) {
+  //cout << "begin offset: " << offset << " and end offset: " << end_offset << endl;
   vector<pair<uint64_t, uint64_t>> result;
   uint8_t buffer[4096];
   pread(indexFile, (void *)&buffer, 4096, offset);
   uint64_t local_key = *((uint64_t *)&buffer[0]);
+   pread(indexFile, (void *)&local_key, sizeof(local_key), offset);
   uint32_t count;
   uint32_t length;
   off_t size_read = sizeof(local_key);
   off_t old_size_read = size_read;
-  off_t total_size_read = 0;
-  off_t buffers_read = 0;
+  off_t total_size_read = sizeof(local_key);
   result.push_back(make_pair(local_key, offset));
 
 
@@ -144,29 +151,38 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::probe_bin(int indexFile, off_t offs
     count = *((uint32_t *)&buffer[size_read]);
 
     size_read += sizeof(count);
+    total_size_read += sizeof(count);
+
     length = *((uint32_t *)&buffer[size_read]);
 
     size_read += sizeof(length);
     size_read += ceil((float)count/8.0) + count + length ;
-    cout << "size: " << (size_read+offset) << endl;
-    cout << "total size: " << (total_size_read+offset) << endl;
-    cout << "offset: " << end_offset << endl;
-    if (size_read+offset >= end_offset) {
+
+    total_size_read += sizeof(length);
+    total_size_read += ceil((float)count/8.0) + count + length ;
+
+    /*
+    cout << "local key: " << local_key << endl;
+    cout << "size+offset: " << (size_read+offset) << endl;
+    cout << "size: " << size_read << endl;
+    cout << "total size+offset: " << (total_size_read+offset) << endl;
+    cout << "end_offset: " << end_offset << endl;
+    cout << "inserted offset: " << (total_size_read + 4096 - size_read+offset) << endl;
+    */
+    if (total_size_read+offset >= end_offset) {
       //last 4096 buffer has reached its end
       break;
     }
     if (size_read > 4096 - header_leng) {
-      total_size_read += size_read;
       size_read = 0;
-      buffers_read++;
       pread(indexFile, (void *)&buffer, 4096, offset+total_size_read);
-      //pread(indexFile, (void *)&local_key, sizeof(local_key), total_size_read+offset);
     }
 
     local_key = *((uint64_t *)&buffer[size_read]);
 
-    result.push_back(make_pair(local_key, buffers_read*4096 + size_read+offset));
+    result.push_back(make_pair(local_key, total_size_read + offset));
     size_read += sizeof(local_key);
+    total_size_read += sizeof(local_key);
   }
   return result;
 }
@@ -180,11 +196,8 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
   if (local_key == key) {
     return make_pair(true, offset);
   }
-  //cout << "local key: " << local_key << endl;
   uint32_t count = *((uint32_t *)&buffer[sizeof(local_key)]);
-  //cout << "count: " << count << endl;
   uint32_t length = *((uint32_t *)&buffer[sizeof(local_key)+sizeof(count)]);
-  //cout << "length: " << length << endl;
   new_offset = sizeof(local_key) + sizeof(count) + sizeof(length) + ceil((float)count/8.0) + count + length ;
   off_t size_read = new_offset;
   off_t old_size_read = 0;
@@ -200,7 +213,7 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
   }
 
     size_read += sizeof(local_key);
-  while (local_key != key and size_read <= 4096 - header_leng) {
+  while (local_key < key and size_read <= 4096 - header_leng) {
 
 
     old_offset = new_offset;
@@ -224,10 +237,13 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
     }
     size_read += sizeof(local_key);
   }
-  if (local_key == key) {
+  cout << "local key: " << local_key << endl;
+  cout << "found: " << (size_read+offset-sizeof(local_key)) << endl;
 
+  if (local_key == key) {
     return make_pair(true, size_read+offset-sizeof(local_key));
   } else {
+    //return the smallest key larger than search key, if search key not found
     return make_pair(false, size_read+offset-sizeof(local_key));
   }
 
@@ -244,7 +260,7 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe(uint64_t key, int index
     BTreePage::read(indexFile, curPage, true, size_read);
     int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
     uint64_t offset = curPage.rids.at(found_index);
-    return probe_bin(binFile, offset, bin_file_end);
+    return range_probe_bin(binFile, offset, bin_file_end);
   }
 
   auto result = curPage.find(key);
@@ -253,7 +269,7 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe(uint64_t key, int index
       BTreePage::read(indexFile, curPage, true, (off_t)result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t));
       int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
       uint64_t offset = curPage.rids.at(found_index);
-      return probe_bin(binFile, offset, bin_file_end);
+      return range_probe_bin(binFile, offset, bin_file_end);
     }
     level++;
     BTreePage::read(indexFile, curPage, false, (off_t)result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t));

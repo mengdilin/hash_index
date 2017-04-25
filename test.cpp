@@ -56,7 +56,7 @@ inline off_t fileSize(int fd) {
    return(s.st_size);
 }
 
-void range_probe_key(uint64_t key, string dataBinFilePath, string indexFilePath) {
+void range_probe_key_gt(uint64_t key, string dataBinFilePath, string indexFilePath) {
     BTreeIndex btree;
     cout << "here" << endl;
     FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
@@ -64,20 +64,33 @@ void range_probe_key(uint64_t key, string dataBinFilePath, string indexFilePath)
     int index_fd = fileno(c_read_index);
     int data_bin_fd = fileno(c_bin_file);
     off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
-    auto result = btree.range_probe(key, index_fd, data_bin_fd, bin_file_size);
+    auto result = btree.range_probe_gt(key, index_fd, data_bin_fd, bin_file_size);
     for(auto pair_r : result) {
         cout << pair_r.first << "," << pair_r.second << endl;
-    }
-    /*
-    if (result.first) {
-        cout << "got rid: " << result.second << endl;
+        auto test_result = btree.probe(pair_r.first,index_fd, data_bin_fd);
+        print_error_if_failed(test_result, pair_r.first, pair_r.second);
 
-    } else {
-        cout << "not found: " << key << endl;
     }
-    */
+    cout << "found keys: " << result.size() << endl;
 }
 
+void range_probe_key_lt(uint64_t key, string dataBinFilePath, string indexFilePath) {
+    BTreeIndex btree;
+    cout << "here" << endl;
+    FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
+    FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
+    int index_fd = fileno(c_read_index);
+    int data_bin_fd = fileno(c_bin_file);
+    off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
+    auto result = btree.range_probe_lt(key, index_fd, data_bin_fd);
+    for(auto pair_r : result) {
+        cout << pair_r.first << "," << pair_r.second << endl;
+        auto test_result = btree.probe(pair_r.first,index_fd, data_bin_fd);
+        print_error_if_failed(test_result, pair_r.first, pair_r.second);
+
+    }
+    cout << "found keys: " << result.size() << endl;
+}
 
 void probe_key(uint64_t key, string dataBinFilePath, string indexFilePath) {
     BTreeIndex btree;
@@ -128,7 +141,7 @@ int main(int argc, char** argv) {
         probe_file(dataIdxFilePath, dataBinFilePath, indexFilePath);
     } else if (mode == "-probe_key") {
         if (argc < 5) {
-            cerr << "use ./test <key> -probe_file <index_file_path> <binary_data_file_path>" << endl;
+            cerr << "use ./test <key> -probe_key <index_file_path> <binary_data_file_path>" << endl;
             exit(1);
         }
         uint64_t key;
@@ -161,11 +174,11 @@ int main(int argc, char** argv) {
         string dataBinFilePath = argv[4];
         string dataIdxFilePath = argv[5];
         build_index(dataIdxFilePath, indexFilePath);
-        range_probe_key(key, dataBinFilePath, indexFilePath);
+        range_probe_key_gt(key, dataBinFilePath, indexFilePath);
 
-    } else if (mode == "-range_probe_key") {
+    } else if (mode == "-range_probe_key_gt") {
         if (argc < 5) {
-            cerr << "use ./test <key> -probe_file <index_file_path> <binary_data_file_path>" << endl;
+            cerr << "use ./test <key> -range_probe_key_gt <index_file_path> <binary_data_file_path>" << endl;
             exit(1);
         }
         uint64_t key;
@@ -176,7 +189,21 @@ int main(int argc, char** argv) {
         }
         string indexFilePath = argv[3];
         string dataBinFilePath = argv[4];
-        range_probe_key(key, dataBinFilePath, indexFilePath);
+        range_probe_key_gt(key, dataBinFilePath, indexFilePath);
+    } else if (mode == "-range_probe_key_lt") {
+        if (argc < 5) {
+            cerr << "use ./test <key> -range_probe_key_lt <index_file_path> <binary_data_file_path>" << endl;
+            exit(1);
+        }
+        uint64_t key;
+        istringstream ss(argv[1]);
+        if (!(ss >> key)) {
+            cout << "set key failed" << endl;
+            exit(1);
+        }
+        string indexFilePath = argv[3];
+        string dataBinFilePath = argv[4];
+        range_probe_key_lt(key, dataBinFilePath, indexFilePath);
     } else {
         cerr << "mode: " << mode << " not supported" << endl;
 
