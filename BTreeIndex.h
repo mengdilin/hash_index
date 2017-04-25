@@ -35,6 +35,10 @@ public:
   pair<bool, uint64_t> probe(uint64_t, int, int);
 
   pair<bool, uint64_t> probe_bin(uint64_t, int, off_t);
+
+  pair<bool, uint64_t> range_probe_bin_gt(uint64_t, int, off_t);
+  vector<pair<uint64_t, uint64_t>> range_probe(uint64_t key, int indexFile, int binFile, off_t bin_file_end);
+  vector<pair<uint64_t, uint64_t>> probe_bin(int indexFile, off_t offset, off_t end_offset);
   ~BTreeIndex();
 
 };

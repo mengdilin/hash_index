@@ -23,6 +23,7 @@ void print_error_if_failed(pair<bool, uint64_t>& result, uint64_t& key, uint64_t
     if (not result.first) {
         cout << "binary search cannot find key. probe failed for key: " << key << endl;
     } else {
+
         if (result.second != rid) {
             cout << "proble failed for key: " << key << " expected: " << rid << " but got: " << result.second << endl;
         }
@@ -44,6 +45,39 @@ void probe_file(string dataIdxFilePath, string dataBinFilePath, string indexFile
     auto t2 = chrono::high_resolution_clock::now();
     cout << "avg microsec per probe: " << chrono::duration_cast<chrono::microseconds>(t2-t1).count()/all_entries.size() << endl;
 }
+
+inline off_t fileSize(int fd) {
+   struct stat s;
+   if (fstat(fd, &s) == -1) {
+      int saveErrno = errno;
+      fprintf(stderr, "fstat(%d) returned errno=%d.", fd, saveErrno);
+      return(0);
+   }
+   return(s.st_size);
+}
+
+void range_probe_key(uint64_t key, string dataBinFilePath, string indexFilePath) {
+    BTreeIndex btree;
+    cout << "here" << endl;
+    FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
+    FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
+    int index_fd = fileno(c_read_index);
+    int data_bin_fd = fileno(c_bin_file);
+    off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
+    auto result = btree.range_probe(key, index_fd, data_bin_fd, bin_file_size);
+    for(auto pair_r : result) {
+        cout << pair_r.first << "," << pair_r.second << endl;
+    }
+    /*
+    if (result.first) {
+        cout << "got rid: " << result.second << endl;
+
+    } else {
+        cout << "not found: " << key << endl;
+    }
+    */
+}
+
 
 void probe_key(uint64_t key, string dataBinFilePath, string indexFilePath) {
     BTreeIndex btree;
@@ -116,8 +150,36 @@ int main(int argc, char** argv) {
         string dataBinFilePath = argv[4];
         build_index(dataIdxFilePath, indexFilePath);
         probe_file(dataIdxFilePath, dataBinFilePath, indexFilePath);
+    } else if (mode == "-range" ) {
+        uint64_t key;
+        istringstream ss(argv[1]);
+        if (!(ss >> key)) {
+            cout << "set key failed" << endl;
+            exit(1);
+        }
+        string indexFilePath = argv[3];
+        string dataBinFilePath = argv[4];
+        string dataIdxFilePath = argv[5];
+        build_index(dataIdxFilePath, indexFilePath);
+        range_probe_key(key, dataBinFilePath, indexFilePath);
+
+    } else if (mode == "-range_probe_key") {
+        if (argc < 5) {
+            cerr << "use ./test <key> -probe_file <index_file_path> <binary_data_file_path>" << endl;
+            exit(1);
+        }
+        uint64_t key;
+        istringstream ss(argv[1]);
+        if (!(ss >> key)) {
+            cout << "set key failed" << endl;
+            exit(1);
+        }
+        string indexFilePath = argv[3];
+        string dataBinFilePath = argv[4];
+        range_probe_key(key, dataBinFilePath, indexFilePath);
     } else {
         cerr << "mode: " << mode << " not supported" << endl;
+
     }
     /*
     BTreePage page;
