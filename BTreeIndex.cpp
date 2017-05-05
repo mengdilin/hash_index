@@ -12,10 +12,21 @@
 #include <errno.h>
 #include <string>
 #include <math.h>       /* ceil */
+
+/**
+ * @file BTreeIndex.cpp
+ * @brief implementation of btree index
+ */
+
 BTreeIndex::~BTreeIndex() {
 
 }
 
+/**
+ * @brief Constructor of BTreeIndex that sets up the initial variables
+ * It needs to compute number of total keys per level, given max keys
+ * per page.
+ */
 BTreeIndex::BTreeIndex() {
   cout << "MAX_KEY_PER_PAGE: " << BTreePage::MAX_KEY_PER_PAGE << endl;
 
@@ -30,6 +41,14 @@ BTreeIndex::BTreeIndex() {
   }
 }
 
+/**
+ * @brief helper function when building btree index. Offsets range from 0 to
+ * total pages in the btree tree. This function sets each page's offset by doing
+ * a level-wise traversal (BFS) of the tree from left to right.
+ * root page has an offset of 0. Its leftmost child
+ * has an offset of 1. Its rightmost child has an offset of <total pages in the child's level>
+ * its leftmost grandchild's offset = its rightmost child's offset + 1 and so on..
+ */
 void BTreeIndex::setPageOffset() {
   uint64_t pageNum = 0;
   BTreePage* root =(tree.at(0).at(0));
@@ -52,23 +71,16 @@ void BTreeIndex::setPageOffset() {
   }
 }
 
-void BTreeIndex::debugPrint() {
-  debugPrint(tree.at(0).at(0));
-}
-
-
-vector<BTreePage*> BTreeIndex::get_simulated_stream() {
-  vector<BTreePage*> stream;
-  for (int i = 0; i < tree.size(); i++) {
-    for (int j = 0; j < tree.at(i).size(); j++) {
-      stream.push_back(tree.at(i).at(j));
-    }
-  }
-  return stream;
-}
-
-
-
+/**
+ * @brief writes the btree index to a binary file via
+ * a level-wise traversal (BFS)
+ * Format of the index file:
+ * number of pages in the index (8 bytes) followed by
+ * root page, leftmost child page of root, ...., rightmost
+ * child page of root, leftmost grandchild of root, ...,
+ * leftmost leaf page, ..., rightmost leaf page.
+ * @param indexFilePath path of the output index file
+ */
 void BTreeIndex::flush(string indexFilePath) {
   ofstream indexFile;
   indexFile.open(indexFilePath, ios::binary | ios::out);
@@ -88,7 +100,13 @@ void BTreeIndex::flush(string indexFilePath) {
   }
 }
 
-
+/**
+ * @brief helper function used in probe() to find
+ * the index of the corresponding rid of a key in a given btree page.
+ * @param begin begin iterator of the key vector
+ * @param end end iterator of the key vector
+ * @param val key value we are doing the binary find on
+ */
 template<class Iter, class T>
 Iter binary_find(Iter begin, Iter end, T val)
 {
@@ -104,10 +122,16 @@ Iter binary_find(Iter begin, Iter end, T val)
     }
 }
 
+/**
+ * @brief range probe if we are searching for all keys x such that: x >= key
+ * @param key: value of key for the inquality x >= key
+ * @param indexFile: file descriptor of the binary index file
+ * @param dataBinFile: file descriptor of the binary data file
+ * @param bin_file_end: size of dataBinFile (i.e. last byte of dataBinFile)
+ */
 vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_gt(uint64_t key, int indexFile, int dataBinFile, off_t bin_file_end) {
     auto result = probe(key,indexFile, dataBinFile);
     off_t rid = (off_t)result.second;
-    cout << "found rid: " << rid << endl;
     if (rid >= bin_file_end) {
       vector<pair<uint64_t, uint64_t>> empty;
       return empty;
@@ -115,6 +139,12 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_gt(uint64_t key, int in
     return range_probe_bin(dataBinFile, rid, bin_file_end);
   }
 
+/**
+ * @brief range probe if we are searching for all keys x such that: key >= x
+ * @param key: value of key for the inquality key >= x
+ * @param indexFile: file descriptor of the binary index file
+ * @param dataBinFile: file descriptor of the binary data file
+ */
 vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_lt(uint64_t key, int indexFile, int dataBinFile) {
     auto result = probe(key,indexFile, dataBinFile);
     off_t rid = (off_t)result.second;
@@ -122,6 +152,15 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_lt(uint64_t key, int in
     pairs.push_back(make_pair(key, rid));
     return pairs;
   }
+
+  /**
+ * @brief range probe if we are searching for all keys x such that: start_key <= x <= end_key
+ * @param start_key: value of key for the inquality start_key <= x <= end_key
+ * @param end_key: value of key for the inquality start_key <= x <= end_key
+ * @param indexFile: file descriptor of the binary index file
+ * @param dataBinFile: file descriptor of the binary data file
+ * @param bin_file_end: size of dataBinFile (i.e. last byte of dataBinFile)
+ */
  vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_endpts(uint64_t start_key, uint64_t end_key, int indexFile, int dataBinFile, off_t bin_file_end) {
     auto start_result = probe(start_key, indexFile, dataBinFile);
     auto end_result = probe(end_key,indexFile, dataBinFile);
@@ -145,7 +184,14 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_lt(uint64_t key, int in
     return result;
  }
 
-
+/**
+ * @brief helper function for range probe.
+ * Given a start offset and an end offset of a binary data file, return
+ * all keys within the offsets
+ * @param indexFile: file descriptor of the binary data file
+ * @param offset: start offset of the binary data file
+ * @param end_offset: end offset of the binary data file
+ */
 vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_bin(int indexFile, off_t offset, off_t end_offset) {
   //cout << "begin offset: " << offset << " and end offset: " << end_offset << endl;
   vector<pair<uint64_t, uint64_t>> result;
@@ -178,14 +224,6 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_bin(int indexFile, off_
     total_size_read += sizeof(length);
     total_size_read += ceil((float)count/8.0) + count + length ;
 
-    /*
-    cout << "local key: " << local_key << endl;
-    cout << "size+offset: " << (size_read+offset) << endl;
-    cout << "size: " << size_read << endl;
-    cout << "total size+offset: " << (total_size_read+offset) << endl;
-    cout << "end_offset: " << end_offset << endl;
-    cout << "inserted offset: " << (total_size_read + 4096 - size_read+offset) << endl;
-    */
     if (total_size_read+offset >= end_offset) {
       //last 4096 buffer has reached its end
       break;
@@ -204,6 +242,15 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_bin(int indexFile, off_
   return result;
 }
 
+/**
+ * @brief helper function for btree quality probe on a single key. It searches
+ * the binary data file, looking for key and if key is found, returns an
+ * offset to the binary data file. If key is not found, return an offset of
+ * the smallest key larger than the search key.
+ * @param key: the key we are probing for
+ * @param indexFile: file descriptor of the binary data file
+ * @param offset: start offset of the binary data file
+ */
 pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t offset) {
   uint8_t buffer[4096];
   ssize_t bytes_read = pread(indexFile, (void *)&buffer, 4096, offset);
@@ -266,7 +313,14 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
 
 }
 
-
+/**
+ * @brief btree quality probe on a single key using file descriptor. First, it traverses the btree
+ * index, then it calls probe_bin to probe the binary data file, looking for
+ * the offset of the key.
+ * @param key: the key we are probing for
+ * @param indexFile: file descriptor of the btree index file
+ * @param binFile: file descriptor of the binary data file
+ */
 pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, int indexFile, int binFile) {
   //cout << "key: " << key << endl;
   int level = 1;
@@ -279,20 +333,10 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, int indexFile, int binFile)
   } else {
     BTreePage::read(indexFile, curPage, true, size_read);
     int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
-    if (found_index == - 1) {
-      for (auto key : curPage.keys) {
-        cout << key << "\t";
-      }
-      cout << endl;
+    if (found_index == -1) {
+      return make_pair(false, 0);
     }
-    cout << "here" << endl;
-    for (auto key : curPage.keys) {
-        cout << key << "\t";
-      }
-      cout << endl;
-    cout << "found_index: " << found_index << endl;
     uint64_t offset = curPage.rids.at(found_index);
-    cout << "found offset: " << offset << endl;
     return probe_bin(key, binFile, offset);
   }
 
@@ -302,10 +346,7 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, int indexFile, int binFile)
       BTreePage::read(indexFile, curPage, true, (off_t)result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t));
       int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
     if (found_index == - 1) {
-      for (auto key : curPage.keys) {
-        cout << key << "\t";
-      }
-      cout << endl;
+      return make_pair(false, 0);
     }
       uint64_t offset = curPage.rids.at(found_index);
       return probe_bin(key, binFile, offset);
@@ -318,20 +359,19 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, int indexFile, int binFile)
   return make_pair(false, 0);
 }
 
-
+/**
+ * @brief This method is not being used in the current
+ * implementation of probe. btree quality probe on a single key using file handler.
+ * First, it traverses the btree
+ * index, then it calls probe_bin to probe the binary data file, looking for
+ * the offset of the key.
+ * @param key: the key we are probing for
+ * @param indexFile: file handler of the btree index file
+ */
 pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
-  //cout << "key: " << key << endl;
   int level = 1;
   uint64_t tree_size;
   fread(&tree_size, sizeof(tree_size), 1, indexFile);
-  /*
-  cout << "tree size: " << tree_size << endl;
-  for (auto &level : tree) {
-    cout <<"level nodes: " << level.size() << endl;
-  }
-  */
-  //cout << tree.size() << endl;
-
   BTreePage curPage;
   if (tree_size > 1) {
     BTreePage::read(indexFile, curPage, false);
@@ -352,86 +392,25 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
 
   auto result = curPage.find(key);
   while(level < tree_size) {
-    //cout << "child numer: " << result.second << endl;
-    //cout << "key: " << key << endl;
-
-
     if (level == tree_size-1) {
-      /*
-      cout << "reached max level" << endl;
-      cout << "key: " << key << endl;
-      cout << "page num: " << result.second << endl;
-      */
       fseek(indexFile, result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t), SEEK_SET);
       BTreePage::read(indexFile, curPage, true);
-      //curPage = stream.at(result.second);
-      //cout << "binary find" << endl;
       int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
 
       fseek(indexFile, 0, SEEK_SET);
       return make_pair(true, curPage.rids.at(found_index));
-
-      //cout << "found index: " << found_index <<endl;
-
-      /*
-      for (int i =0; i < curPage.keys.size(); i++) {
-        cout << curPage.keys.at(i) << "\t";
-        if (curPage.keys.at(i) == key) {
-          cout << "new found index: " << i << endl;
-          found_index = i;
-        }
-      }
-
-      cout << endl;
-      for (int i =0; i < curPage.rids.size(); i++) {
-        cout << curPage.rids.at(i) << "\t";
-      }
-
-
-      cout << endl;
-      cout << "found value: " << curPage.rids.at(found_index) << endl;
-      break;
-      */
-
     }
     level++;
     fseek(indexFile, result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t), SEEK_SET);
     BTreePage::read(indexFile, curPage, false);
-    //cout << "total pages: " << stream.size() << endl;
-
-    //curPage = stream.at(result.second);
     result = curPage.find(key);
-    //cout << "level: " << level << endl;
-    //cout << "tree level: " << tree.size() << endl;
   }
   return make_pair(false, 0);
 }
 
-/*
-void BTreeIndex::probe(uint64_t key, vector<BTreePage*> stream) {
-  cout << "key: " << key << endl;
-  int level = 1;
-  BTreePage* curPage = stream.at(0);
-  auto result = curPage->find(key);
-  while(result.first) {
-    if (level == tree.size()-1) {
-      cout << "reached max level" << endl;
-      curPage = stream.at(result.second);
-      for (int i =0; i < curPage->keys.size(); i++) {
-        cout << curPage->keys.at(i) << "\t";
-      }
-      cout << endl;
-      break;
-    }
-    level++;
-    //cout << "total pages: " << stream.size() << endl;
-    curPage = stream.at(result.second);
-    result = curPage->find(key);
-    //cout << "level: " << level << endl;
-    //cout << "tree level: " << tree.size() << endl;
-  }
-}
-*/
+/**
+ * @brief Prints each page in the tree
+ */
 void BTreeIndex::BfsDebugPrint() {
   queue<BTreePage*> myqueue;
   myqueue.push(tree.at(0).at(0));
@@ -458,53 +437,25 @@ void BTreeIndex::BfsDebugPrint() {
   }
 }
 
-
-
-void BTreeIndex::test_page_read(FILE* indexFile) {
-  uint64_t tree_size;
-  fread(&tree_size, sizeof(tree_size), 1, indexFile);
-  BTreePage page;
-  BTreePage::read(indexFile, page, false);
-  cout << "size of keys: " << page.keys.size() << endl;
-  for (auto& key : page.keys) {
-    cout << key << endl;
-  }
-}
-
-void BTreeIndex::debugPrint(BTreePage* page) {
-  if (page == nullptr) {
-    cout << " encountered null " << endl;
-    return;
-  }
-  cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
-  for(int i = 0; i < page->children.size(); i++) {
-    cout << "child num: " << page->children.at(i)->pageNum << " \t";
-  }
-  cout << endl;
-  for(int i = 0; i < page->children.size(); i++) {
-    debugPrint(page->children.at(i));
-  }
-}
-
+/**
+ * @brief helper function for building a btree index. It adds a node to a level
+ *
+ */
 void BTreeIndex::addNodeToTree(int level, BTreePage* node) {
-  /*
-    cout << "tree size:" << tree.size() << endl;
-       cout << "insert:" << max_level-level << endl;
-        cout << "Lvl:" << level << endl;
-
-  */
   tree.at(max_level-level).push_back(node);
 }
 
+/**
+ * @brief builds a btree index using the bulkloading algorithm as discussed in
+ * the textbook
+ * @param entries: all (key,rid) entries
+ */
 void BTreeIndex::build_tree(vector<DataEntry> entries) {
   uint64_t sum = 0;
   unsigned int num_levels_needed = 0;
   auto low=lower_bound (keys_per_level.begin(), keys_per_level.end(), entries.size());
-  //cout << "lower bound: " << low-keys_per_level.begin() << endl;
-  //cout << "entry size: " << entries.size() << endl;
   while (entries.size() > sum) {
     sum = keys_per_level[num_levels_needed++];
-    //cout << "node for this level: " << keys_per_level[num_levels_needed-1] << endl;
     vector<BTreePage*> cur_level;
     tree.push_back(cur_level);
   }
@@ -518,29 +469,23 @@ void BTreeIndex::build_tree(vector<DataEntry> entries) {
   for (int i = 0; i < entries.size(); i++) {
 
     if (!leaf->isFull()) {
-      //cout << "leaf not full. add entry: " << i << endl;
 
       leaf->addKey(entries.at(i).key);
       leaf->rids.push_back(entries.at(i).rid);
     } else {
-      //cout << "leaf full for entry: " << i << endl;
       //find latest unfill ancestor
       BTreePage *parent = leaf->parent;
       BTreePage* child = leaf;
-      //cout << "child level before traversal: " << leaf->level;
-
       while((parent != nullptr) && parent->isFull()) {
         child = parent;
         parent = parent->parent;
       }
-      //cout << "child level after traversal: " << child->level;
 
       if (parent == nullptr) {
-        //cout << "create new parent" << endl;
+        //create new ancestor and add current entry to ancestor
+        //add latest full ancestor as its child
         BTreePage* newParent = new BTreePage();
         newParent->level = child->level+1;
-        //cout << "parent level: " << child->level+1 << endl;
-
         newParent->addKey(entries.at(i).key);
 
         addNodeToTree(newParent->level, newParent);
@@ -551,18 +496,19 @@ void BTreeIndex::build_tree(vector<DataEntry> entries) {
 
         child->setParent(parent);
       } else {
+        //add current key to latest unfilled parent
         parent->addKey(entries.at(i).key);
       }
-      //cout << "create new child" << endl;
+      //create new child
       BTreePage* newChild = new BTreePage();
       newChild->level = child->level;
       addNodeToTree(newChild->level, newChild);
-
+      //add child to parent
       parent->addChild(newChild);
       newChild->setParent(parent);
 
       while (newChild->level > 0) { //if child is not leaf
-        //cout << "create grandchild for level: " << newChild->level-1 << endl;
+        //create descendants until we hit the leaf level
         BTreePage* tmp = new BTreePage();
         tmp->level = newChild->level-1;
         addNodeToTree(tmp->level, tmp);
@@ -571,7 +517,6 @@ void BTreeIndex::build_tree(vector<DataEntry> entries) {
         newChild = tmp;
       }
 
-      //cout << "add entry: " << i << " to level: " << newChild->level << endl;
       newChild->addKey(entries.at(i).key); //add current entry to the leaf
       newChild->rids.push_back(entries.at(i).rid);
       leaf = newChild;
@@ -580,8 +525,8 @@ void BTreeIndex::build_tree(vector<DataEntry> entries) {
   setPageOffset();
 }
 
-/*
- * parser that expects a file with 3 tab-delimited columns
+/**
+ * @brief parser that expects a file with 3 tab-delimited columns
  * with the following format: key\tcount\trid where the
  * middle value count is ignored
  */
@@ -638,8 +583,8 @@ vector<DataEntry> BTreeIndex::parse_idx_file(string path) {
   return data_entries;
 }
 
-/*
- * parser that expects a file with 3 tab-delimited columns
+/**
+ * @brief parser that expects a file with 3 tab-delimited columns
  * with the following format: key\tcount\trid where the
  * middle value count is ignored
  */

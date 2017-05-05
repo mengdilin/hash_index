@@ -7,6 +7,11 @@
 #include <utility>
 #include "BTreePage.h"
 
+/**
+ * @file BTreeIndex.h
+ * @brief this header file will contain all required definitions
+ * and basic utility functions for Btree Index
+ */
 using namespace std;
 
 class BTreeIndex {
@@ -15,22 +20,20 @@ class BTreeIndex {
     vector<vector<BTreePage*>> tree;
     vector<uint64_t> keys_per_level;
     vector<uint64_t> fanout_per_level;
-    unsigned int max_level = 20; //fits 824633720832 keys at leaf
+    unsigned int max_level = 20; //arbitrarily set-> max level of a tree
 
 public:
+
+
   BTreeIndex();
   vector<DataEntry> parse_idx_file(string);
   vector<DataEntry> parse_idx_file_get_all(string);
   void build_tree(vector<DataEntry>);
   void setPageOffset();
-  void debugPrint();
   void BfsDebugPrint();
-  void debugPrint(BTreePage*);
   void addNodeToTree(int, BTreePage*);
-  void test_page_read(FILE*);
   void flush(string);
   void probe(uint64_t key, vector<BTreePage*> stream);
-  vector<BTreePage*> get_simulated_stream();
   pair<bool, uint64_t> probe(uint64_t, FILE* );
   pair<bool, uint64_t> probe(uint64_t, int, int);
 

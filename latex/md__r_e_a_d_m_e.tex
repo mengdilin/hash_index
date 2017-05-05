@@ -1,0 +1,23 @@
+
+\begin{DoxyItemize}
+\item ./test 1000\+\_\+entries.\+idx -\/probe\+\_\+file index\+File /dev/shm/genome/v0/data.bin
+\item ./test 1000\+\_\+entries.\+idx -\/build index\+File
+\item ./test 0 -\/probe\+\_\+key index\+File /dev/shm/genome/v0/data.bin
+\end{DoxyItemize}
+
+\subsection*{To test the correctness of range probing when developing the code\+:}
+
+
+\begin{DoxyItemize}
+\item Create a test idx file where entries are in ascending order
+\item Range probe will be run on each entry in the idx file and check against the expected result in the test idx file as follows\+:
+\begin{DoxyItemize}
+\item on a greater-\/than-\/and-\/equal-\/to range probe, a vector of result on current entry from test idx file must then match all (key,rid) pairs after the current entry in test idx file
+\end{DoxyItemize}
+\item To run\+:
+\begin{DoxyItemize}
+\item Ex\+: ./test\+\_\+2048 range\+\_\+test.\+idx -\/range\+\_\+probe\+\_\+key\+\_\+gt\+\_\+test /dev/shm/btree\+\_\+test/2048\+\_\+btree\+\_\+index /dev/shm/genome/v0/data.bin
+\item range\+\_\+test.\+idx is the testing idx file that contains all the entries I would like to test the range probe against.
+\end{DoxyItemize}
+\item Testing on more than 1000 entries can be very slow because confirming all results from all probes is O(n$^\wedge$3) 
+\end{DoxyItemize}

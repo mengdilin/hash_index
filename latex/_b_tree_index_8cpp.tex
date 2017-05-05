@@ -1,0 +1,55 @@
+\hypertarget{_b_tree_index_8cpp}{}\section{B\+Tree\+Index.\+cpp File Reference}
+\label{_b_tree_index_8cpp}\index{B\+Tree\+Index.\+cpp@{B\+Tree\+Index.\+cpp}}
+
+
+implementation of btree index  
+
+
+{\ttfamily \#include \char`\"{}B\+Tree\+Index.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$algorithm$>$}\\*
+{\ttfamily \#include $<$climits$>$}\\*
+{\ttfamily \#include $<$queue$>$}\\*
+{\ttfamily \#include $<$cassert$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$sys/stat.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class Iter , class T $>$ }\\Iter \hyperlink{_b_tree_index_8cpp_a638c4c1117470f8ac6e214449883de71}{binary\+\_\+find} (Iter begin, Iter end, T val)
+\begin{DoxyCompactList}\small\item\em helper function used in probe() to find the index of the corresponding rid of a key in a given btree page. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+implementation of btree index 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{_b_tree_index_8cpp_a638c4c1117470f8ac6e214449883de71}{}\index{B\+Tree\+Index.\+cpp@{B\+Tree\+Index.\+cpp}!binary\+\_\+find@{binary\+\_\+find}}
+\index{binary\+\_\+find@{binary\+\_\+find}!B\+Tree\+Index.\+cpp@{B\+Tree\+Index.\+cpp}}
+\subsubsection[{binary\+\_\+find}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Iter , class T $>$ Iter binary\+\_\+find (
+\begin{DoxyParamCaption}
+\item[{Iter}]{begin, }
+\item[{Iter}]{end, }
+\item[{T}]{val}
+\end{DoxyParamCaption}
+)}\label{_b_tree_index_8cpp_a638c4c1117470f8ac6e214449883de71}
+
+
+helper function used in probe() to find the index of the corresponding rid of a key in a given btree page. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em begin} & begin iterator of the key vector \\
+\hline
+{\em end} & end iterator of the key vector \\
+\hline
+{\em val} & key value we are doing the binary find on \\
+\hline
+\end{DoxyParams}

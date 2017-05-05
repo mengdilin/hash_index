@@ -1,0 +1,276 @@
+\hypertarget{class_b_tree_index}{}\section{B\+Tree\+Index Class Reference}
+\label{class_b_tree_index}\index{B\+Tree\+Index@{B\+Tree\+Index}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_b_tree_index_ae737b5dea98c2e2036fd3b3d9bdcfc22}{B\+Tree\+Index} ()
+\begin{DoxyCompactList}\small\item\em Constructor of \hyperlink{class_b_tree_index}{B\+Tree\+Index} that sets up the initial variables It needs to compute number of total keys per level, given max keys per page. \end{DoxyCompactList}\item 
+\hypertarget{class_b_tree_index_a6202c61a8541b0f5c13eef1f1a940e31}{}vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$ \hyperlink{class_b_tree_index_a6202c61a8541b0f5c13eef1f1a940e31}{parse\+\_\+idx\+\_\+file} (string)\label{class_b_tree_index_a6202c61a8541b0f5c13eef1f1a940e31}
+
+\begin{DoxyCompactList}\small\item\em parser that expects a file with 3 tab-\/delimited columns with the following format\+: key where the middle value count is ignored \end{DoxyCompactList}\item 
+\hypertarget{class_b_tree_index_a4a7270c48f911f355442265f1dc340fd}{}vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$ \hyperlink{class_b_tree_index_a4a7270c48f911f355442265f1dc340fd}{parse\+\_\+idx\+\_\+file\+\_\+get\+\_\+all} (string)\label{class_b_tree_index_a4a7270c48f911f355442265f1dc340fd}
+
+\begin{DoxyCompactList}\small\item\em parser that expects a file with 3 tab-\/delimited columns with the following format\+: key where the middle value count is ignored \end{DoxyCompactList}\item 
+void \hyperlink{class_b_tree_index_a4517e016a4f60cd2e61471f6ba10f347}{build\+\_\+tree} (vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$)
+\begin{DoxyCompactList}\small\item\em builds a btree index using the bulkloading algorithm as discussed in the textbook \end{DoxyCompactList}\item 
+\hypertarget{class_b_tree_index_a46927719822348be775e2ce581a06de0}{}void \hyperlink{class_b_tree_index_a46927719822348be775e2ce581a06de0}{set\+Page\+Offset} ()\label{class_b_tree_index_a46927719822348be775e2ce581a06de0}
+
+\begin{DoxyCompactList}\small\item\em helper function when building btree index. Offsets range from 0 to total pages in the btree tree. This function sets each page\textquotesingle{}s offset by doing a level-\/wise traversal (B\+F\+S) of the tree from left to right. root page has an offset of 0. Its leftmost child has an offset of 1. Its rightmost child has an offset of $<$total pages in the child\textquotesingle{}s level$>$ its leftmost grandchild\textquotesingle{}s offset = its rightmost child\textquotesingle{}s offset + 1 and so on.. \end{DoxyCompactList}\item 
+\hypertarget{class_b_tree_index_af931d39bed7e041211aafd30c6972152}{}void \hyperlink{class_b_tree_index_af931d39bed7e041211aafd30c6972152}{Bfs\+Debug\+Print} ()\label{class_b_tree_index_af931d39bed7e041211aafd30c6972152}
+
+\begin{DoxyCompactList}\small\item\em Prints each page in the tree. \end{DoxyCompactList}\item 
+\hypertarget{class_b_tree_index_a37e5ad19a5ccc848bf9a80480e1a0ec3}{}void \hyperlink{class_b_tree_index_a37e5ad19a5ccc848bf9a80480e1a0ec3}{add\+Node\+To\+Tree} (int, \hyperlink{class_b_tree_page}{B\+Tree\+Page} $\ast$)\label{class_b_tree_index_a37e5ad19a5ccc848bf9a80480e1a0ec3}
+
+\begin{DoxyCompactList}\small\item\em helper function for building a btree index. It adds a node to a level \end{DoxyCompactList}\item 
+void \hyperlink{class_b_tree_index_a5f08960f28fbaee925bd76a225110f56}{flush} (string)
+\begin{DoxyCompactList}\small\item\em writes the btree index to a binary file via a level-\/wise traversal (B\+F\+S) Format of the index file\+: number of pages in the index (8 bytes) followed by root page, leftmost child page of root, ...., rightmost child page of root, leftmost grandchild of root, ..., leftmost leaf page, ..., rightmost leaf page. \end{DoxyCompactList}\item 
+\hypertarget{class_b_tree_index_a3b32e1e49d409365bffaf2f111068f23}{}void {\bfseries probe} (uint64\+\_\+t key, vector$<$ \hyperlink{class_b_tree_page}{B\+Tree\+Page} $\ast$ $>$ stream)\label{class_b_tree_index_a3b32e1e49d409365bffaf2f111068f23}
+
+\item 
+pair$<$ bool, uint64\+\_\+t $>$ \hyperlink{class_b_tree_index_a768090c78f62663632baa93b3786552f}{probe} (uint64\+\_\+t, F\+I\+L\+E $\ast$)
+\begin{DoxyCompactList}\small\item\em This method is not being used in the current implementation of probe. btree quality probe on a single key using file handler. First, it traverses the btree index, then it calls probe\+\_\+bin to probe the binary data file, looking for the offset of the key. \end{DoxyCompactList}\item 
+pair$<$ bool, uint64\+\_\+t $>$ \hyperlink{class_b_tree_index_a5f7c70180b49b73c02352ba1135a91f7}{probe} (uint64\+\_\+t, int, int)
+\begin{DoxyCompactList}\small\item\em btree quality probe on a single key using file descriptor. First, it traverses the btree index, then it calls probe\+\_\+bin to probe the binary data file, looking for the offset of the key. \end{DoxyCompactList}\item 
+pair$<$ bool, uint64\+\_\+t $>$ \hyperlink{class_b_tree_index_a8a5d7a705ae4eb777695d819b88c08a4}{probe\+\_\+bin} (uint64\+\_\+t, int, off\+\_\+t)
+\begin{DoxyCompactList}\small\item\em helper function for btree quality probe on a single key. It searches the binary data file, looking for key and if key is found, returns an offset to the binary data file. If key is not found, return an offset of the smallest key larger than the search key. \end{DoxyCompactList}\item 
+vector$<$ pair$<$ uint64\+\_\+t, uint64\+\_\+t $>$ $>$ \hyperlink{class_b_tree_index_a212f6138db459618a7dd7e2ccc813cc3}{range\+\_\+probe\+\_\+gt} (uint64\+\_\+t, int, int, off\+\_\+t)
+\begin{DoxyCompactList}\small\item\em range probe if we are searching for all keys x such that\+: x $>$= key \end{DoxyCompactList}\item 
+vector$<$ pair$<$ uint64\+\_\+t, uint64\+\_\+t $>$ $>$ \hyperlink{class_b_tree_index_a648938da25539265a0c938e989076e06}{range\+\_\+probe\+\_\+lt} (uint64\+\_\+t, int, int)
+\begin{DoxyCompactList}\small\item\em range probe if we are searching for all keys x such that\+: key $>$= x \end{DoxyCompactList}\item 
+vector$<$ pair$<$ uint64\+\_\+t, uint64\+\_\+t $>$ $>$ \hyperlink{class_b_tree_index_acf5cdb0e95eb8472762f945ccb7ade6d}{range\+\_\+probe\+\_\+endpts} (uint64\+\_\+t, uint64\+\_\+t, int, int, off\+\_\+t)
+\begin{DoxyCompactList}\small\item\em range probe if we are searching for all keys x such that\+: start\+\_\+key $<$= x $<$= end\+\_\+key \end{DoxyCompactList}\item 
+vector$<$ pair$<$ uint64\+\_\+t, uint64\+\_\+t $>$ $>$ \hyperlink{class_b_tree_index_a60cebd82ad0c571732099c1d67dd2c2a}{range\+\_\+probe\+\_\+bin} (int, off\+\_\+t, off\+\_\+t)
+\begin{DoxyCompactList}\small\item\em helper function for range probe. Given a start offset and an end offset of a binary data file, return all keys within the offsets \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_b_tree_index_a988b1687e253f7899d8d0a9e9843b006}{}\hyperlink{class_b_tree_page}{B\+Tree\+Page} {\bfseries root}\label{class_b_tree_index_a988b1687e253f7899d8d0a9e9843b006}
+
+\item 
+\hypertarget{class_b_tree_index_abd4ae24282d1758307060525cba080c7}{}vector$<$ vector$<$ \hyperlink{class_b_tree_page}{B\+Tree\+Page} $\ast$ $>$ $>$ {\bfseries tree}\label{class_b_tree_index_abd4ae24282d1758307060525cba080c7}
+
+\item 
+\hypertarget{class_b_tree_index_a7982147961269188e41438a5682b14f7}{}vector$<$ uint64\+\_\+t $>$ {\bfseries keys\+\_\+per\+\_\+level}\label{class_b_tree_index_a7982147961269188e41438a5682b14f7}
+
+\item 
+\hypertarget{class_b_tree_index_a87a1ab8990dd4e454d83e81acc3adbd4}{}vector$<$ uint64\+\_\+t $>$ {\bfseries fanout\+\_\+per\+\_\+level}\label{class_b_tree_index_a87a1ab8990dd4e454d83e81acc3adbd4}
+
+\item 
+\hypertarget{class_b_tree_index_ae9453917f1f749a4ba4b74e0821c670c}{}unsigned int {\bfseries max\+\_\+level} = 20\label{class_b_tree_index_ae9453917f1f749a4ba4b74e0821c670c}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_b_tree_index_ae737b5dea98c2e2036fd3b3d9bdcfc22}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!B\+Tree\+Index@{B\+Tree\+Index}}
+\index{B\+Tree\+Index@{B\+Tree\+Index}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{B\+Tree\+Index}]{\setlength{\rightskip}{0pt plus 5cm}B\+Tree\+Index\+::\+B\+Tree\+Index (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_ae737b5dea98c2e2036fd3b3d9bdcfc22}
+
+
+Constructor of \hyperlink{class_b_tree_index}{B\+Tree\+Index} that sets up the initial variables It needs to compute number of total keys per level, given max keys per page. 
+
+Constructor of \hyperlink{class_b_tree_index}{B\+Tree\+Index} that sets up the initial variables 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_b_tree_index_a4517e016a4f60cd2e61471f6ba10f347}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!build\+\_\+tree@{build\+\_\+tree}}
+\index{build\+\_\+tree@{build\+\_\+tree}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{build\+\_\+tree}]{\setlength{\rightskip}{0pt plus 5cm}void B\+Tree\+Index\+::build\+\_\+tree (
+\begin{DoxyParamCaption}
+\item[{vector$<$ {\bf Data\+Entry} $>$}]{entries}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_a4517e016a4f60cd2e61471f6ba10f347}
+
+
+builds a btree index using the bulkloading algorithm as discussed in the textbook 
+
+
+\begin{DoxyParams}{Parameters}
+{\em entries} & all (key,rid) entries \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_b_tree_index_a5f08960f28fbaee925bd76a225110f56}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!flush@{flush}}
+\index{flush@{flush}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{flush}]{\setlength{\rightskip}{0pt plus 5cm}void B\+Tree\+Index\+::flush (
+\begin{DoxyParamCaption}
+\item[{string}]{index\+File\+Path}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_a5f08960f28fbaee925bd76a225110f56}
+
+
+writes the btree index to a binary file via a level-\/wise traversal (B\+F\+S) Format of the index file\+: number of pages in the index (8 bytes) followed by root page, leftmost child page of root, ...., rightmost child page of root, leftmost grandchild of root, ..., leftmost leaf page, ..., rightmost leaf page. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\+File\+Path} & path of the output index file \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_b_tree_index_a768090c78f62663632baa93b3786552f}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!probe@{probe}}
+\index{probe@{probe}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{probe}]{\setlength{\rightskip}{0pt plus 5cm}pair$<$ bool, uint64\+\_\+t $>$ B\+Tree\+Index\+::probe (
+\begin{DoxyParamCaption}
+\item[{uint64\+\_\+t}]{key, }
+\item[{F\+I\+L\+E $\ast$}]{index\+File}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_a768090c78f62663632baa93b3786552f}
+
+
+This method is not being used in the current implementation of probe. btree quality probe on a single key using file handler. First, it traverses the btree index, then it calls probe\+\_\+bin to probe the binary data file, looking for the offset of the key. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & the key we are probing for \\
+\hline
+{\em index\+File} & file handler of the btree index file \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_b_tree_index_a5f7c70180b49b73c02352ba1135a91f7}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!probe@{probe}}
+\index{probe@{probe}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{probe}]{\setlength{\rightskip}{0pt plus 5cm}pair$<$ bool, uint64\+\_\+t $>$ B\+Tree\+Index\+::probe (
+\begin{DoxyParamCaption}
+\item[{uint64\+\_\+t}]{key, }
+\item[{int}]{index\+File, }
+\item[{int}]{bin\+File}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_a5f7c70180b49b73c02352ba1135a91f7}
+
+
+btree quality probe on a single key using file descriptor. First, it traverses the btree index, then it calls probe\+\_\+bin to probe the binary data file, looking for the offset of the key. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & the key we are probing for \\
+\hline
+{\em index\+File} & file descriptor of the btree index file \\
+\hline
+{\em bin\+File} & file descriptor of the binary data file \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_b_tree_index_a8a5d7a705ae4eb777695d819b88c08a4}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!probe\+\_\+bin@{probe\+\_\+bin}}
+\index{probe\+\_\+bin@{probe\+\_\+bin}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{probe\+\_\+bin}]{\setlength{\rightskip}{0pt plus 5cm}pair$<$ bool, uint64\+\_\+t $>$ B\+Tree\+Index\+::probe\+\_\+bin (
+\begin{DoxyParamCaption}
+\item[{uint64\+\_\+t}]{key, }
+\item[{int}]{index\+File, }
+\item[{off\+\_\+t}]{offset}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_a8a5d7a705ae4eb777695d819b88c08a4}
+
+
+helper function for btree quality probe on a single key. It searches the binary data file, looking for key and if key is found, returns an offset to the binary data file. If key is not found, return an offset of the smallest key larger than the search key. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & the key we are probing for \\
+\hline
+{\em index\+File} & file descriptor of the binary data file \\
+\hline
+{\em offset} & start offset of the binary data file \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_b_tree_index_a60cebd82ad0c571732099c1d67dd2c2a}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!range\+\_\+probe\+\_\+bin@{range\+\_\+probe\+\_\+bin}}
+\index{range\+\_\+probe\+\_\+bin@{range\+\_\+probe\+\_\+bin}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{range\+\_\+probe\+\_\+bin}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ pair$<$ uint64\+\_\+t, uint64\+\_\+t $>$ $>$ B\+Tree\+Index\+::range\+\_\+probe\+\_\+bin (
+\begin{DoxyParamCaption}
+\item[{int}]{index\+File, }
+\item[{off\+\_\+t}]{offset, }
+\item[{off\+\_\+t}]{end\+\_\+offset}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_a60cebd82ad0c571732099c1d67dd2c2a}
+
+
+helper function for range probe. Given a start offset and an end offset of a binary data file, return all keys within the offsets 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\+File} & file descriptor of the binary data file \\
+\hline
+{\em offset} & start offset of the binary data file \\
+\hline
+{\em end\+\_\+offset} & end offset of the binary data file \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_b_tree_index_acf5cdb0e95eb8472762f945ccb7ade6d}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!range\+\_\+probe\+\_\+endpts@{range\+\_\+probe\+\_\+endpts}}
+\index{range\+\_\+probe\+\_\+endpts@{range\+\_\+probe\+\_\+endpts}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{range\+\_\+probe\+\_\+endpts}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ pair$<$ uint64\+\_\+t, uint64\+\_\+t $>$ $>$ B\+Tree\+Index\+::range\+\_\+probe\+\_\+endpts (
+\begin{DoxyParamCaption}
+\item[{uint64\+\_\+t}]{start\+\_\+key, }
+\item[{uint64\+\_\+t}]{end\+\_\+key, }
+\item[{int}]{index\+File, }
+\item[{int}]{data\+Bin\+File, }
+\item[{off\+\_\+t}]{bin\+\_\+file\+\_\+end}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_acf5cdb0e95eb8472762f945ccb7ade6d}
+
+
+range probe if we are searching for all keys x such that\+: start\+\_\+key $<$= x $<$= end\+\_\+key 
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+\_\+key} & value of key for the inquality start\+\_\+key $<$= x $<$= end\+\_\+key \\
+\hline
+{\em end\+\_\+key} & value of key for the inquality start\+\_\+key $<$= x $<$= end\+\_\+key \\
+\hline
+{\em index\+File} & file descriptor of the binary index file \\
+\hline
+{\em data\+Bin\+File} & file descriptor of the binary data file \\
+\hline
+{\em bin\+\_\+file\+\_\+end} & size of data\+Bin\+File (i.\+e. last byte of data\+Bin\+File) \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_b_tree_index_a212f6138db459618a7dd7e2ccc813cc3}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!range\+\_\+probe\+\_\+gt@{range\+\_\+probe\+\_\+gt}}
+\index{range\+\_\+probe\+\_\+gt@{range\+\_\+probe\+\_\+gt}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{range\+\_\+probe\+\_\+gt}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ pair$<$ uint64\+\_\+t, uint64\+\_\+t $>$ $>$ B\+Tree\+Index\+::range\+\_\+probe\+\_\+gt (
+\begin{DoxyParamCaption}
+\item[{uint64\+\_\+t}]{key, }
+\item[{int}]{index\+File, }
+\item[{int}]{data\+Bin\+File, }
+\item[{off\+\_\+t}]{bin\+\_\+file\+\_\+end}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_a212f6138db459618a7dd7e2ccc813cc3}
+
+
+range probe if we are searching for all keys x such that\+: x $>$= key 
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & value of key for the inquality x $>$= key \\
+\hline
+{\em index\+File} & file descriptor of the binary index file \\
+\hline
+{\em data\+Bin\+File} & file descriptor of the binary data file \\
+\hline
+{\em bin\+\_\+file\+\_\+end} & size of data\+Bin\+File (i.\+e. last byte of data\+Bin\+File) \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_b_tree_index_a648938da25539265a0c938e989076e06}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!range\+\_\+probe\+\_\+lt@{range\+\_\+probe\+\_\+lt}}
+\index{range\+\_\+probe\+\_\+lt@{range\+\_\+probe\+\_\+lt}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{range\+\_\+probe\+\_\+lt}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ pair$<$ uint64\+\_\+t, uint64\+\_\+t $>$ $>$ B\+Tree\+Index\+::range\+\_\+probe\+\_\+lt (
+\begin{DoxyParamCaption}
+\item[{uint64\+\_\+t}]{key, }
+\item[{int}]{index\+File, }
+\item[{int}]{data\+Bin\+File}
+\end{DoxyParamCaption}
+)}\label{class_b_tree_index_a648938da25539265a0c938e989076e06}
+
+
+range probe if we are searching for all keys x such that\+: key $>$= x 
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & value of key for the inquality key $>$= x \\
+\hline
+{\em index\+File} & file descriptor of the binary index file \\
+\hline
+{\em data\+Bin\+File} & file descriptor of the binary data file \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{_b_tree_index_8h}{B\+Tree\+Index.\+h}\item 
+\hyperlink{_b_tree_index_8cpp}{B\+Tree\+Index.\+cpp}\end{DoxyCompactItemize}

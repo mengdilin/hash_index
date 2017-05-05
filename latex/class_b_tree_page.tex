@@ -1,0 +1,74 @@
+\hypertarget{class_b_tree_page}{}\section{B\+Tree\+Page Class Reference}
+\label{class_b_tree_page}\index{B\+Tree\+Page@{B\+Tree\+Page}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_b_tree_page_ab1a09989306d53d00fad36ec856f1d6a}{}pair$<$ bool, uint64\+\_\+t $>$ {\bfseries find} (uint64\+\_\+t key)\label{class_b_tree_page_ab1a09989306d53d00fad36ec856f1d6a}
+
+\item 
+\hypertarget{class_b_tree_page_a072d6f5aff5dbc4835843a1ce834d6a0}{}void {\bfseries set\+Parent} (\hyperlink{class_b_tree_page}{B\+Tree\+Page} $\ast$)\label{class_b_tree_page_a072d6f5aff5dbc4835843a1ce834d6a0}
+
+\item 
+\hypertarget{class_b_tree_page_a6f0a55351b3575f1504a38c8e4ad5891}{}void {\bfseries add\+Key} (uint64\+\_\+t key)\label{class_b_tree_page_a6f0a55351b3575f1504a38c8e4ad5891}
+
+\item 
+\hypertarget{class_b_tree_page_a603a37a0dbbb8996d21063ecbe03a1c3}{}void {\bfseries add\+Child} (\hyperlink{class_b_tree_page}{B\+Tree\+Page} $\ast$)\label{class_b_tree_page_a603a37a0dbbb8996d21063ecbe03a1c3}
+
+\item 
+\hypertarget{class_b_tree_page_a102c6fd32f4c2254c07b1e214530e23e}{}bool {\bfseries is\+Full} ()\label{class_b_tree_page_a102c6fd32f4c2254c07b1e214530e23e}
+
+\item 
+\hypertarget{class_b_tree_page_afaceefe62feb4d475328616b4c2b8142}{}ofstream \& {\bfseries flush} (ofstream \&)\label{class_b_tree_page_afaceefe62feb4d475328616b4c2b8142}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_b_tree_page_a6d96d17702420c219cb89d18f4841117}{}static void {\bfseries read} (F\+I\+L\+E $\ast$, \hyperlink{class_b_tree_page}{B\+Tree\+Page} \&, bool)\label{class_b_tree_page_a6d96d17702420c219cb89d18f4841117}
+
+\item 
+\hypertarget{class_b_tree_page_a6505accec8fefbec85a2b7bcba8b53ef}{}static void {\bfseries read} (int, \hyperlink{class_b_tree_page}{B\+Tree\+Page} \&, bool, off\+\_\+t)\label{class_b_tree_page_a6505accec8fefbec85a2b7bcba8b53ef}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_b_tree_page_adcb8f9ed6fa5ab538347b2538d16b2ec}{}uint64\+\_\+t {\bfseries page\+Num} = 0\label{class_b_tree_page_adcb8f9ed6fa5ab538347b2538d16b2ec}
+
+\item 
+\hypertarget{class_b_tree_page_adc38acfd7f3e7176478a2e62a3d69394}{}int {\bfseries num\+Child\+Refs} = 0\label{class_b_tree_page_adc38acfd7f3e7176478a2e62a3d69394}
+
+\item 
+\hypertarget{class_b_tree_page_a1b431b5ce5f434d1e689caea6402a9bc}{}vector$<$ \hyperlink{class_b_tree_page}{B\+Tree\+Page} $\ast$ $>$ {\bfseries children}\label{class_b_tree_page_a1b431b5ce5f434d1e689caea6402a9bc}
+
+\item 
+\hypertarget{class_b_tree_page_a0986ecaf3fc280e005810a2418761abc}{}vector$<$ uint64\+\_\+t $>$ {\bfseries keys}\label{class_b_tree_page_a0986ecaf3fc280e005810a2418761abc}
+
+\item 
+\hypertarget{class_b_tree_page_a2b24fbe8ab336eecbcd873f7d3eaf23f}{}vector$<$ uint64\+\_\+t $>$ {\bfseries rids}\label{class_b_tree_page_a2b24fbe8ab336eecbcd873f7d3eaf23f}
+
+\item 
+\hypertarget{class_b_tree_page_a2c78cff1e68ce6a7249fde41ec2db837}{}\hyperlink{class_b_tree_page}{B\+Tree\+Page} $\ast$ {\bfseries parent}\label{class_b_tree_page_a2c78cff1e68ce6a7249fde41ec2db837}
+
+\item 
+\hypertarget{class_b_tree_page_aca9f838a9d26413fe153386d2b36ec3d}{}unsigned int {\bfseries level} = 0\label{class_b_tree_page_aca9f838a9d26413fe153386d2b36ec3d}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_b_tree_page_ab446693b95b661587c0699cadda63644}{}static constexpr unsigned int {\bfseries P\+A\+G\+E\+\_\+\+S\+I\+Z\+E} = 4096\label{class_b_tree_page_ab446693b95b661587c0699cadda63644}
+
+\item 
+\hypertarget{class_b_tree_page_a30db9179507a56b19f633b210bc1369d}{}static constexpr unsigned int {\bfseries M\+A\+X\+\_\+\+K\+E\+Y\+\_\+\+P\+E\+R\+\_\+\+P\+A\+G\+E} = P\+A\+G\+E\+\_\+\+S\+I\+Z\+E$\ast$1.\+0/(2$\ast$sizeof(uint64\+\_\+t))-\/1\label{class_b_tree_page_a30db9179507a56b19f633b210bc1369d}
+
+\item 
+\hypertarget{class_b_tree_page_ac82396e8a895f09d853882a4673c5081}{}static constexpr unsigned int {\bfseries fan\+\_\+out} = M\+A\+X\+\_\+\+K\+E\+Y\+\_\+\+P\+E\+R\+\_\+\+P\+A\+G\+E+1\label{class_b_tree_page_ac82396e8a895f09d853882a4673c5081}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+B\+Tree\+Page.\+h\item 
+B\+Tree\+Page.\+cpp\end{DoxyCompactItemize}
