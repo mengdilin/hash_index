@@ -449,15 +449,18 @@ void HashIndex::build_index(string path, string indexFilePath) {
       if (iterator == overflow_map.end()) {
         //overflow has been merged with primary buckets
         page = primary_buckets.at((uint64_t)page->overflow_addr-1);
+        //cout << " merged -> " << (uint32_t)page->counter;
         break;
       } else {
         page = iterator->second;
+        //cout << " -> " << (uint32_t)page->counter;
       }
     }
     primary_buckets.at(i)->flush(indexFile);
   }
 
-
+  //cout << "---------overflow-----------"<<endl;
+  //cout << "overflow after merge: " << overflow_map.size() << endl;
     for (int i = 0; i < overflow_pages.size(); i++) {
       Page* cur_page = overflow_pages.at(i);
       auto iterator = map_for_prev_page.find(cur_page);

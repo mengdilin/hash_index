@@ -21,6 +21,8 @@ void build_index(string dataFilePath, string indexFileName, float load_capacity)
 void probe_file(string dataFilePath, string indexFileName, float load_capacity) {
     HashIndex index(load_capacity);
     //vector<DataEntry> test_data = index.parse_idx_file(dataFilePath);
+    uint64_t successful = 0;
+    uint64_t unsuccessful = 0;
     vector<DataEntry> test_data = index.parse_key_file(dataFilePath);
     FILE *c_read_index = fopen(indexFileName.c_str(),"rb");
     int fd = fileno(c_read_index);
@@ -28,6 +30,11 @@ void probe_file(string dataFilePath, string indexFileName, float load_capacity) 
     for (int i = 0; i < test_data.size(); i++) {
     DataEntry test = test_data[i];
     pair<bool,uint64_t> result = index.search(test.key, fd);
+    if (result.first) {
+        successful++;
+    } else {
+        unsuccessful++;
+    }
     /*
     if (not result.first) {
     cout << "not found key: " << test.key << endl;
@@ -44,6 +51,8 @@ void probe_file(string dataFilePath, string indexFileName, float load_capacity) 
     auto t2 = chrono::high_resolution_clock::now();
     cout << "index probe time (ns): " << chrono::duration_cast<chrono::nanoseconds>(t2-t1).count() << endl;
     cout << "average per probe (ns): " << (chrono::duration_cast<chrono::nanoseconds>(t2-t1).count()) / test_data.size() << endl;
+    cout << "successful searches: " << successful << endl;
+    cout << "unsuccessful searches: " << unsuccessful << endl;
 }
 
 
