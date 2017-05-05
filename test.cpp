@@ -53,28 +53,28 @@ void probe_key(uint64_t test_key, string indexFileName, float load_capacity) {
 }
 int main(int argc, char** argv) {
     if (argc != 5) {
-        cerr << "use: ./test <data_file_path> <mode> <index_file_path> <loading_capacity>" << endl;
+        cerr << "use: ./test <mode> <data_file_path> <index_file_path> <loading_capacity>" << endl;
         exit(1);
     }
     string::size_type sz;
     float load_capacity = stof (argv[4],&sz);
     string indexFileName = argv[3];
-    string mode = argv[2];
+    string mode = argv[1];
     if (mode=="-build") {
-        string dataFilePath = argv[1];
+        string dataFilePath = argv[2];
         cout << "running with data file path: " << dataFilePath << endl;
         cout << "running with index file path: " << indexFileName << endl;
         cout << "running with loading capacity: " << load_capacity << endl;
         build_index(dataFilePath, indexFileName, load_capacity);
     } else if (mode == "-probe_file") {
-        string dataFilePath = argv[1];
+        string dataFilePath = argv[2];
         cout << "running with data file path: " << dataFilePath << endl;
         cout << "running with index file path: " << indexFileName << endl;
         cout << "running with loading capacity: " << load_capacity << endl;
         probe_file(dataFilePath, indexFileName, load_capacity);
     } else if (mode=="-probe_key") {
         uint64_t test_key;
-        istringstream ss(argv[1]);
+        istringstream ss(argv[2]);
         if (!(ss >> test_key)) {
             cout << "set key failed" <<endl;
             exit(1);
