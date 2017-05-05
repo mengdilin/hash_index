@@ -42,7 +42,6 @@ void BTreeIndex::setPageOffset() {
       curPage->pageNum = pageNum++;
       if (curPage->parent != nullptr) {
         int numChildRefsOfParent = curPage->parent->numChildRefs;
-        //curPage->parent->rids.at(numChildRefsOfParent) = curPage->pageNum;
         curPage->parent->rids.push_back(curPage->pageNum);
         curPage->parent->numChildRefs++;
         assert(curPage->parent->numChildRefs == curPage->parent->rids.size());
@@ -50,10 +49,6 @@ void BTreeIndex::setPageOffset() {
         cout << "parent is null" << endl;
       }
     }
-    //cout << endl;
-    //cout << "level: " << i <<" with keys: " << sum <<" and with num nodes: " << tree.at(i).size() << endl;
-
-    //cout << "max keys: " << pow(BTreePage::fan_out, i)*BTreePage::MAX_KEY_PER_PAGE << " max nodes: " <<  pow(BTreePage::fan_out, i)<< endl;
   }
 }
 
@@ -87,13 +82,9 @@ void BTreeIndex::flush(string indexFilePath) {
     BTreePage* page = myqueue.front();
     myqueue.pop();
     page->flush(indexFile);
-    //cout << "page num: " << page->pageNum << " with keys: " << page->keys.size() << endl;
     for(int i = 0; i < page->children.size(); i++) {
-      //cout << "child num: " << page->children.at(i)->pageNum << " \t";
-      assert(page->children.at(i)->pageNum == page->rids.at(i));
       myqueue.push(page->children.at(i));
     }
-    //cout << endl;
   }
 }
 
@@ -105,11 +96,9 @@ Iter binary_find(Iter begin, Iter end, T val)
     Iter i = lower_bound(begin, end, val);
 
     if (i != end && !(val < *i)) {
-      //cout << "binary_find found value" << endl;
       return i; // actual value found
     }
     else {
-            //cout << "binary_find not found value" << endl;
         return i-1; // actual value not found. return smallest value larger than val
 
     }
@@ -118,6 +107,11 @@ Iter binary_find(Iter begin, Iter end, T val)
 vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_gt(uint64_t key, int indexFile, int dataBinFile, off_t bin_file_end) {
     auto result = probe(key,indexFile, dataBinFile);
     off_t rid = (off_t)result.second;
+    cout << "found rid: " << rid << endl;
+    if (rid >= bin_file_end) {
+      vector<pair<uint64_t, uint64_t>> empty;
+      return empty;
+    }
     return range_probe_bin(dataBinFile, rid, bin_file_end);
   }
 
@@ -128,12 +122,35 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_lt(uint64_t key, int in
     pairs.push_back(make_pair(key, rid));
     return pairs;
   }
+ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_endpts(uint64_t start_key, uint64_t end_key, int indexFile, int dataBinFile, off_t bin_file_end) {
+    auto start_result = probe(start_key, indexFile, dataBinFile);
+    auto end_result = probe(end_key,indexFile, dataBinFile);
+    off_t start_rid = (off_t)start_result.second;
+    off_t end_rid = (off_t)end_result.second;
+    //if start_rid > end_rid or if start_rid is at the end of the bin file
+    if (start_rid > end_rid || start_rid >= bin_file_end) {
+      //check end_rid?
+      vector<pair<uint64_t, uint64_t>> empty;
+      return empty;
+    }
+
+    if (end_rid > bin_file_end) {
+      end_rid = bin_file_end;
+    }
+    vector<pair<uint64_t, uint64_t>> result = range_probe_bin(dataBinFile, start_rid, end_rid);
+    if (end_result.first && start_key != end_key) {
+      //if end_key is found in indexFile, include it in the range probe result
+      result.push_back({end_key, end_rid});
+    }
+    return result;
+ }
+
 
 vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_bin(int indexFile, off_t offset, off_t end_offset) {
   //cout << "begin offset: " << offset << " and end offset: " << end_offset << endl;
   vector<pair<uint64_t, uint64_t>> result;
   uint8_t buffer[4096];
-  pread(indexFile, (void *)&buffer, 4096, offset);
+  ssize_t bytes_read = pread(indexFile, (void *)&buffer, 4096, offset);
   uint64_t local_key = *((uint64_t *)&buffer[0]);
    pread(indexFile, (void *)&local_key, sizeof(local_key), offset);
   uint32_t count;
@@ -173,9 +190,9 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_bin(int indexFile, off_
       //last 4096 buffer has reached its end
       break;
     }
-    if (size_read > 4096 - header_leng) {
+    if (size_read > bytes_read - header_leng) {
       size_read = 0;
-      pread(indexFile, (void *)&buffer, 4096, offset+total_size_read);
+      bytes_read = pread(indexFile, (void *)&buffer, 4096, offset+total_size_read);
     }
 
     local_key = *((uint64_t *)&buffer[size_read]);
@@ -189,7 +206,7 @@ vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe_bin(int indexFile, off_
 
 pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t offset) {
   uint8_t buffer[4096];
-  pread(indexFile, (void *)&buffer, 4096, offset);
+  ssize_t bytes_read = pread(indexFile, (void *)&buffer, 4096, offset);
   off_t new_offset;
   off_t old_offset = offset;
   uint64_t local_key = *((uint64_t *)&buffer[0]);
@@ -205,7 +222,7 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
   new_offset += offset;
   ssize_t header_leng = sizeof(uint64_t) + 2*sizeof(uint32_t);
 
-  if (size_read > 4096 - header_leng) {
+  if (size_read > bytes_read - header_leng) {
       pread(indexFile, (void *)&local_key, sizeof(local_key), new_offset);
 
   } else {
@@ -213,7 +230,7 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
   }
 
     size_read += sizeof(local_key);
-  while (local_key < key and size_read <= 4096 - header_leng) {
+  while (local_key < key and size_read <= bytes_read - header_leng) {
 
 
     old_offset = new_offset;
@@ -237,46 +254,16 @@ pair<bool, uint64_t> BTreeIndex::probe_bin(uint64_t key, int indexFile, off_t of
     }
     size_read += sizeof(local_key);
   }
-  cout << "local key: " << local_key << endl;
-  cout << "found: " << (size_read+offset-sizeof(local_key)) << endl;
 
   if (local_key == key) {
     return make_pair(true, size_read+offset-sizeof(local_key));
   } else {
-    //return the smallest key larger than search key, if search key not found
+    //if search key not found, return the smallest key larger than search key.
+    //if no key is larger than search key in data.bin, probe will return
+    //an offset to the end of the data.bin file
     return make_pair(false, size_read+offset-sizeof(local_key));
   }
 
-}
-
-vector<pair<uint64_t, uint64_t>> BTreeIndex::range_probe(uint64_t key, int indexFile, int binFile, off_t bin_file_end) {
-  int level = 1;
-  uint64_t tree_size;
-  off_t size_read = pread(indexFile, (void *)&tree_size, sizeof(tree_size), 0);
-  BTreePage curPage;
-  if (tree_size > 1) {
-    BTreePage::read(indexFile, curPage, false, size_read);
-  } else {
-    BTreePage::read(indexFile, curPage, true, size_read);
-    int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
-    uint64_t offset = curPage.rids.at(found_index);
-    return range_probe_bin(binFile, offset, bin_file_end);
-  }
-
-  auto result = curPage.find(key);
-  while(level < tree_size) {
-    if (level == tree_size-1) {
-      BTreePage::read(indexFile, curPage, true, (off_t)result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t));
-      int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
-      uint64_t offset = curPage.rids.at(found_index);
-      return range_probe_bin(binFile, offset, bin_file_end);
-    }
-    level++;
-    BTreePage::read(indexFile, curPage, false, (off_t)result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t));
-    result = curPage.find(key);
-  }
-  vector<pair<uint64_t, uint64_t>> final_result;
-  return final_result;
 }
 
 
@@ -298,11 +285,14 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, int indexFile, int binFile)
       }
       cout << endl;
     }
-    //cout << "found_index: " << found_index << endl;
+    cout << "here" << endl;
+    for (auto key : curPage.keys) {
+        cout << key << "\t";
+      }
+      cout << endl;
+    cout << "found_index: " << found_index << endl;
     uint64_t offset = curPage.rids.at(found_index);
-    if (key == 844468738445) {
-      cout << "offset for key: " << key << " is " << offset << endl;
-   }
+    cout << "found offset: " << offset << endl;
     return probe_bin(key, binFile, offset);
   }
 
@@ -642,6 +632,7 @@ vector<DataEntry> BTreeIndex::parse_idx_file(string path) {
     }
 
   }
+  cout << "data size: " << data_entries.size() << endl;
 
 
   return data_entries;

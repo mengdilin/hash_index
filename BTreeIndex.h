@@ -38,8 +38,8 @@ public:
 
  vector<pair<uint64_t, uint64_t>> range_probe_gt(uint64_t, int, int, off_t );
  vector<pair<uint64_t, uint64_t>> range_probe_lt(uint64_t , int , int );
+ vector<pair<uint64_t, uint64_t>> range_probe_endpts(uint64_t, uint64_t, int, int, off_t);
 
-  vector<pair<uint64_t, uint64_t>> range_probe(uint64_t , int , int , off_t );
   vector<pair<uint64_t, uint64_t>> range_probe_bin(int , off_t , off_t );
   ~BTreeIndex();
 

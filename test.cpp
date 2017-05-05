@@ -45,7 +45,6 @@ void probe_file(string dataIdxFilePath, string dataBinFilePath, string indexFile
     auto t2 = chrono::high_resolution_clock::now();
     cout << "avg microsec per probe: " << chrono::duration_cast<chrono::microseconds>(t2-t1).count()/all_entries.size() << endl;
 }
-
 inline off_t fileSize(int fd) {
    struct stat s;
    if (fstat(fd, &s) == -1) {
@@ -55,6 +54,39 @@ inline off_t fileSize(int fd) {
    }
    return(s.st_size);
 }
+void range_probe_key_get_test(string dataIdxFilePath, string dataBinFilePath, string indexFilePath) {
+    BTreeIndex btree;
+    vector<DataEntry> all_entries = btree.parse_idx_file_get_all(dataIdxFilePath);
+    FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
+    FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
+    int index_fd = fileno(c_read_index);
+    int data_bin_fd = fileno(c_bin_file);
+    off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
+
+    int i = 0;
+    for (int i = 0; i < all_entries.size(); i++) {
+        auto& entry = all_entries.at(i);
+        auto result = btree.range_probe_gt(entry.key, index_fd, data_bin_fd, bin_file_size);
+        if (result.size() != all_entries.size()-i) {
+            cerr << "expected range result size: " << (all_entries.size()-i) << " but got: " << result.size() << endl;
+        }
+        for(auto pair_r : result) {
+            auto test_result = btree.probe(pair_r.first,index_fd, data_bin_fd);
+            print_error_if_failed(test_result, pair_r.first, pair_r.second);
+        }
+        for (int j = i; j < all_entries.size(); j++) {
+
+            if (all_entries.at(j).key != result.at(j-i).first or all_entries.at(j).rid != result.at(j-i).second) {
+                cout << "expected key: " << all_entries.at(j).key << " rid: " << all_entries.at(j).rid << endl;
+                cout << "found key: " << result.at(j-i).first << " rid: " << result.at(j-i).second << endl;
+            }
+
+        }
+
+    }
+}
+
+
 
 void range_probe_key_gt(uint64_t key, string dataBinFilePath, string indexFilePath) {
     BTreeIndex btree;
@@ -65,6 +97,24 @@ void range_probe_key_gt(uint64_t key, string dataBinFilePath, string indexFilePa
     int data_bin_fd = fileno(c_bin_file);
     off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
     auto result = btree.range_probe_gt(key, index_fd, data_bin_fd, bin_file_size);
+    for(auto pair_r : result) {
+        cout << pair_r.first << "," << pair_r.second << endl;
+        auto test_result = btree.probe(pair_r.first,index_fd, data_bin_fd);
+        print_error_if_failed(test_result, pair_r.first, pair_r.second);
+
+    }
+    cout << "found keys: " << result.size() << endl;
+}
+
+void range_probe_key_endpts(uint64_t start_key, uint64_t end_key, string dataBinFilePath, string indexFilePath) {
+    BTreeIndex btree;
+    cout << "here" << endl;
+    FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
+    FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
+    int index_fd = fileno(c_read_index);
+    int data_bin_fd = fileno(c_bin_file);
+    off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
+    auto result = btree.range_probe_endpts(start_key, end_key, index_fd, data_bin_fd, bin_file_size);
     for(auto pair_r : result) {
         cout << pair_r.first << "," << pair_r.second << endl;
         auto test_result = btree.probe(pair_r.first,index_fd, data_bin_fd);
@@ -121,31 +171,31 @@ int main(int argc, char** argv) {
         cerr << "use: ./test <arg> <mode> <arg>..." << endl;
         exit(1);
     }
-    string mode = argv[2];
+    string mode = argv[1];
     if (mode == "-build") {
         if (argc < 4) {
-            cerr << "use ./test <data_file_path> -build <index_file_path>" << endl;
+            cerr << "use ./test  -build <data_file_path> <index_file_path>" << endl;
             exit(1);
         }
         string indexFilePath = argv[3];
-        string dataIdxFilePath = argv[1];
+        string dataIdxFilePath = argv[2];
         build_index(dataIdxFilePath, indexFilePath);
     } else if (mode == "-probe_file") {
         if (argc < 5) {
-            cerr << "use ./test <data_file_path> -probe_file <index_file_path> <binary_data_file_path>" << endl;
+            cerr << "use ./test -probe_file <data_file_path> <index_file_path> <binary_data_file_path>" << endl;
             exit(1);
         }
         string indexFilePath = argv[3];
-        string dataIdxFilePath = argv[1];
+        string dataIdxFilePath = argv[2];
         string dataBinFilePath = argv[4];
         probe_file(dataIdxFilePath, dataBinFilePath, indexFilePath);
     } else if (mode == "-probe_key") {
         if (argc < 5) {
-            cerr << "use ./test <key> -probe_key <index_file_path> <binary_data_file_path>" << endl;
+            cerr << "use ./test -probe_key <key> <index_file_path> <binary_data_file_path>" << endl;
             exit(1);
         }
         uint64_t key;
-        istringstream ss(argv[1]);
+        istringstream ss(argv[2]);
         if (!(ss >> key)) {
             cout << "set key failed" << endl;
             exit(1);
@@ -155,17 +205,17 @@ int main(int argc, char** argv) {
         probe_key(key, dataBinFilePath, indexFilePath);
     } else if (mode=="-all") {
         if (argc < 5) {
-            cerr << "use ./test <data_file_path> -probe_file <index_file_path> <binary_data_file_path>" << endl;
+            cerr << "use ./test -probe_file <data_file_path> <index_file_path> <binary_data_file_path>" << endl;
             exit(1);
         }
         string indexFilePath = argv[3];
-        string dataIdxFilePath = argv[1];
+        string dataIdxFilePath = argv[2];
         string dataBinFilePath = argv[4];
         build_index(dataIdxFilePath, indexFilePath);
         probe_file(dataIdxFilePath, dataBinFilePath, indexFilePath);
     } else if (mode == "-range" ) {
         uint64_t key;
-        istringstream ss(argv[1]);
+        istringstream ss(argv[2]);
         if (!(ss >> key)) {
             cout << "set key failed" << endl;
             exit(1);
@@ -178,11 +228,11 @@ int main(int argc, char** argv) {
 
     } else if (mode == "-range_probe_key_gt") {
         if (argc < 5) {
-            cerr << "use ./test <key> -range_probe_key_gt <index_file_path> <binary_data_file_path>" << endl;
+            cerr << "use ./test -range_probe_key_gt <key> <index_file_path> <binary_data_file_path>" << endl;
             exit(1);
         }
         uint64_t key;
-        istringstream ss(argv[1]);
+        istringstream ss(argv[2]);
         if (!(ss >> key)) {
             cout << "set key failed" << endl;
             exit(1);
@@ -190,13 +240,33 @@ int main(int argc, char** argv) {
         string indexFilePath = argv[3];
         string dataBinFilePath = argv[4];
         range_probe_key_gt(key, dataBinFilePath, indexFilePath);
+    } else if (mode == "-range_probe_key_endpts") {
+        if (argc < 6) {
+            cerr << "use ./test -range_probe_key_endpts <start_key> <end_key> <index_file_path> <binary_data_file_path>" << endl;
+            exit(1);
+        }
+        uint64_t start_key;
+        istringstream ss(argv[2]);
+        if (!(ss >> start_key)) {
+            cout << "set key failed" << endl;
+            exit(1);
+        }
+        uint64_t end_key;
+        istringstream ss1(argv[3]);
+        if (!(ss1 >> end_key)) {
+            cout << "set key failed" << endl;
+            exit(1);
+        }
+        string indexFilePath = argv[4];
+        string dataBinFilePath = argv[5];
+        range_probe_key_endpts(start_key, end_key, dataBinFilePath, indexFilePath);
     } else if (mode == "-range_probe_key_lt") {
         if (argc < 5) {
-            cerr << "use ./test <key> -range_probe_key_lt <index_file_path> <binary_data_file_path>" << endl;
+            cerr << "use ./test -range_probe_key_lt <key> <index_file_path> <binary_data_file_path>" << endl;
             exit(1);
         }
         uint64_t key;
-        istringstream ss(argv[1]);
+        istringstream ss(argv[2]);
         if (!(ss >> key)) {
             cout << "set key failed" << endl;
             exit(1);
@@ -204,6 +274,15 @@ int main(int argc, char** argv) {
         string indexFilePath = argv[3];
         string dataBinFilePath = argv[4];
         range_probe_key_lt(key, dataBinFilePath, indexFilePath);
+    } else if (mode == "-range_probe_key_gt_test") {
+        if (argc < 5) {
+            cerr << "use ./test -range_probe_key_gt_test <data_file_path> <index_file_path> <binary_data_file_path>" << endl;
+            exit(1);
+        }
+        string dataIdxFilePath = argv[2];
+        string indexFilePath = argv[3];
+        string dataBinFilePath = argv[4];
+        range_probe_key_get_test(dataIdxFilePath, dataBinFilePath, indexFilePath);
     } else {
         cerr << "mode: " << mode << " not supported" << endl;
 
