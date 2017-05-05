@@ -1,2 +1,5 @@
 test
 test.dSYM
+test.dSYM/Contents
+.DS_Store
+*.o

@@ -24,11 +24,12 @@ void probe_file(string dataFilePath, string indexFileName, float load_capacity) 
     uint64_t successful = 0;
     uint64_t unsuccessful = 0;
     vector<DataEntry> test_data = index.parse_key_file(dataFilePath);
+    cout << "size of entry: " << test_data.size() << endl;
     FILE *c_read_index = fopen(indexFileName.c_str(),"rb");
     int fd = fileno(c_read_index);
     auto t1 = chrono::high_resolution_clock::now();
     for (int i = 0; i < test_data.size(); i++) {
-    DataEntry test = test_data[i];
+    DataEntry test = test_data.at(i);
     pair<bool,uint64_t> result = index.search(test.key, fd);
     if (result.first) {
         successful++;

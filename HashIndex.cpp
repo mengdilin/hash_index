@@ -98,7 +98,7 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
   Page::read(is, curPage);
 
   //check if key > largest/last key on current page
-  while (key > curPage.data_entry_list[curPage.counter-1].key) {
+  while (curPage.counter > 0 and key > curPage.data_entry_list[curPage.counter-1].key) {
     //go to overflow
     if (curPage.hasOverflow()) {
       //reset pointer
@@ -116,7 +116,7 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
   if (result.first) {
     return result;
   }
-  cout << "not found" << endl;
+  //cout << "not found" << endl;
   // not found
 
   return result;
@@ -183,7 +183,7 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, int is) {
   Page::read(is, curPage, primary_bucket_offset);
 
   //check if key > largest/last key on current page
-  while (key > curPage.data_entry_list[curPage.counter-1].key) {
+  while (curPage.counter > 0 and key > curPage.data_entry_list[curPage.counter-1].key) {
     //go to overflow
     if (curPage.hasOverflow()) {
       offset = sizeof(unsigned int) + ((uint64_t)curPage.overflow_addr-1) * Page::PAGE_SIZE;
