@@ -27,6 +27,22 @@ void print_error_if_failed(pair<bool, uint64_t>& result, uint64_t& key, uint64_t
 
 void probe_file(string dataIdxFilePath, string dataBinFilePath, string indexFilePath) {
     BTreeIndex btree;
+    vector<DataEntry> all_entries = btree.parse_key_file(dataIdxFilePath);
+    cout << "num entries read: " << all_entries.size() << endl;
+    FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
+    FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
+    int index_fd = fileno(c_read_index);
+    int data_bin_fd = fileno(c_bin_file);
+    auto t1 = chrono::high_resolution_clock::now();
+    for (auto& entry : all_entries) {
+        auto result = btree.probe(entry.key,index_fd, data_bin_fd);
+    }
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "avg microsec per probe: " << chrono::duration_cast<chrono::microseconds>(t2-t1).count()/all_entries.size() << endl;
+}
+
+void probe_file_test(string dataIdxFilePath, string dataBinFilePath, string indexFilePath) {
+    BTreeIndex btree;
     vector<DataEntry> all_entries = btree.parse_idx_file_get_all(dataIdxFilePath);
     FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
     FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
@@ -35,7 +51,7 @@ void probe_file(string dataIdxFilePath, string dataBinFilePath, string indexFile
     auto t1 = chrono::high_resolution_clock::now();
     for (auto& entry : all_entries) {
         auto result = btree.probe(entry.key,index_fd, data_bin_fd);
-        //print_error_if_failed(result, entry.key, entry.rid);
+        print_error_if_failed(result, entry.key, entry.rid);
     }
     auto t2 = chrono::high_resolution_clock::now();
     cout << "avg microsec per probe: " << chrono::duration_cast<chrono::microseconds>(t2-t1).count()/all_entries.size() << endl;
@@ -219,6 +235,15 @@ int main(int argc, char** argv) {
         string dataIdxFilePath = argv[2];
         string dataBinFilePath = argv[4];
         probe_file(dataIdxFilePath, dataBinFilePath, indexFilePath);
+    } else if (mode == "-probe_file_test") {
+        if (argc < 5) {
+            cerr << "use ./test -probe_file <data_file_path> <index_file_path> <binary_data_file_path>" << endl;
+            exit(1);
+        }
+        string indexFilePath = argv[3];
+        string dataIdxFilePath = argv[2];
+        string dataBinFilePath = argv[4];
+        probe_file_test(dataIdxFilePath, dataBinFilePath, indexFilePath);
     } else if (mode == "-probe_key") {
         if (argc < 5) {
             cerr << "use ./test -probe_key <key> <index_file_path> <binary_data_file_path>" << endl;
