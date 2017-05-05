@@ -1,5 +1,10 @@
 #include <iostream>
 
+/**
+ * @file DataEntry.h
+ * @brief this header file will contain all required definitions
+ * and basic utility functions for DataEntry
+ */
 class DataEntry {
   public:
     uint64_t key;

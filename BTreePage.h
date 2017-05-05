@@ -8,22 +8,36 @@ using namespace std;
 
 class BTreePage {
   public:
+
+    //size in bytes of a btree index page
     constexpr static unsigned int PAGE_SIZE = 4096;
 
     //page_size/16 -1 (1 for counter + extra rid)
     constexpr static unsigned int MAX_KEY_PER_PAGE = PAGE_SIZE*1.0/(2*sizeof(uint64_t))-1;
     constexpr static unsigned int fan_out = MAX_KEY_PER_PAGE+1;
-    //const static unsigned int PAGE_SIZE = 4096;
+
+    //page offset for the current page
     uint64_t pageNum = 0;
+
+    //number of children in current page
     int numChildRefs = 0;
+
+    //pointers to the children page
     vector<BTreePage*> children;
+
+    //keys in the current page
     vector<uint64_t> keys;
+
+    /* pageNum of the children page, if current page is not leaf
+     * rids of keys, if current page is leaf
+     */
     vector<uint64_t> rids;
+
+    //pointer to parent page
     BTreePage* parent;
+
+    //current level of the page
     unsigned int level = 0;
-
-
-    //static constexpr double KNUTH_NUMBER = 1054997077.39;
 
 public:
   BTreePage();

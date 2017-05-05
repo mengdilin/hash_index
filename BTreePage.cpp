@@ -13,10 +13,18 @@
 
 using namespace std;
 
+/**
+ * @brief constructor for a BTreePage which initializes
+ * current page's parent to null
+ */
 BTreePage::BTreePage() {
   this->parent = nullptr;
 }
 
+/**
+ * @brief adds page to the end of children's vector
+ * @param c a pointer to the child page
+ */
 void BTreePage::addChild(BTreePage* c) {
   assert(children.size() < fan_out);
   children.push_back(c);
@@ -25,6 +33,14 @@ void BTreePage::addChild(BTreePage* c) {
 BTreePage::~BTreePage() {
 
 }
+
+/**
+ * @brief writes current page to binary index file
+ * Page format consists of a uint64_t counter maintaining
+ * the number of children in the page, followed by MAX_KEY_PER_PAGE
+ * uin64_t keys and MAX_KEY_PER_PAGE + 1 rids
+ * @param indexFile ofstream of index file
+ */
 ofstream& BTreePage::flush(ofstream& indexFile) {
   auto before = indexFile.tellp();
   uint64_t counter = keys.size();
@@ -57,6 +73,13 @@ ofstream& BTreePage::flush(ofstream& indexFile) {
   return indexFile;
 }
 
+/**
+ * @brief reads data into a BTreePage from an indexFile using a file descriptor
+ * @param indexFile is a file descriptor to the binary btree index file
+ * @param page is an empty BTreePage which will be populated after read completes
+ * @param is_leaf indicates whether the current page to be read should be a leaf page
+ * @param offset is the offset of indexFile that indicates the start of the current page
+ */
 void BTreePage::read(int indexFile, BTreePage& page, bool is_leaf, off_t offset) {
   uint64_t counter;
   off_t size_read = pread(indexFile, (void *)&counter, sizeof(counter), offset) + offset;
@@ -78,6 +101,12 @@ void BTreePage::read(int indexFile, BTreePage& page, bool is_leaf, off_t offset)
   }
 }
 
+/**
+ * @brief reads data into a BTreePage from an indexFile using a file handler
+ * @param indexFile is a file handler to the binary btree index file
+ * @param page is an empty BTreePage which will be populated after read completes
+ * @param is_leaf indicates whether the current page to be read should be a leaf page
+ */
 void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {
   uint64_t counter;
   fread(&counter, sizeof(counter), 1, indexFile);
@@ -96,6 +125,13 @@ void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {
   }
 }
 
+/**
+ * @brief given a key, finds the reference/rid to the child page
+ * @param key search key
+ * @return a pair where the first item is a boolean indicating whether
+ * key is found in the current page and the second pair is the rid
+ * of the child corresponding to the key
+ */
 pair<bool,uint64_t> BTreePage::find(uint64_t key) {
 
   // lower_bound implements binary search
@@ -124,15 +160,26 @@ pair<bool,uint64_t> BTreePage::find(uint64_t key) {
   return find_result;
 }
 
-
+/**
+ * @brief function used by BTreeIndex to set the parent of the current page
+ * @param p pointer of the parent page
+ */
 void BTreePage::setParent(BTreePage* p) {
   this->parent = p;
 }
 
+/**
+ * @brief function used by BTreeIndex to add key to the current page
+ * @param key key to be added
+ */
 void BTreePage::addKey(uint64_t key) {
   assert(keys.size() < MAX_KEY_PER_PAGE);
   keys.push_back(key);
 }
+
+/**
+ * @brief check if current page is full
+ */
 bool BTreePage::isFull() {
   return keys.size() == MAX_KEY_PER_PAGE;
 }
