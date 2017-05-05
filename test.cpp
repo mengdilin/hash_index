@@ -26,6 +26,8 @@ void print_error_if_failed(pair<bool, uint64_t>& result, uint64_t& key, uint64_t
 }
 
 void probe_file(string dataIdxFilePath, string dataBinFilePath, string indexFilePath) {
+    uint64_t successful = 0;
+    uint64_t unsuccessful = 0;
     BTreeIndex btree;
     vector<DataEntry> all_entries = btree.parse_key_file(dataIdxFilePath);
     cout << "num entries read: " << all_entries.size() << endl;
@@ -36,9 +38,17 @@ void probe_file(string dataIdxFilePath, string dataBinFilePath, string indexFile
     auto t1 = chrono::high_resolution_clock::now();
     for (auto& entry : all_entries) {
         auto result = btree.probe(entry.key,index_fd, data_bin_fd);
+        if (result.first) {
+            successful++;
+        } else {
+            unsuccessful++;
+        }
     }
     auto t2 = chrono::high_resolution_clock::now();
     cout << "avg microsec per probe: " << chrono::duration_cast<chrono::microseconds>(t2-t1).count()/all_entries.size() << endl;
+    cout << "total entry size: " << all_entries.size() << endl;
+    cout << "successful probe: " << successful << endl;
+    cout << "unsuccessful probe: " << unsuccessful << endl;
 }
 
 void probe_file_test(string dataIdxFilePath, string dataBinFilePath, string indexFilePath) {
