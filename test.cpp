@@ -20,6 +20,35 @@ void build_index(string dataFilePath, string indexFileName, float load_capacity)
 
 void probe_file(string dataFilePath, string indexFileName, float load_capacity) {
     HashIndex index(load_capacity);
+    //vector<DataEntry> test_data = index.parse_idx_file(dataFilePath);
+    vector<DataEntry> test_data = index.parse_key_file(dataFilePath);
+    FILE *c_read_index = fopen(indexFileName.c_str(),"rb");
+    int fd = fileno(c_read_index);
+    auto t1 = chrono::high_resolution_clock::now();
+    for (int i = 0; i < test_data.size(); i++) {
+    DataEntry test = test_data[i];
+    pair<bool,uint64_t> result = index.search(test.key, fd);
+    /*
+    if (not result.first) {
+    cout << "not found key: " << test.key << endl;
+    } else {
+
+        if (result.second != test.rid) {
+            cout << "error: expected: " << test.key << "," <<test.rid << " but got: " << test.key << "," <<result.second <<endl;
+            }
+        }
+        */
+
+    }
+
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "index probe time (ns): " << chrono::duration_cast<chrono::nanoseconds>(t2-t1).count() << endl;
+    cout << "average per probe (ns): " << (chrono::duration_cast<chrono::nanoseconds>(t2-t1).count()) / test_data.size() << endl;
+}
+
+
+void probe_file_test(string dataFilePath, string indexFileName, float load_capacity) {
+    HashIndex index(load_capacity);
     vector<DataEntry> test_data = index.parse_idx_file(dataFilePath);
     FILE *c_read_index = fopen(indexFileName.c_str(),"rb");
     int fd = fileno(c_read_index);
@@ -27,13 +56,16 @@ void probe_file(string dataFilePath, string indexFileName, float load_capacity) 
     for (int i = 0; i < test_data.size(); i++) {
     DataEntry test = test_data[i];
     pair<bool,uint64_t> result = index.search(test.key, fd);
+
     if (not result.first) {
     cout << "not found key: " << test.key << endl;
     } else {
+
         if (result.second != test.rid) {
             cout << "error: expected: " << test.key << "," <<test.rid << " but got: " << test.key << "," <<result.second <<endl;
             }
         }
+
     }
     auto t2 = chrono::high_resolution_clock::now();
     cout << "index probe time (ns): " << chrono::duration_cast<chrono::nanoseconds>(t2-t1).count() << endl;
@@ -83,6 +115,12 @@ int main(int argc, char** argv) {
         cout << "running with index file path: " << indexFileName << endl;
         cout << "running with loading capacity: " << load_capacity << endl;
         probe_key(test_key, indexFileName, load_capacity);
+    } else if (mode=="-probe_file_test") {
+        string dataFilePath = argv[2];
+        cout << "running with data file path: " << dataFilePath << endl;
+        cout << "running with index file path: " << indexFileName << endl;
+        cout << "running with loading capacity: " << load_capacity << endl;
+        probe_file_test(dataFilePath, indexFileName, load_capacity);
     }
     return 0;
 }

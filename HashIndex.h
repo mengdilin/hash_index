@@ -46,6 +46,8 @@ public:
   std::pair<bool,uint64_t> search(uint64_t, int);
   void build_index(std::string, std::string);
   std::vector<DataEntry> parse_idx_file(std::string path);
+  std::vector<DataEntry> parse_key_file(std::string path);
+
   ~HashIndex();
 private:
   static uint64_t search(uint64_t, unsigned int);

@@ -518,3 +518,38 @@ vector<DataEntry> HashIndex::parse_idx_file(string path) {
 
   return data_entries;
 }
+
+/**
+ * @brief parser that expects a file with 3 tab-delimited columns
+ * with the following format: key\tcount\trid where the
+ * middle value count is ignored
+ * @param path of the idx file
+ */
+vector<DataEntry> HashIndex::parse_key_file(string path) {
+  vector<DataEntry> data_entries;
+  ifstream input(path);
+  char const row_delim = '\n';
+  string const field_delim = "\t";
+  for (string row; getline(input, row, row_delim);) {
+    istringstream ss(row);
+
+    //read in key
+    auto start = 0U;
+    auto end = row.find(field_delim);
+    DataEntry entry (0, 0);
+    ss.clear();
+    ss.str(row.substr(start, end - start));
+    if (!(ss >> entry.key)) {
+      cout << "read key failed" << endl;
+      cout << row.substr(start, end - start) << endl;
+      continue;
+    }
+
+    start = end + field_delim.length();
+    end = row.find(field_delim, start);
+    data_entries.push_back(entry);
+  }
+
+
+  return data_entries;
+}
