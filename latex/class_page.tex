@@ -1,0 +1,86 @@
+\hypertarget{class_page}{}\section{Page Class Reference}
+\label{class_page}\index{Page@{Page}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_page_a9a7cc22d5459498ce638c54ae966c79b}{}\hyperlink{class_page_a9a7cc22d5459498ce638c54ae966c79b}{Page} ()\label{class_page_a9a7cc22d5459498ce638c54ae966c79b}
+
+\begin{DoxyCompactList}\small\item\em constructor for a \hyperlink{class_page}{Page} used for probing \end{DoxyCompactList}\item 
+\hypertarget{class_page_a7f324ffee128c9356321edfdcce791d2}{}{\bfseries Page} (std\+::vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$)\label{class_page_a7f324ffee128c9356321edfdcce791d2}
+
+\item 
+\hypertarget{class_page_a2341fff1cc032ab6528874175e7dd841}{}\hyperlink{class_page_a2341fff1cc032ab6528874175e7dd841}{$\sim$\+Page} ()\label{class_page_a2341fff1cc032ab6528874175e7dd841}
+
+\begin{DoxyCompactList}\small\item\em destructor for a \hyperlink{class_page}{Page} \end{DoxyCompactList}\item 
+\hypertarget{class_page_ace77ab8193c19fc94e322d495b316195}{}void \hyperlink{class_page_ace77ab8193c19fc94e322d495b316195}{add\+Entry} (\hyperlink{class_data_entry}{Data\+Entry})\label{class_page_ace77ab8193c19fc94e322d495b316195}
+
+\begin{DoxyCompactList}\small\item\em add an entry to the current page \end{DoxyCompactList}\item 
+\hypertarget{class_page_a6dbbd6372d07a62279fae471be5e54a2}{}std\+::ofstream \& \hyperlink{class_page_a6dbbd6372d07a62279fae471be5e54a2}{flush} (std\+::ofstream \&)\label{class_page_a6dbbd6372d07a62279fae471be5e54a2}
+
+\begin{DoxyCompactList}\small\item\em Helper function used during index building stage. flushes a page to index file. \end{DoxyCompactList}\item 
+\hypertarget{class_page_ac8eaa244c45b970832a714927fdad424}{}bool \hyperlink{class_page_ac8eaa244c45b970832a714927fdad424}{is\+Full} ()\label{class_page_ac8eaa244c45b970832a714927fdad424}
+
+\begin{DoxyCompactList}\small\item\em check whether current page is full \end{DoxyCompactList}\item 
+\hypertarget{class_page_a38336065dbdaf6bf02b4eb17c9de5435}{}bool \hyperlink{class_page_a38336065dbdaf6bf02b4eb17c9de5435}{has\+Overflow} ()\label{class_page_a38336065dbdaf6bf02b4eb17c9de5435}
+
+\begin{DoxyCompactList}\small\item\em check whether current page has overflow \end{DoxyCompactList}\item 
+\hypertarget{class_page_acf084e21946e416d82fecab30ec3576a}{}void \hyperlink{class_page_acf084e21946e416d82fecab30ec3576a}{set\+Overflow} (uint64\+\_\+t overflow\+\_\+addr)\label{class_page_acf084e21946e416d82fecab30ec3576a}
+
+\begin{DoxyCompactList}\small\item\em set the overflow of the page \end{DoxyCompactList}\item 
+\hypertarget{class_page_a562f9dd698df89d7d7fa48d0237f0a26}{}void \hyperlink{class_page_a562f9dd698df89d7d7fa48d0237f0a26}{sort\+Entries} ()\label{class_page_a562f9dd698df89d7d7fa48d0237f0a26}
+
+\begin{DoxyCompactList}\small\item\em Helper function used when merging a page with another page all entries in the same page must be sorted. \end{DoxyCompactList}\item 
+\hypertarget{class_page_aad61b7644bf5e986cb6b1dc35bddad10}{}std\+::pair$<$ bool, uint64\+\_\+t $>$ {\bfseries find} (uint64\+\_\+t)\label{class_page_aad61b7644bf5e986cb6b1dc35bddad10}
+
+\item 
+\hypertarget{class_page_ab28dfd54e442f3f757f5a8906256517a}{}void \hyperlink{class_page_ab28dfd54e442f3f757f5a8906256517a}{merge\+Page} (\hyperlink{class_page}{Page} \&other)\label{class_page_ab28dfd54e442f3f757f5a8906256517a}
+
+\begin{DoxyCompactList}\small\item\em Helper function used during index building stage. merging a page with another page. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_page_a0e7f5ba909c41e17244a8ed088aeb4ff}{}static void \hyperlink{class_page_a0e7f5ba909c41e17244a8ed088aeb4ff}{read} (std\+::ifstream \&, \hyperlink{class_page}{Page} \&)\label{class_page_a0e7f5ba909c41e17244a8ed088aeb4ff}
+
+\begin{DoxyCompactList}\small\item\em O\+L\+D\+: reading a page into memory using ifstream. \end{DoxyCompactList}\item 
+\hypertarget{class_page_a48f4f99d2d0b353225494b83e9a2b133}{}static void \hyperlink{class_page_a48f4f99d2d0b353225494b83e9a2b133}{read} (F\+I\+L\+E $\ast$, \hyperlink{class_page}{Page} \&)\label{class_page_a48f4f99d2d0b353225494b83e9a2b133}
+
+\begin{DoxyCompactList}\small\item\em Helper function used during probing stage. reading a page into memory using fread. \end{DoxyCompactList}\item 
+\hypertarget{class_page_abcbc613bc9b2cc7ca90b8ef89b2e996f}{}static void \hyperlink{class_page_abcbc613bc9b2cc7ca90b8ef89b2e996f}{read} (int, \hyperlink{class_page}{Page} \&, uint64\+\_\+t)\label{class_page_abcbc613bc9b2cc7ca90b8ef89b2e996f}
+
+\begin{DoxyCompactList}\small\item\em O\+L\+D\+: reading a page into memory using pread. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_page_af4274422131fc6e432650f47a3b18ca1}{}uint64\+\_\+t {\bfseries overflow\+\_\+addr}\label{class_page_af4274422131fc6e432650f47a3b18ca1}
+
+\item 
+\hypertarget{class_page_aaf8d2ff8db86b06812f9020a54599d28}{}uint32\+\_\+t {\bfseries counter}\label{class_page_aaf8d2ff8db86b06812f9020a54599d28}
+
+\item 
+\hypertarget{class_page_a2c002ece8b3ceb2208e5c47c2325749a}{}uint32\+\_\+t {\bfseries hash}\label{class_page_a2c002ece8b3ceb2208e5c47c2325749a}
+
+\item 
+\hypertarget{class_page_a3ca5b29177f41a614d8124c7013b64a5}{}\hyperlink{class_data_entry}{Data\+Entry} $\ast$ {\bfseries data\+\_\+entry\+\_\+list} = nullptr\label{class_page_a3ca5b29177f41a614d8124c7013b64a5}
+
+\item 
+\hypertarget{class_page_a6dc030c120ee33bbfadbe9dba191dc93}{}uint8\+\_\+t $\ast$ {\bfseries buffer} = nullptr\label{class_page_a6dc030c120ee33bbfadbe9dba191dc93}
+
+\item 
+\hypertarget{class_page_adbd1fbdf77dbc3a6f691cee74b17166a}{}bool {\bfseries overflow\+\_\+merged}\label{class_page_adbd1fbdf77dbc3a6f691cee74b17166a}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_page_ae213c81894f5b25ab59017f40c2697cd}{}static const int {\bfseries P\+A\+G\+E\+\_\+\+S\+I\+Z\+E} = 64\label{class_page_ae213c81894f5b25ab59017f40c2697cd}
+
+\item 
+\hypertarget{class_page_a463fba97b1e91d7e94fc4f9fe71064f0}{}static constexpr int {\bfseries M\+A\+X\+\_\+\+E\+N\+T\+R\+I\+E\+S} = (Page\+::\+P\+A\+G\+E\+\_\+\+S\+I\+Z\+E-\/2$\ast$sizeof(uint64\+\_\+t))/(2$\ast$sizeof(uint64\+\_\+t))\label{class_page_a463fba97b1e91d7e94fc4f9fe71064f0}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Page.\+h\item 
+Page.\+cpp\end{DoxyCompactItemize}

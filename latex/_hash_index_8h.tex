@@ -1,0 +1,22 @@
+\hypertarget{_hash_index_8h}{}\section{Hash\+Index.\+h File Reference}
+\label{_hash_index_8h}\index{Hash\+Index.\+h@{Hash\+Index.\+h}}
+
+
+Format of \hyperlink{class_hash_index}{Hash\+Index}\+: unsigned int, \hyperlink{class_page}{Page}, \hyperlink{class_page}{Page}, \hyperlink{class_page}{Page}, \hyperlink{class_page}{Page} unsigned int indicates the number of primary buckets in the hash index. \hyperlink{class_page}{Page} is a data structure defined in \hyperlink{_page_8h_source}{Page.\+h} and Page.\+cpp Pages are synonymous with buckets. The entries in a primary page and its overflow pages are sorted in ascending order such that the entry with the smallest key for the hash is always the first entry in the primary page and the entry with the largest key for the hash is always the last entry in the primary/overflow page.  
+
+
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$unordered\+\_\+map$>$}\\*
+{\ttfamily \#include \char`\"{}Page.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_hash_index}{Hash\+Index}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Format of \hyperlink{class_hash_index}{Hash\+Index}\+: unsigned int, \hyperlink{class_page}{Page}, \hyperlink{class_page}{Page}, \hyperlink{class_page}{Page}, \hyperlink{class_page}{Page} unsigned int indicates the number of primary buckets in the hash index. \hyperlink{class_page}{Page} is a data structure defined in \hyperlink{_page_8h_source}{Page.\+h} and Page.\+cpp Pages are synonymous with buckets. The entries in a primary page and its overflow pages are sorted in ascending order such that the entry with the smallest key for the hash is always the first entry in the primary page and the entry with the largest key for the hash is always the last entry in the primary/overflow page. 
+

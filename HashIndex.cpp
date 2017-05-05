@@ -14,8 +14,8 @@
 #include <stdio.h>
 #include <unistd.h>
 using namespace std;
-/*
- * constructor that takes in load_capacity as a variable
+/**
+ * @brief constructor that takes in load_capacity as a variable
  */
 HashIndex::HashIndex(float load_capacity) {
   this->load_capacity = load_capacity;
@@ -24,8 +24,8 @@ HashIndex::HashIndex(float load_capacity) {
   cout << "page entries: " << Page::MAX_ENTRIES << endl;
 }
 
-/*
- * destructor that frees all pages
+/**
+ * @brief destructor that frees all pages
  */
 HashIndex::~HashIndex() {
   for (Page* page : primary_buckets) {
@@ -42,9 +42,10 @@ uint32_t HashIndex::hash(uint64_t key) {
   return hash(key, this->number_buckets);
 }
 
-/*
- * hash function that given a key and number of primary buckets, returns the hash
- * has some debug print in it.
+/**
+ * @brief multiplicative hash function that given a key and number of primary buckets, returns the hash
+ * @param key key to be hashed
+ * @param num_buckets is the number of primary buckets in the index
  */
 uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
     key ^= key >> 33;
@@ -58,9 +59,11 @@ uint32_t HashIndex::hash(uint64_t key, unsigned int num_buckets) {
     return key;
 }
 
-/*
- * takes a key and number of total primary buckets and returns the offset
+/**
+ * @brief function used during index probing. takes a key and number of total primary buckets and returns the offset
  * of the page in the index file corresponding to the key
+ * @param key key to be hashed
+ * @param num_buckets is the number of primary buckets in the index
  */
 uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
   //get the primary bucket of the key
@@ -73,16 +76,18 @@ uint64_t HashIndex::search(uint64_t key, unsigned int num_buckets) {
 }
 
 /**
- * searches through the index file and returns rid of a given key
+ * @brief searches through the index file (using c++ file stream)
+ * and returns rid of a given key
  * structure of index file: all records with the same hash
  * are sorted in ascending order. Therefore, before performing
  * binary search on a page, check that the greatest key in the page
  * is >= the key we are looking for. Else, we go to the overflow page
+ * @param key is the probed key
+ * @param is is the index file input stream
  */
 pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
   unsigned int bucket_num;
   is.read((char *)&bucket_num, sizeof(unsigned int));
-    //test performance on a pre-allocated vector
   uint64_t primary_bucket_offset = search(key, bucket_num);
   is.seekg(0);
   is.seekg(primary_bucket_offset);
@@ -118,7 +123,16 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, ifstream& is) {
 
 }
 
-
+/**
+ * @brief searches through the index file using file handler
+ * and returns rid of a given key
+ * structure of index file: all records with the same hash
+ * are sorted in ascending order. Therefore, before performing
+ * binary search on a page, check that the greatest key in the page
+ * is >= the key we are looking for. Else, we go to the overflow page
+ * @param key is the probed key
+ * @param is is the index file input stream
+ */
 pair<bool,uint64_t> HashIndex::search(uint64_t key, FILE* is) {
   unsigned int bucket_num;
   fread((char *)&bucket_num, sizeof(unsigned int), 1, is);
@@ -150,8 +164,15 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, FILE* is) {
 
 }
 
-/*
- * hash index probing using pread
+/**
+ * @brief searches through the index file using file descriptor
+ * and returns rid of a given key
+ * structure of index file: all records with the same hash
+ * are sorted in ascending order. Therefore, before performing
+ * binary search on a page, check that the greatest key in the page
+ * is >= the key we are looking for. Else, we go to the overflow page
+ * @param key is the probed key
+ * @param is is the index file input stream
  */
 pair<bool,uint64_t> HashIndex::search(uint64_t key, int is) {
   unsigned int bucket_num;
@@ -176,7 +197,7 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, int is) {
   return result;
 
 }
-/*
+/**
  * Helper function during the index building stage.
  * checks if current page has overflow.
  */
@@ -191,11 +212,11 @@ bool HashIndex::page_has_overflow(Page* page) {
   }
 }
 
-/*
- * merges overflow pages with certain primary buckets, if primary buckets
+/**
+ * @brief merges overflow pages with certain primary buckets, if primary buckets
  * have enough room.
- * overflow pages are sorted in increasing order;
- * primary buckets sorted in decreasing order;
+ * @param merge_primary_buckets are primary buckets sorted in decreasing order
+ * @param overflow pages are overflow pages of the index sorted in increasing order
  */
 int HashIndex::merge(vector<Page*>& merge_primary_buckets, vector<Page*>& overflow_pages) {
 
@@ -284,11 +305,11 @@ int HashIndex::merge(vector<Page*>& merge_primary_buckets, vector<Page*>& overfl
   return i;
 }
 
-/*
- * main function for building the hash index given path to the data.idx file
+/**
+ * @brief main function for building the hash index given path to the data.idx file
  * and a path to index file.
- * path: path of data.idx file
- * indexFilePath: path of index file
+ * @param path path of data.idx file
+ * @param indexFilePath: path of index file
  */
 void HashIndex::build_index(string path, string indexFilePath) {
   vector<DataEntry> entries = this->parse_idx_file(path);
@@ -451,10 +472,11 @@ void HashIndex::build_index(string path, string indexFilePath) {
 
 }
 
-/*
- * parser that expects a file with 3 tab-delimited columns
+/**
+ * @brief parser that expects a file with 3 tab-delimited columns
  * with the following format: key\tcount\trid where the
  * middle value count is ignored
+ * @param path of the idx file
  */
 vector<DataEntry> HashIndex::parse_idx_file(string path) {
   vector<DataEntry> data_entries;

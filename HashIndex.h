@@ -4,7 +4,9 @@
 #include "Page.h"
 #include <stdio.h>
 
-/* Format of HashIndex: unsigned int, Page, Page, Page, Page
+/**
+ * @file HashIndex.h
+ * @brief Format of HashIndex: unsigned int, Page, Page, Page, Page
  * unsigned int indicates the number of primary buckets in the hash index.
  * Page is a data structure defined in Page.h and Page.cpp
  * Pages are synonymous with buckets. The entries in a primary page and its
@@ -13,6 +15,7 @@
  * the entry with the largest key for the hash is always the last entry in the
  * primary/overflow page
  */
+
 class HashIndex {
   public:
     //number of primary buckets in the index
