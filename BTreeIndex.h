@@ -29,6 +29,7 @@ public:
   vector<DataEntry> parse_idx_file(string);
   vector<DataEntry> parse_idx_file_get_all(string);
   vector<DataEntry> parse_key_file(std::string path);
+  vector<pair<DataEntry, int>> parse_sample_range_probe_idx(string path);
 
   void build_tree(vector<DataEntry>);
   void setPageOffset();

@@ -12,6 +12,8 @@
 #include <errno.h>
 #include <string>
 #include <math.h>       /* ceil */
+#include <tuple>
+
 
 /**
  * @file BTreeIndex.cpp
@@ -28,7 +30,7 @@ BTreeIndex::~BTreeIndex() {
  * per page.
  */
 BTreeIndex::BTreeIndex() {
-  cout << "MAX_KEY_PER_PAGE: " << BTreePage::MAX_KEY_PER_PAGE << endl;
+  //cout << "MAX_KEY_PER_PAGE: " << BTreePage::MAX_KEY_PER_PAGE << endl;
 
   int i = 0;
   while (i < max_level) {
@@ -37,7 +39,7 @@ BTreeIndex::BTreeIndex() {
     fanout_per_level.push_back(num_nodes*BTreePage::fan_out);
 
     i++;
-    cout << "level with keys: " << keys_per_level[keys_per_level.size()-1] << endl;
+    //cout << "level with keys: " << keys_per_level[keys_per_level.size()-1] << endl;
   }
 }
 
@@ -664,6 +666,63 @@ vector<DataEntry> BTreeIndex::parse_key_file(string path) {
     start = end + field_delim.length();
     end = row.find(field_delim, start);
     data_entries.push_back(entry);
+  }
+
+
+  return data_entries;
+}
+
+/**
+ * @brief parser that expects a file with 3 tab-delimited columns
+ * with the following format: key\tcount\trid where the
+ * middle value count is ignored
+ */
+vector<pair<DataEntry, int>> BTreeIndex::parse_sample_range_probe_idx(string path) {
+  vector<pair<DataEntry, int>> data_entries;
+  ifstream input(path);
+  char const row_delim = '\n';
+  string const field_delim = "\t";
+  for (string row; getline(input, row, row_delim);) {
+    istringstream ss(row);
+
+
+    //read in key
+    auto start = 0U;
+    auto end = row.find(field_delim);
+    DataEntry entry;
+    int size;
+    ss.clear();
+    ss.str(row.substr(start, end - start));
+    if (!(ss >> entry.key)) {
+      cout << "read key failed" << endl;
+      cout << row.substr(start, end - start) << endl;
+      continue;
+    }
+
+    //ignore count for now
+    start = end + field_delim.length();
+    end = row.find(field_delim, start);
+    ss.clear();
+    ss.str(row.substr(start, end - start));
+    if (!(ss >> entry.rid)) {
+      cout << "read key failed" << endl;
+      cout << row.substr(start, end - start) << endl;
+      continue;
+    }
+
+
+    //read in rid
+    start = end + field_delim.length();
+    end = row.find(field_delim, start);
+    ss.clear();
+    ss.str(row.substr(start, end - start));
+    if (!(ss >> size)) {
+      cout << "read rid failed" << endl;
+      cout << row.substr(start, end - start) << endl;
+      continue;
+    }
+
+    data_entries.push_back({entry,size});
   }
 
 

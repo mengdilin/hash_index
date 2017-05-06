@@ -15,6 +15,8 @@
 #include <errno.h>
 #include <string>
 #include <math.h>       /* ceil */
+#include <vector>       // std::vector
+#include <algorithm>
 
 #include "BTreeIndex.h"
 using namespace std;
@@ -127,12 +129,6 @@ void range_probe_key_endpts_test(string dataIdxFilePath, string dataBinFilePath,
         if (result.size() != increments-1) {
             cerr << "expected range result size: " << increments-1 << " but got: " << result.size() << endl;
         }
-        /*
-        for(auto pair_r : result) {
-            auto test_result = btree.probe(pair_r.first,index_fd, data_bin_fd);
-            print_error_if_failed(test_result, pair_r.first, pair_r.second);
-        }
-        */
         for (int j = i; j < increments+i; j++) {
             cout << result.at(j-i).first << "," << result.at(j-i).second << endl;
             if (all_entries.at(j).key != result.at(j-i).first or all_entries.at(j).rid != result.at(j-i).second) {
@@ -146,55 +142,78 @@ void range_probe_key_endpts_test(string dataIdxFilePath, string dataBinFilePath,
 
 void range_probe_key_gt(uint64_t key, string dataBinFilePath, string indexFilePath) {
     BTreeIndex btree;
-    cout << "here" << endl;
     FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
     FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
     int index_fd = fileno(c_read_index);
     int data_bin_fd = fileno(c_bin_file);
     off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
     auto result = btree.range_probe_gt(key, index_fd, data_bin_fd, bin_file_size);
-    for(auto pair_r : result) {
-        cout << pair_r.first << "," << pair_r.second << endl;
-        auto test_result = btree.probe(pair_r.first,index_fd, data_bin_fd);
-        //print_error_if_failed(test_result, pair_r.first, pair_r.second);
-
-    }
     cout << "found keys: " << result.size() << endl;
 }
 
-void range_probe_key_endpts(uint64_t start_key, uint64_t end_key, string dataBinFilePath, string indexFilePath) {
+void generate_range_sample_for_test(string dataIdxFilePath, string probeIdxFilePath) {
     BTreeIndex btree;
-    cout << "here" << endl;
+    vector<DataEntry> all_entries = btree.parse_key_file(dataIdxFilePath);
+    vector<DataEntry> start_probe_entries = btree.parse_key_file(probeIdxFilePath);
+
+    int num_probes = start_probe_entries.size();
+    for (int i = 0; i < num_probes; i++) {
+        auto result = lower_bound (all_entries.begin(), all_entries.end(), start_probe_entries.at(i), DataEntry::compare);
+        if (result !=  all_entries.end()) {
+            if (all_entries.end() - result > 1000) {
+                cout << start_probe_entries.at(i).key << '\t' << (result + 1000)->key << '\t' << 1000 << endl;
+            } else {
+                cout << start_probe_entries.at(i).key << '\t' << (all_entries.end()-1)->key << '\t' << all_entries.end() - result << endl;
+            }
+
+        }
+    }
+}
+
+void range_probe_key_endpts(string probeIdxFilePath, string dataBinFilePath, string indexFilePath) {
+    BTreeIndex btree;
+    vector<pair<DataEntry, int>> all_entries = btree.parse_sample_range_probe_idx(probeIdxFilePath);
+
+    FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
+    FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
+    int index_fd = fileno(c_read_index);
+    int data_bin_fd = fileno(c_bin_file);
+    off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
+    cout << "entry size: " << all_entries.size() << endl;
+
+    auto t1 = chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < all_entries.size(); i++) {
+        auto result = btree.range_probe_endpts((all_entries.at(i).first).key, (all_entries.at(i).first).rid, index_fd, data_bin_fd, bin_file_size);
+        if (result.size() != all_entries.at(i).second+1) {
+            cout << "got size: " << result.size() << " but expected: " << all_entries.at(i).second << endl;
+        }
+
+    }
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "avg microsec per probe: " << chrono::duration_cast<chrono::microseconds>(t2-t1).count()/all_entries.size() << endl;
+
+}
+
+void range_probe_file_key_endpts(uint64_t start_key, uint64_t end_key, string dataBinFilePath, string indexFilePath) {
+    BTreeIndex btree;
     FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
     FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
     int index_fd = fileno(c_read_index);
     int data_bin_fd = fileno(c_bin_file);
     off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
     auto result = btree.range_probe_endpts(start_key, end_key, index_fd, data_bin_fd, bin_file_size);
-    for(auto pair_r : result) {
-        cout << pair_r.first << "," << pair_r.second << endl;
-        auto test_result = btree.probe(pair_r.first,index_fd, data_bin_fd);
-        //print_error_if_failed(test_result, pair_r.first, pair_r.second);
-
-    }
     cout << "found keys: " << result.size() << endl;
 }
 
 void range_probe_key_lt(uint64_t key, string dataBinFilePath, string indexFilePath) {
     BTreeIndex btree;
-    cout << "here" << endl;
     FILE *c_read_index = fopen(indexFilePath.c_str(),"rb");
     FILE *c_bin_file = fopen(dataBinFilePath.c_str(), "rb");
     int index_fd = fileno(c_read_index);
     int data_bin_fd = fileno(c_bin_file);
     off_t bin_file_size = fileSize(data_bin_fd); //indicate end of file
     auto result = btree.range_probe_lt(key, index_fd, data_bin_fd);
-    for(auto pair_r : result) {
-        cout << pair_r.first << "," << pair_r.second << endl;
-        auto test_result = btree.probe(pair_r.first,index_fd, data_bin_fd);
-        //print_error_if_failed(test_result, pair_r.first, pair_r.second);
-
-    }
     cout << "found keys: " << result.size() << endl;
 }
 
@@ -306,25 +325,14 @@ int main(int argc, char** argv) {
         string dataBinFilePath = argv[4];
         range_probe_key_gt(key, dataBinFilePath, indexFilePath);
     } else if (mode == "-range_probe_key_endpts") {
-        if (argc < 6) {
-            cerr << "use ./test -range_probe_key_endpts <start_key> <end_key> <index_file_path> <binary_data_file_path>" << endl;
+        if (argc < 4) {
+            cerr << "use ./test -range_probe_key_endpts <dataFilePath> <index_file_path> <binary_data_file_path>" << endl;
             exit(1);
         }
-        uint64_t start_key;
-        istringstream ss(argv[2]);
-        if (!(ss >> start_key)) {
-            cout << "set key failed" << endl;
-            exit(1);
-        }
-        uint64_t end_key;
-        istringstream ss1(argv[3]);
-        if (!(ss1 >> end_key)) {
-            cout << "set key failed" << endl;
-            exit(1);
-        }
-        string indexFilePath = argv[4];
-        string dataBinFilePath = argv[5];
-        range_probe_key_endpts(start_key, end_key, dataBinFilePath, indexFilePath);
+        string dataIdxFilePath = argv[2];
+        string indexFilePath = argv[3];
+        string dataBinFilePath = argv[4];
+        range_probe_key_endpts(dataIdxFilePath, dataBinFilePath, indexFilePath);
     } else if (mode == "-range_probe_key_lt") {
         if (argc < 5) {
             cerr << "use ./test -range_probe_key_lt <key> <index_file_path> <binary_data_file_path>" << endl;
@@ -357,67 +365,19 @@ int main(int argc, char** argv) {
         string indexFilePath = argv[3];
         string dataBinFilePath = argv[4];
         range_probe_key_endpts_test(dataIdxFilePath, dataBinFilePath, indexFilePath);
+    } else if (mode == "-generate_range_sample_for_test") {
+        if (argc < 3) {
+            cerr << "use ./test -generate_range_sample_for_test <sorted_idx_data_file_path> <random_idx_file_path>" << endl;
+            exit(1);
+        }
+        string dataIdxFilePath = argv[2];
+        string probeFilePath = argv[3];
+        generate_range_sample_for_test(dataIdxFilePath, probeFilePath);
     }
     else {
         cerr << "mode: " << mode << " not supported" << endl;
 
     }
-
-
-    /*
-    BTreePage page;
-    BTreeIndex btree;
-    vector<DataEntry> entries = btree.parse_idx_file(argv[1]);
-    btree.build_tree(entries);
-    //btree.BfsDebugPrint();
-
-
-    string index_path = "indexFile";
-    if (argc >= 3) {
-       index_path = argv[2];
-       cout << "running with index path: " << index_path << endl;
-    }
-
-    btree.flush(index_path);
-    vector<DataEntry> all_entries = btree.parse_idx_file_get_all(argv[1]);
-
-
-    uint64_t key =40;
-    if (argc >= 4) {
-        istringstream ss(argv[3]);
-        if (!(ss >> key)) {
-            cout << "set key failed" << endl;
-        }
-    }
-    string data_bin_path = "/dev/shm/genome/v0/data.bin";
-    if (argc >= 5) {
-        data_bin_path = argv[4];
-        cout << "running with data bin path: " << data_bin_path << endl;
-    }
-    cout << "probe key: " << key << endl;
-    FILE *c_read_index = fopen(index_path.c_str(),"rb");
-    FILE *c_bin_file = fopen(data_bin_path.c_str(), "rb");
-    int index_fd = fileno(c_read_index);
-    int data_bin_fd = fileno(c_bin_file);
-    auto result = btree.probe(key,index_fd, data_bin_fd);
-    cout << "here" << endl;;
-    if (result.first) {
-        cout << "got value: " << result.second << endl;
-
-    } else {
-        cout << "not found: " << key << endl;
-    }
-
-    auto t1 = chrono::high_resolution_clock::now();
-    for (auto& entry : all_entries) {
-        //cout << "key: " << entry.key << endl;
-        auto result = btree.probe(entry.key,index_fd, data_bin_fd);
-        print_error_if_failed(result, entry.key, entry.rid);
-    }
-    auto t2 = chrono::high_resolution_clock::now();
-    cout << "avg nanosec per probe: " << (t2-t1).count()/entries.size() << endl;
-    //btree.BfsDebugPrint();
-    */
     return 0;
 }
 
