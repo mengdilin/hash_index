@@ -187,6 +187,7 @@ pair<bool,uint64_t> HashIndex::search(uint64_t key, int is) {
     //go to overflow
     if (curPage.hasOverflow()) {
       offset = sizeof(unsigned int) + ((uint64_t)curPage.overflow_addr-1) * Page::PAGE_SIZE;
+      free(curPage.buffer);
       Page::read(is, curPage, offset);
     } else {
       break;

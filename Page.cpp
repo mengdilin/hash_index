@@ -96,7 +96,7 @@ pair<bool,uint64_t> Page::find(uint64_t key) {
     look_for,
     DataEntry::compare);
   pair <bool,uint64_t> find_result;
-  if (result == data_entry_list + counter) {
+  if (result == data_entry_list + counter || result->key != key) {
     // did not find key in Page
     find_result = make_pair(false, 0);
   } else {
