@@ -38,7 +38,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -118,25 +117,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="class_page.html#a2341fff1cc032ab6528874175e7dd841">~Page</a>();</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_page.html#ace77ab8193c19fc94e322d495b316195">addEntry</a>(<a class="code" href="class_data_entry.html">DataEntry</a>);</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    std::ofstream&amp; <a class="code" href="class_page.html#a6dbbd6372d07a62279fae471be5e54a2">flush</a>(std::ofstream&amp;);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="class_page.html#a0e7f5ba909c41e17244a8ed088aeb4ff">read</a>(std::ifstream&amp;, <a class="code" href="class_page.html">Page</a>&amp;);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="class_page.html#a0e7f5ba909c41e17244a8ed088aeb4ff">read</a>(FILE*, <a class="code" href="class_page.html">Page</a>&amp;);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="class_page.html#a0e7f5ba909c41e17244a8ed088aeb4ff">read</a>(<span class="keywordtype">int</span>, <a class="code" href="class_page.html">Page</a>&amp;, uint64_t);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_page.html#ac8eaa244c45b970832a714927fdad424">isFull</a>();</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_page.html#a38336065dbdaf6bf02b4eb17c9de5435">hasOverflow</a>();</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_page.html#acf084e21946e416d82fecab30ec3576a">setOverflow</a>(uint64_t overflow_addr);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_page.html#a562f9dd698df89d7d7fa48d0237f0a26">sortEntries</a>();</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    std::pair&lt;bool,uint64_t&gt; find(uint64_t);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_page.html#ab28dfd54e442f3f757f5a8906256517a">mergePage</a>(<a class="code" href="class_page.html">Page</a>&amp; other);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="class_page.html#abcbc613bc9b2cc7ca90b8ef89b2e996f">read</a>(<span class="keywordtype">int</span>, <a class="code" href="class_page.html">Page</a>&amp;, uint64_t);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_page.html#ac8eaa244c45b970832a714927fdad424">isFull</a>();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_page.html#a38336065dbdaf6bf02b4eb17c9de5435">hasOverflow</a>();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_page.html#acf084e21946e416d82fecab30ec3576a">setOverflow</a>(uint64_t overflow_addr);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_page.html#a562f9dd698df89d7d7fa48d0237f0a26">sortEntries</a>();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    std::pair&lt;bool,uint64_t&gt; find(uint64_t);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_page.html#ab28dfd54e442f3f757f5a8906256517a">mergePage</a>(<a class="code" href="class_page.html">Page</a>&amp; other);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;};</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
 <div class="ttc" id="class_page_html_a9a7cc22d5459498ce638c54ae966c79b"><div class="ttname"><a href="class_page.html#a9a7cc22d5459498ce638c54ae966c79b">Page::Page</a></div><div class="ttdeci">Page()</div><div class="ttdoc">constructor for a Page used for probing </div><div class="ttdef"><b>Definition:</b> Page.cpp:13</div></div>
 <div class="ttc" id="class_page_html_a38336065dbdaf6bf02b4eb17c9de5435"><div class="ttname"><a href="class_page.html#a38336065dbdaf6bf02b4eb17c9de5435">Page::hasOverflow</a></div><div class="ttdeci">bool hasOverflow()</div><div class="ttdoc">check whether current page has overflow </div><div class="ttdef"><b>Definition:</b> Page.cpp:65</div></div>
 <div class="ttc" id="class_page_html_ace77ab8193c19fc94e322d495b316195"><div class="ttname"><a href="class_page.html#ace77ab8193c19fc94e322d495b316195">Page::addEntry</a></div><div class="ttdeci">void addEntry(DataEntry)</div><div class="ttdoc">add an entry to the current page </div><div class="ttdef"><b>Definition:</b> Page.cpp:49</div></div>
 <div class="ttc" id="class_page_html"><div class="ttname"><a href="class_page.html">Page</a></div><div class="ttdef"><b>Definition:</b> Page.h:8</div></div>
 <div class="ttc" id="class_page_html_acf084e21946e416d82fecab30ec3576a"><div class="ttname"><a href="class_page.html#acf084e21946e416d82fecab30ec3576a">Page::setOverflow</a></div><div class="ttdeci">void setOverflow(uint64_t overflow_addr)</div><div class="ttdoc">set the overflow of the page </div><div class="ttdef"><b>Definition:</b> Page.cpp:72</div></div>
-<div class="ttc" id="class_page_html_a0e7f5ba909c41e17244a8ed088aeb4ff"><div class="ttname"><a href="class_page.html#a0e7f5ba909c41e17244a8ed088aeb4ff">Page::read</a></div><div class="ttdeci">static void read(std::ifstream &amp;, Page &amp;)</div><div class="ttdoc">OLD: reading a page into memory using ifstream. </div><div class="ttdef"><b>Definition:</b> Page.cpp:149</div></div>
 <div class="ttc" id="class_page_html_a562f9dd698df89d7d7fa48d0237f0a26"><div class="ttname"><a href="class_page.html#a562f9dd698df89d7d7fa48d0237f0a26">Page::sortEntries</a></div><div class="ttdeci">void sortEntries()</div><div class="ttdoc">Helper function used when merging a page with another page all entries in the same page must be sorte...</div><div class="ttdef"><b>Definition:</b> Page.cpp:113</div></div>
+<div class="ttc" id="class_page_html_abcbc613bc9b2cc7ca90b8ef89b2e996f"><div class="ttname"><a href="class_page.html#abcbc613bc9b2cc7ca90b8ef89b2e996f">Page::read</a></div><div class="ttdeci">static void read(int, Page &amp;, uint64_t)</div><div class="ttdoc">Helper function used during probing stage. reading a page into memory using pread. </div><div class="ttdef"><b>Definition:</b> Page.cpp:150</div></div>
 <div class="ttc" id="class_page_html_a2341fff1cc032ab6528874175e7dd841"><div class="ttname"><a href="class_page.html#a2341fff1cc032ab6528874175e7dd841">Page::~Page</a></div><div class="ttdeci">~Page()</div><div class="ttdoc">destructor for a Page </div><div class="ttdef"><b>Definition:</b> Page.cpp:36</div></div>
 <div class="ttc" id="class_page_html_ac8eaa244c45b970832a714927fdad424"><div class="ttname"><a href="class_page.html#ac8eaa244c45b970832a714927fdad424">Page::isFull</a></div><div class="ttdeci">bool isFull()</div><div class="ttdoc">check whether current page is full </div><div class="ttdef"><b>Definition:</b> Page.cpp:58</div></div>
 <div class="ttc" id="class_page_html_ab28dfd54e442f3f757f5a8906256517a"><div class="ttname"><a href="class_page.html#ab28dfd54e442f3f757f5a8906256517a">Page::mergePage</a></div><div class="ttdeci">void mergePage(Page &amp;other)</div><div class="ttdoc">Helper function used during index building stage. merging a page with another page. </div><div class="ttdef"><b>Definition:</b> Page.cpp:136</div></div>
@@ -145,7 +142,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri May 5 2017 02:21:34 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 6 2017 05:19:12 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

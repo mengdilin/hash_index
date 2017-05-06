@@ -38,7 +38,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -113,30 +112,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <a class="code" href="class_hash_index.html#a42b72951825c779461709d0ce309f314">HashIndex</a>(<span class="keywordtype">float</span> load_capacity);</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  uint32_t hash(uint64_t);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  std::pair&lt;bool,uint64_t&gt; search(uint64_t, std::ifstream&amp;);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  std::pair&lt;bool,uint64_t&gt; search(uint64_t, FILE*);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="comment">//fastest probing method using pread</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  std::pair&lt;bool,uint64_t&gt; search(uint64_t, <span class="keywordtype">int</span>);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_hash_index.html#a7d704988a35e8703feeefd9f2a5e68c8">build_index</a>(std::string, std::string);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  std::vector&lt;DataEntry&gt; <a class="code" href="class_hash_index.html#af1027d9d3684c93abcc703ccd1824937">parse_idx_file</a>(std::string path);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="class_hash_index.html#af8de8c5d009e19dc923f82e5e6cb4ae3">~HashIndex</a>();</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keyword">static</span> uint64_t search(uint64_t, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keyword">static</span> uint32_t hash(uint64_t, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keywordtype">int</span> merge(std::vector&lt;Page*&gt;&amp;, std::vector&lt;Page*&gt;&amp;);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordtype">bool</span> page_has_overflow(<a class="code" href="class_page.html">Page</a>*);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;};</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="comment">//fastest probing method using pread</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  std::pair&lt;bool,uint64_t&gt; <a class="code" href="class_hash_index.html#a247ba4d9ac11792be1853eec5593ac1a">search</a>(uint64_t, <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_hash_index.html#a7d704988a35e8703feeefd9f2a5e68c8">build_index</a>(std::string, std::string);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  std::vector&lt;DataEntry&gt; <a class="code" href="class_hash_index.html#af1027d9d3684c93abcc703ccd1824937">parse_idx_file</a>(std::string path);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  std::vector&lt;DataEntry&gt; <a class="code" href="class_hash_index.html#a7b1b1f9d1cd6cec6cae120b338287526">parse_key_file</a>(std::string path);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="class_hash_index.html#af8de8c5d009e19dc923f82e5e6cb4ae3">~HashIndex</a>();</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">static</span> uint64_t <a class="code" href="class_hash_index.html#a247ba4d9ac11792be1853eec5593ac1a">search</a>(uint64_t, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keyword">static</span> uint32_t hash(uint64_t, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordtype">int</span> merge(std::vector&lt;Page*&gt;&amp;, std::vector&lt;Page*&gt;&amp;);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keywordtype">bool</span> page_has_overflow(<a class="code" href="class_page.html">Page</a>*);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;};</div>
 <div class="ttc" id="class_hash_index_html_a42b72951825c779461709d0ce309f314"><div class="ttname"><a href="class_hash_index.html#a42b72951825c779461709d0ce309f314">HashIndex::HashIndex</a></div><div class="ttdeci">HashIndex(float load_capacity)</div><div class="ttdoc">constructor that takes in load_capacity as a variable </div><div class="ttdef"><b>Definition:</b> HashIndex.cpp:20</div></div>
 <div class="ttc" id="class_page_html"><div class="ttname"><a href="class_page.html">Page</a></div><div class="ttdef"><b>Definition:</b> Page.h:8</div></div>
-<div class="ttc" id="class_hash_index_html_af1027d9d3684c93abcc703ccd1824937"><div class="ttname"><a href="class_hash_index.html#af1027d9d3684c93abcc703ccd1824937">HashIndex::parse_idx_file</a></div><div class="ttdeci">std::vector&lt; DataEntry &gt; parse_idx_file(std::string path)</div><div class="ttdoc">parser that expects a file with 3 tab-delimited columns with the following format: key where the midd...</div><div class="ttdef"><b>Definition:</b> HashIndex.cpp:481</div></div>
+<div class="ttc" id="class_hash_index_html_a247ba4d9ac11792be1853eec5593ac1a"><div class="ttname"><a href="class_hash_index.html#a247ba4d9ac11792be1853eec5593ac1a">HashIndex::search</a></div><div class="ttdeci">std::pair&lt; bool, uint64_t &gt; search(uint64_t, int)</div><div class="ttdoc">searches through the index file using file descriptor and returns rid of a given key structure of ind...</div><div class="ttdef"><b>Definition:</b> HashIndex.cpp:88</div></div>
+<div class="ttc" id="class_hash_index_html_af1027d9d3684c93abcc703ccd1824937"><div class="ttname"><a href="class_hash_index.html#af1027d9d3684c93abcc703ccd1824937">HashIndex::parse_idx_file</a></div><div class="ttdeci">std::vector&lt; DataEntry &gt; parse_idx_file(std::string path)</div><div class="ttdoc">parser that expects a file with 3 tab-delimited columns with the following format: key where the midd...</div><div class="ttdef"><b>Definition:</b> HashIndex.cpp:396</div></div>
 <div class="ttc" id="class_hash_index_html_af8de8c5d009e19dc923f82e5e6cb4ae3"><div class="ttname"><a href="class_hash_index.html#af8de8c5d009e19dc923f82e5e6cb4ae3">HashIndex::~HashIndex</a></div><div class="ttdeci">~HashIndex()</div><div class="ttdoc">destructor that frees all pages </div><div class="ttdef"><b>Definition:</b> HashIndex.cpp:30</div></div>
-<div class="ttc" id="class_hash_index_html_a7d704988a35e8703feeefd9f2a5e68c8"><div class="ttname"><a href="class_hash_index.html#a7d704988a35e8703feeefd9f2a5e68c8">HashIndex::build_index</a></div><div class="ttdeci">void build_index(std::string, std::string)</div><div class="ttdoc">main function for building the hash index given path to the data.idx file and a path to index file...</div><div class="ttdef"><b>Definition:</b> HashIndex.cpp:314</div></div>
+<div class="ttc" id="class_hash_index_html_a7d704988a35e8703feeefd9f2a5e68c8"><div class="ttname"><a href="class_hash_index.html#a7d704988a35e8703feeefd9f2a5e68c8">HashIndex::build_index</a></div><div class="ttdeci">void build_index(std::string, std::string)</div><div class="ttdoc">main function for building the hash index given path to the data.idx file and a path to index file...</div><div class="ttdef"><b>Definition:</b> HashIndex.cpp:226</div></div>
+<div class="ttc" id="class_hash_index_html_a7b1b1f9d1cd6cec6cae120b338287526"><div class="ttname"><a href="class_hash_index.html#a7b1b1f9d1cd6cec6cae120b338287526">HashIndex::parse_key_file</a></div><div class="ttdeci">std::vector&lt; DataEntry &gt; parse_key_file(std::string path)</div><div class="ttdoc">parser that expects a file with 3 tab-delimited columns with the following format: key where the midd...</div><div class="ttdef"><b>Definition:</b> HashIndex.cpp:443</div></div>
 <div class="ttc" id="class_hash_index_html"><div class="ttname"><a href="class_hash_index.html">HashIndex</a></div><div class="ttdef"><b>Definition:</b> HashIndex.h:19</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri May 5 2017 02:21:34 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 6 2017 05:19:12 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

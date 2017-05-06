@@ -38,7 +38,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -100,12 +99,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a649efbc49a59fc99180af0a5c8a63f60"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a649efbc49a59fc99180af0a5c8a63f60"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>hash</b> (uint64_t)</td></tr>
 <tr class="separator:a649efbc49a59fc99180af0a5c8a63f60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1322500f9a4eb1cb714680e99230286"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1322500f9a4eb1cb714680e99230286"></a>
-std::pair&lt; bool, uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>search</b> (uint64_t, std::ifstream &amp;)</td></tr>
-<tr class="separator:ac1322500f9a4eb1cb714680e99230286"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac044690bf6e2f7cbf0aca62600cb355d"><td class="memItemLeft" align="right" valign="top">std::pair&lt; bool, uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hash_index.html#ac044690bf6e2f7cbf0aca62600cb355d">search</a> (uint64_t, FILE *)</td></tr>
-<tr class="memdesc:ac044690bf6e2f7cbf0aca62600cb355d"><td class="mdescLeft">&#160;</td><td class="mdescRight">searches through the index file using file handler and returns rid of a given key structure of index file: all records with the same hash are sorted in ascending order. Therefore, before performing binary search on a page, check that the greatest key in the page is &gt;= the key we are looking for. Else, we go to the overflow page  <a href="#ac044690bf6e2f7cbf0aca62600cb355d">More...</a><br /></td></tr>
-<tr class="separator:ac044690bf6e2f7cbf0aca62600cb355d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a247ba4d9ac11792be1853eec5593ac1a"><td class="memItemLeft" align="right" valign="top">std::pair&lt; bool, uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hash_index.html#a247ba4d9ac11792be1853eec5593ac1a">search</a> (uint64_t, int)</td></tr>
 <tr class="memdesc:a247ba4d9ac11792be1853eec5593ac1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">searches through the index file using file descriptor and returns rid of a given key structure of index file: all records with the same hash are sorted in ascending order. Therefore, before performing binary search on a page, check that the greatest key in the page is &gt;= the key we are looking for. Else, we go to the overflow page  <a href="#a247ba4d9ac11792be1853eec5593ac1a">More...</a><br /></td></tr>
 <tr class="separator:a247ba4d9ac11792be1853eec5593ac1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,6 +108,9 @@ std::pair&lt; bool, uint64_t &gt;&#160;</td><td class="memItemRight" valign="bot
 <tr class="memitem:af1027d9d3684c93abcc703ccd1824937"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_data_entry.html">DataEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hash_index.html#af1027d9d3684c93abcc703ccd1824937">parse_idx_file</a> (std::string path)</td></tr>
 <tr class="memdesc:af1027d9d3684c93abcc703ccd1824937"><td class="mdescLeft">&#160;</td><td class="mdescRight">parser that expects a file with 3 tab-delimited columns with the following format: key where the middle value count is ignored  <a href="#af1027d9d3684c93abcc703ccd1824937">More...</a><br /></td></tr>
 <tr class="separator:af1027d9d3684c93abcc703ccd1824937"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b1b1f9d1cd6cec6cae120b338287526"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_data_entry.html">DataEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hash_index.html#a7b1b1f9d1cd6cec6cae120b338287526">parse_key_file</a> (std::string path)</td></tr>
+<tr class="memdesc:a7b1b1f9d1cd6cec6cae120b338287526"><td class="mdescLeft">&#160;</td><td class="mdescRight">parser that expects a file with 3 tab-delimited columns with the following format: key where the middle value count is ignored  <a href="#a7b1b1f9d1cd6cec6cae120b338287526">More...</a><br /></td></tr>
+<tr class="separator:a7b1b1f9d1cd6cec6cae120b338287526"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8de8c5d009e19dc923f82e5e6cb4ae3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af8de8c5d009e19dc923f82e5e6cb4ae3"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_hash_index.html#af8de8c5d009e19dc923f82e5e6cb4ae3">~HashIndex</a> ()</td></tr>
 <tr class="memdesc:af8de8c5d009e19dc923f82e5e6cb4ae3"><td class="mdescLeft">&#160;</td><td class="mdescRight">destructor that frees all pages <br /></td></tr>
@@ -186,35 +182,24 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>number_bucket
 
 </div>
 </div>
-<a class="anchor" id="ac044690bf6e2f7cbf0aca62600cb355d"></a>
+<a class="anchor" id="a7b1b1f9d1cd6cec6cae120b338287526"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pair&lt; bool, uint64_t &gt; HashIndex::search </td>
+          <td class="memname">vector&lt; <a class="el" href="class_data_entry.html">DataEntry</a> &gt; HashIndex::parse_key_file </td>
           <td>(</td>
-          <td class="paramtype">uint64_t&#160;</td>
-          <td class="paramname"><em>key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">FILE *&#160;</td>
-          <td class="paramname"><em>is</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>searches through the index file using file handler and returns rid of a given key structure of index file: all records with the same hash are sorted in ascending order. Therefore, before performing binary search on a page, check that the greatest key in the page is &gt;= the key we are looking for. Else, we go to the overflow page </p>
+<p>parser that expects a file with 3 tab-delimited columns with the following format: key where the middle value count is ignored </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">key</td><td>is the probed key </td></tr>
-    <tr><td class="paramname">is</td><td>is the index file input stream </td></tr>
+    <tr><td class="paramname">path</td><td>of the idx file </td></tr>
   </table>
   </dd>
 </dl>
@@ -263,7 +248,7 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>number_bucket
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri May 5 2017 02:21:34 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 6 2017 05:19:12 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

@@ -9,16 +9,13 @@
 \hypertarget{class_hash_index_a649efbc49a59fc99180af0a5c8a63f60}{}uint32\+\_\+t {\bfseries hash} (uint64\+\_\+t)\label{class_hash_index_a649efbc49a59fc99180af0a5c8a63f60}
 
 \item 
-\hypertarget{class_hash_index_ac1322500f9a4eb1cb714680e99230286}{}std\+::pair$<$ bool, uint64\+\_\+t $>$ {\bfseries search} (uint64\+\_\+t, std\+::ifstream \&)\label{class_hash_index_ac1322500f9a4eb1cb714680e99230286}
-
-\item 
-std\+::pair$<$ bool, uint64\+\_\+t $>$ \hyperlink{class_hash_index_ac044690bf6e2f7cbf0aca62600cb355d}{search} (uint64\+\_\+t, F\+I\+L\+E $\ast$)
-\begin{DoxyCompactList}\small\item\em searches through the index file using file handler and returns rid of a given key structure of index file\+: all records with the same hash are sorted in ascending order. Therefore, before performing binary search on a page, check that the greatest key in the page is $>$= the key we are looking for. Else, we go to the overflow page \end{DoxyCompactList}\item 
 std\+::pair$<$ bool, uint64\+\_\+t $>$ \hyperlink{class_hash_index_a247ba4d9ac11792be1853eec5593ac1a}{search} (uint64\+\_\+t, int)
 \begin{DoxyCompactList}\small\item\em searches through the index file using file descriptor and returns rid of a given key structure of index file\+: all records with the same hash are sorted in ascending order. Therefore, before performing binary search on a page, check that the greatest key in the page is $>$= the key we are looking for. Else, we go to the overflow page \end{DoxyCompactList}\item 
 void \hyperlink{class_hash_index_a7d704988a35e8703feeefd9f2a5e68c8}{build\+\_\+index} (std\+::string, std\+::string)
 \begin{DoxyCompactList}\small\item\em main function for building the hash index given path to the data.\+idx file and a path to index file. \end{DoxyCompactList}\item 
 std\+::vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$ \hyperlink{class_hash_index_af1027d9d3684c93abcc703ccd1824937}{parse\+\_\+idx\+\_\+file} (std\+::string path)
+\begin{DoxyCompactList}\small\item\em parser that expects a file with 3 tab-\/delimited columns with the following format\+: key where the middle value count is ignored \end{DoxyCompactList}\item 
+std\+::vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$ \hyperlink{class_hash_index_a7b1b1f9d1cd6cec6cae120b338287526}{parse\+\_\+key\+\_\+file} (std\+::string path)
 \begin{DoxyCompactList}\small\item\em parser that expects a file with 3 tab-\/delimited columns with the following format\+: key where the middle value count is ignored \end{DoxyCompactList}\item 
 \hypertarget{class_hash_index_af8de8c5d009e19dc923f82e5e6cb4ae3}{}\hyperlink{class_hash_index_af8de8c5d009e19dc923f82e5e6cb4ae3}{$\sim$\+Hash\+Index} ()\label{class_hash_index_af8de8c5d009e19dc923f82e5e6cb4ae3}
 
@@ -67,23 +64,20 @@ parser that expects a file with 3 tab-\/delimited columns with the following for
 {\em path} & of the idx file \\
 \hline
 \end{DoxyParams}
-\hypertarget{class_hash_index_ac044690bf6e2f7cbf0aca62600cb355d}{}\index{Hash\+Index@{Hash\+Index}!search@{search}}
-\index{search@{search}!Hash\+Index@{Hash\+Index}}
-\subsubsection[{search}]{\setlength{\rightskip}{0pt plus 5cm}pair$<$ bool, uint64\+\_\+t $>$ Hash\+Index\+::search (
+\hypertarget{class_hash_index_a7b1b1f9d1cd6cec6cae120b338287526}{}\index{Hash\+Index@{Hash\+Index}!parse\+\_\+key\+\_\+file@{parse\+\_\+key\+\_\+file}}
+\index{parse\+\_\+key\+\_\+file@{parse\+\_\+key\+\_\+file}!Hash\+Index@{Hash\+Index}}
+\subsubsection[{parse\+\_\+key\+\_\+file}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ {\bf Data\+Entry} $>$ Hash\+Index\+::parse\+\_\+key\+\_\+file (
 \begin{DoxyParamCaption}
-\item[{uint64\+\_\+t}]{key, }
-\item[{F\+I\+L\+E $\ast$}]{is}
+\item[{std\+::string}]{path}
 \end{DoxyParamCaption}
-)}\label{class_hash_index_ac044690bf6e2f7cbf0aca62600cb355d}
+)}\label{class_hash_index_a7b1b1f9d1cd6cec6cae120b338287526}
 
 
-searches through the index file using file handler and returns rid of a given key structure of index file\+: all records with the same hash are sorted in ascending order. Therefore, before performing binary search on a page, check that the greatest key in the page is $>$= the key we are looking for. Else, we go to the overflow page 
+parser that expects a file with 3 tab-\/delimited columns with the following format\+: key where the middle value count is ignored 
 
 
 \begin{DoxyParams}{Parameters}
-{\em key} & is the probed key \\
-\hline
-{\em is} & is the index file input stream \\
+{\em path} & of the idx file \\
 \hline
 \end{DoxyParams}
 \hypertarget{class_hash_index_a247ba4d9ac11792be1853eec5593ac1a}{}\index{Hash\+Index@{Hash\+Index}!search@{search}}
