@@ -57,12 +57,10 @@ void BTreeIndex::setPageOffset() {
   root->pageNum = pageNum++;
   cout << "root level has: " << tree.at(0).size() << " nodes and first node has: " << root->keys.size() << " keys" <<endl;
   for (int i=1; i < tree.size(); i++) {
-    int sum = 0;
     for (int j = 0; j < tree.at(i).size(); j++) {
       BTreePage* curPage =(tree.at(i).at(j));
       curPage->pageNum = pageNum++;
       if (curPage->parent != nullptr) {
-        int numChildRefsOfParent = curPage->parent->numChildRefs;
         curPage->parent->rids.push_back(curPage->pageNum);
         curPage->parent->numChildRefs++;
         assert(curPage->parent->numChildRefs == curPage->parent->rids.size());
@@ -362,55 +360,6 @@ pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, int indexFile, int binFile)
 }
 
 /**
- * @brief This method is not being used in the current
- * implementation of probe. btree quality probe on a single key using file handler.
- * First, it traverses the btree
- * index, then it calls probe_bin to probe the binary data file, looking for
- * the offset of the key.
- * @param key: the key we are probing for
- * @param indexFile: file handler of the btree index file
- */
-pair<bool, uint64_t> BTreeIndex::probe(uint64_t key, FILE* indexFile) {
-  int level = 1;
-  uint64_t tree_size;
-  fread(&tree_size, sizeof(tree_size), 1, indexFile);
-  BTreePage curPage;
-  if (tree_size > 1) {
-    BTreePage::read(indexFile, curPage, false);
-  } else {
-    BTreePage::read(indexFile, curPage, true);
-
-
-    int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
-    if (found_index == curPage.keys.size()) {
-      fseek(indexFile, 0, SEEK_SET);
-      return make_pair(false, 0);
-    } else {
-      fseek(indexFile, 0, SEEK_SET);
-      return make_pair(true, curPage.rids.at(found_index));
-    }
-
-  }
-
-  auto result = curPage.find(key);
-  while(level < tree_size) {
-    if (level == tree_size-1) {
-      fseek(indexFile, result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t), SEEK_SET);
-      BTreePage::read(indexFile, curPage, true);
-      int found_index = binary_find(curPage.keys.begin(), curPage.keys.end(), key) - curPage.keys.begin();
-
-      fseek(indexFile, 0, SEEK_SET);
-      return make_pair(true, curPage.rids.at(found_index));
-    }
-    level++;
-    fseek(indexFile, result.second * BTreePage::PAGE_SIZE+sizeof(uint64_t), SEEK_SET);
-    BTreePage::read(indexFile, curPage, false);
-    result = curPage.find(key);
-  }
-  return make_pair(false, 0);
-}
-
-/**
  * @brief Prints each page in the tree
  */
 void BTreeIndex::BfsDebugPrint() {
@@ -455,7 +404,6 @@ void BTreeIndex::addNodeToTree(int level, BTreePage* node) {
 void BTreeIndex::build_tree(vector<DataEntry> entries) {
   uint64_t sum = 0;
   unsigned int num_levels_needed = 0;
-  auto low=lower_bound (keys_per_level.begin(), keys_per_level.end(), entries.size());
   while (entries.size() > sum) {
     sum = keys_per_level[num_levels_needed++];
     vector<BTreePage*> cur_level;

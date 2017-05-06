@@ -102,30 +102,6 @@ void BTreePage::read(int indexFile, BTreePage& page, bool is_leaf, off_t offset)
 }
 
 /**
- * @brief reads data into a BTreePage from an indexFile using a file handler
- * @param indexFile is a file handler to the binary btree index file
- * @param page is an empty BTreePage which will be populated after read completes
- * @param is_leaf indicates whether the current page to be read should be a leaf page
- */
-void BTreePage::read(FILE* indexFile, BTreePage& page, bool is_leaf) {
-  uint64_t counter;
-  fread(&counter, sizeof(counter), 1, indexFile);
-
-  uint64_t tmp_keys[MAX_KEY_PER_PAGE];
-  fread(&tmp_keys, sizeof(uint64_t)*(MAX_KEY_PER_PAGE), 1, indexFile);
-  page.keys.assign(tmp_keys, tmp_keys+counter);
-  uint64_t tmp_rids[MAX_KEY_PER_PAGE+2];
-
-  if (not is_leaf) {
-    fread(&tmp_rids, sizeof(uint64_t)*(MAX_KEY_PER_PAGE+1), 1, indexFile);
-    page.rids.assign(tmp_rids, tmp_rids+counter+1);
-  } else {
-    fread(&tmp_rids, sizeof(uint64_t)*(MAX_KEY_PER_PAGE+1), 1, indexFile);
-    page.rids.assign(tmp_rids, tmp_rids+counter);
-  }
-}
-
-/**
  * @brief given a key, finds the reference/rid to the child page
  * @param key search key
  * @return a pair where the first item is a boolean indicating whether

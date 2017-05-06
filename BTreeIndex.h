@@ -37,7 +37,6 @@ public:
   void addNodeToTree(int, BTreePage*);
   void flush(string);
   void probe(uint64_t key, vector<BTreePage*> stream);
-  pair<bool, uint64_t> probe(uint64_t, FILE* );
   pair<bool, uint64_t> probe(uint64_t, int, int);
 
   pair<bool, uint64_t> probe_bin(uint64_t, int, off_t);
