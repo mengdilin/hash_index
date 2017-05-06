@@ -38,7 +38,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -89,14 +88,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p>This is the complete list of members for <a class="el" href="class_b_tree_page.html">BTreePage</a>, including all inherited members.</p>
 <table class="directory">
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>addChild</b>(BTreePage *) (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>addKey</b>(uint64_t key) (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>BTreePage</b>() (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_b_tree_page.html#a603a37a0dbbb8996d21063ecbe03a1c3">addChild</a>(BTreePage *)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_b_tree_page.html#a6f0a55351b3575f1504a38c8e4ad5891">addKey</a>(uint64_t key)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_b_tree_page.html#a18912dc3a549e1e2cb219524cd4e49c6">BTreePage</a>()</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>children</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>fan_out</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>find</b>(uint64_t key) (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>flush</b>(ofstream &amp;) (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>isFull</b>() (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_b_tree_page.html#ab1a09989306d53d00fad36ec856f1d6a">find</a>(uint64_t key)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_b_tree_page.html#afaceefe62feb4d475328616b4c2b8142">flush</a>(ofstream &amp;)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_b_tree_page.html#a102c6fd32f4c2254c07b1e214530e23e">isFull</a>()</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>keys</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>level</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>MAX_KEY_PER_PAGE</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
@@ -104,15 +103,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>PAGE_SIZE</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>pageNum</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>parent</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>read</b>(FILE *, BTreePage &amp;, bool) (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>read</b>(int, BTreePage &amp;, bool, off_t) (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>rids</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>setParent</b>(BTreePage *) (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>~BTreePage</b>() (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_b_tree_page.html#a6505accec8fefbec85a2b7bcba8b53ef">read</a>(int, BTreePage &amp;, bool, off_t)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>rids</b> (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="class_b_tree_page.html#a072d6f5aff5dbc4835843a1ce834d6a0">setParent</a>(BTreePage *)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>~BTreePage</b>() (defined in <a class="el" href="class_b_tree_page.html">BTreePage</a>)</td><td class="entry"><a class="el" href="class_b_tree_page.html">BTreePage</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu May 4 2017 22:36:36 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 6 2017 05:15:01 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

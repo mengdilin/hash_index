@@ -3,12 +3,18 @@
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{class_b_tree_index_ae737b5dea98c2e2036fd3b3d9bdcfc22}{B\+Tree\+Index} ()
+\hypertarget{class_b_tree_index_ae737b5dea98c2e2036fd3b3d9bdcfc22}{}\hyperlink{class_b_tree_index_ae737b5dea98c2e2036fd3b3d9bdcfc22}{B\+Tree\+Index} ()\label{class_b_tree_index_ae737b5dea98c2e2036fd3b3d9bdcfc22}
+
 \begin{DoxyCompactList}\small\item\em Constructor of \hyperlink{class_b_tree_index}{B\+Tree\+Index} that sets up the initial variables It needs to compute number of total keys per level, given max keys per page. \end{DoxyCompactList}\item 
 \hypertarget{class_b_tree_index_a6202c61a8541b0f5c13eef1f1a940e31}{}vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$ \hyperlink{class_b_tree_index_a6202c61a8541b0f5c13eef1f1a940e31}{parse\+\_\+idx\+\_\+file} (string)\label{class_b_tree_index_a6202c61a8541b0f5c13eef1f1a940e31}
 
 \begin{DoxyCompactList}\small\item\em parser that expects a file with 3 tab-\/delimited columns with the following format\+: key where the middle value count is ignored \end{DoxyCompactList}\item 
 \hypertarget{class_b_tree_index_a4a7270c48f911f355442265f1dc340fd}{}vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$ \hyperlink{class_b_tree_index_a4a7270c48f911f355442265f1dc340fd}{parse\+\_\+idx\+\_\+file\+\_\+get\+\_\+all} (string)\label{class_b_tree_index_a4a7270c48f911f355442265f1dc340fd}
+
+\begin{DoxyCompactList}\small\item\em parser that expects a file with 3 tab-\/delimited columns with the following format\+: key where the middle value count is ignored \end{DoxyCompactList}\item 
+vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$ \hyperlink{class_b_tree_index_a42cb7169c0608f56cd34b9aa7eb91fb8}{parse\+\_\+key\+\_\+file} (std\+::string path)
+\begin{DoxyCompactList}\small\item\em parser that expects a file with 2 tab-\/delimited columns with the following format\+: key where the middle value count is ignored \end{DoxyCompactList}\item 
+\hypertarget{class_b_tree_index_ad9fa5f28875c96e7d10f06f3d2a6771f}{}vector$<$ pair$<$ \hyperlink{class_data_entry}{Data\+Entry}, int $>$ $>$ \hyperlink{class_b_tree_index_ad9fa5f28875c96e7d10f06f3d2a6771f}{parse\+\_\+sample\+\_\+range\+\_\+probe\+\_\+idx} (string path)\label{class_b_tree_index_ad9fa5f28875c96e7d10f06f3d2a6771f}
 
 \begin{DoxyCompactList}\small\item\em parser that expects a file with 3 tab-\/delimited columns with the following format\+: key where the middle value count is ignored \end{DoxyCompactList}\item 
 void \hyperlink{class_b_tree_index_a4517e016a4f60cd2e61471f6ba10f347}{build\+\_\+tree} (vector$<$ \hyperlink{class_data_entry}{Data\+Entry} $>$)
@@ -27,8 +33,6 @@ void \hyperlink{class_b_tree_index_a5f08960f28fbaee925bd76a225110f56}{flush} (st
 \hypertarget{class_b_tree_index_a3b32e1e49d409365bffaf2f111068f23}{}void {\bfseries probe} (uint64\+\_\+t key, vector$<$ \hyperlink{class_b_tree_page}{B\+Tree\+Page} $\ast$ $>$ stream)\label{class_b_tree_index_a3b32e1e49d409365bffaf2f111068f23}
 
 \item 
-pair$<$ bool, uint64\+\_\+t $>$ \hyperlink{class_b_tree_index_a768090c78f62663632baa93b3786552f}{probe} (uint64\+\_\+t, F\+I\+L\+E $\ast$)
-\begin{DoxyCompactList}\small\item\em This method is not being used in the current implementation of probe. btree quality probe on a single key using file handler. First, it traverses the btree index, then it calls probe\+\_\+bin to probe the binary data file, looking for the offset of the key. \end{DoxyCompactList}\item 
 pair$<$ bool, uint64\+\_\+t $>$ \hyperlink{class_b_tree_index_a5f7c70180b49b73c02352ba1135a91f7}{probe} (uint64\+\_\+t, int, int)
 \begin{DoxyCompactList}\small\item\em btree quality probe on a single key using file descriptor. First, it traverses the btree index, then it calls probe\+\_\+bin to probe the binary data file, looking for the offset of the key. \end{DoxyCompactList}\item 
 pair$<$ bool, uint64\+\_\+t $>$ \hyperlink{class_b_tree_index_a8a5d7a705ae4eb777695d819b88c08a4}{probe\+\_\+bin} (uint64\+\_\+t, int, off\+\_\+t)
@@ -60,20 +64,6 @@ vector$<$ pair$<$ uint64\+\_\+t, uint64\+\_\+t $>$ $>$ \hyperlink{class_b_tree_i
 
 \end{DoxyCompactItemize}
 
-
-\subsection{Constructor \& Destructor Documentation}
-\hypertarget{class_b_tree_index_ae737b5dea98c2e2036fd3b3d9bdcfc22}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!B\+Tree\+Index@{B\+Tree\+Index}}
-\index{B\+Tree\+Index@{B\+Tree\+Index}!B\+Tree\+Index@{B\+Tree\+Index}}
-\subsubsection[{B\+Tree\+Index}]{\setlength{\rightskip}{0pt plus 5cm}B\+Tree\+Index\+::\+B\+Tree\+Index (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-)}\label{class_b_tree_index_ae737b5dea98c2e2036fd3b3d9bdcfc22}
-
-
-Constructor of \hyperlink{class_b_tree_index}{B\+Tree\+Index} that sets up the initial variables It needs to compute number of total keys per level, given max keys per page. 
-
-Constructor of \hyperlink{class_b_tree_index}{B\+Tree\+Index} that sets up the initial variables 
 
 \subsection{Member Function Documentation}
 \hypertarget{class_b_tree_index_a4517e016a4f60cd2e61471f6ba10f347}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!build\+\_\+tree@{build\+\_\+tree}}
@@ -108,23 +98,20 @@ writes the btree index to a binary file via a level-\/wise traversal (B\+F\+S) F
 {\em index\+File\+Path} & path of the output index file \\
 \hline
 \end{DoxyParams}
-\hypertarget{class_b_tree_index_a768090c78f62663632baa93b3786552f}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!probe@{probe}}
-\index{probe@{probe}!B\+Tree\+Index@{B\+Tree\+Index}}
-\subsubsection[{probe}]{\setlength{\rightskip}{0pt plus 5cm}pair$<$ bool, uint64\+\_\+t $>$ B\+Tree\+Index\+::probe (
+\hypertarget{class_b_tree_index_a42cb7169c0608f56cd34b9aa7eb91fb8}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!parse\+\_\+key\+\_\+file@{parse\+\_\+key\+\_\+file}}
+\index{parse\+\_\+key\+\_\+file@{parse\+\_\+key\+\_\+file}!B\+Tree\+Index@{B\+Tree\+Index}}
+\subsubsection[{parse\+\_\+key\+\_\+file}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ {\bf Data\+Entry} $>$ B\+Tree\+Index\+::parse\+\_\+key\+\_\+file (
 \begin{DoxyParamCaption}
-\item[{uint64\+\_\+t}]{key, }
-\item[{F\+I\+L\+E $\ast$}]{index\+File}
+\item[{std\+::string}]{path}
 \end{DoxyParamCaption}
-)}\label{class_b_tree_index_a768090c78f62663632baa93b3786552f}
+)}\label{class_b_tree_index_a42cb7169c0608f56cd34b9aa7eb91fb8}
 
 
-This method is not being used in the current implementation of probe. btree quality probe on a single key using file handler. First, it traverses the btree index, then it calls probe\+\_\+bin to probe the binary data file, looking for the offset of the key. 
+parser that expects a file with 2 tab-\/delimited columns with the following format\+: key where the middle value count is ignored 
 
 
 \begin{DoxyParams}{Parameters}
-{\em key} & the key we are probing for \\
-\hline
-{\em index\+File} & file handler of the btree index file \\
+{\em path} & of the idx file \\
 \hline
 \end{DoxyParams}
 \hypertarget{class_b_tree_index_a5f7c70180b49b73c02352ba1135a91f7}{}\index{B\+Tree\+Index@{B\+Tree\+Index}!probe@{probe}}

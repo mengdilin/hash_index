@@ -38,7 +38,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -93,8 +92,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae737b5dea98c2e2036fd3b3d9bdcfc22"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_index.html#ae737b5dea98c2e2036fd3b3d9bdcfc22">BTreeIndex</a> ()</td></tr>
-<tr class="memdesc:ae737b5dea98c2e2036fd3b3d9bdcfc22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor of <a class="el" href="class_b_tree_index.html">BTreeIndex</a> that sets up the initial variables It needs to compute number of total keys per level, given max keys per page.  <a href="#ae737b5dea98c2e2036fd3b3d9bdcfc22">More...</a><br /></td></tr>
+<tr class="memitem:ae737b5dea98c2e2036fd3b3d9bdcfc22"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae737b5dea98c2e2036fd3b3d9bdcfc22"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_index.html#ae737b5dea98c2e2036fd3b3d9bdcfc22">BTreeIndex</a> ()</td></tr>
+<tr class="memdesc:ae737b5dea98c2e2036fd3b3d9bdcfc22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor of <a class="el" href="class_b_tree_index.html">BTreeIndex</a> that sets up the initial variables It needs to compute number of total keys per level, given max keys per page. <br /></td></tr>
 <tr class="separator:ae737b5dea98c2e2036fd3b3d9bdcfc22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6202c61a8541b0f5c13eef1f1a940e31"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6202c61a8541b0f5c13eef1f1a940e31"></a>
 vector&lt; <a class="el" href="class_data_entry.html">DataEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_index.html#a6202c61a8541b0f5c13eef1f1a940e31">parse_idx_file</a> (string)</td></tr>
@@ -104,6 +104,13 @@ vector&lt; <a class="el" href="class_data_entry.html">DataEntry</a> &gt;&#160;</
 vector&lt; <a class="el" href="class_data_entry.html">DataEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_index.html#a4a7270c48f911f355442265f1dc340fd">parse_idx_file_get_all</a> (string)</td></tr>
 <tr class="memdesc:a4a7270c48f911f355442265f1dc340fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">parser that expects a file with 3 tab-delimited columns with the following format: key where the middle value count is ignored <br /></td></tr>
 <tr class="separator:a4a7270c48f911f355442265f1dc340fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42cb7169c0608f56cd34b9aa7eb91fb8"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="class_data_entry.html">DataEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_index.html#a42cb7169c0608f56cd34b9aa7eb91fb8">parse_key_file</a> (std::string path)</td></tr>
+<tr class="memdesc:a42cb7169c0608f56cd34b9aa7eb91fb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">parser that expects a file with 2 tab-delimited columns with the following format: key where the middle value count is ignored  <a href="#a42cb7169c0608f56cd34b9aa7eb91fb8">More...</a><br /></td></tr>
+<tr class="separator:a42cb7169c0608f56cd34b9aa7eb91fb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9fa5f28875c96e7d10f06f3d2a6771f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9fa5f28875c96e7d10f06f3d2a6771f"></a>
+vector&lt; pair&lt; <a class="el" href="class_data_entry.html">DataEntry</a>, int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_index.html#ad9fa5f28875c96e7d10f06f3d2a6771f">parse_sample_range_probe_idx</a> (string path)</td></tr>
+<tr class="memdesc:ad9fa5f28875c96e7d10f06f3d2a6771f"><td class="mdescLeft">&#160;</td><td class="mdescRight">parser that expects a file with 3 tab-delimited columns with the following format: key where the middle value count is ignored <br /></td></tr>
+<tr class="separator:ad9fa5f28875c96e7d10f06f3d2a6771f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4517e016a4f60cd2e61471f6ba10f347"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_index.html#a4517e016a4f60cd2e61471f6ba10f347">build_tree</a> (vector&lt; <a class="el" href="class_data_entry.html">DataEntry</a> &gt;)</td></tr>
 <tr class="memdesc:a4517e016a4f60cd2e61471f6ba10f347"><td class="mdescLeft">&#160;</td><td class="mdescRight">builds a btree index using the bulkloading algorithm as discussed in the textbook  <a href="#a4517e016a4f60cd2e61471f6ba10f347">More...</a><br /></td></tr>
 <tr class="separator:a4517e016a4f60cd2e61471f6ba10f347"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -125,9 +132,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a3b32e1e49d409365bffaf2f111068f23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3b32e1e49d409365bffaf2f111068f23"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>probe</b> (uint64_t key, vector&lt; <a class="el" href="class_b_tree_page.html">BTreePage</a> * &gt; stream)</td></tr>
 <tr class="separator:a3b32e1e49d409365bffaf2f111068f23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a768090c78f62663632baa93b3786552f"><td class="memItemLeft" align="right" valign="top">pair&lt; bool, uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_index.html#a768090c78f62663632baa93b3786552f">probe</a> (uint64_t, FILE *)</td></tr>
-<tr class="memdesc:a768090c78f62663632baa93b3786552f"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method is not being used in the current implementation of probe. btree quality probe on a single key using file handler. First, it traverses the btree index, then it calls probe_bin to probe the binary data file, looking for the offset of the key.  <a href="#a768090c78f62663632baa93b3786552f">More...</a><br /></td></tr>
-<tr class="separator:a768090c78f62663632baa93b3786552f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f7c70180b49b73c02352ba1135a91f7"><td class="memItemLeft" align="right" valign="top">pair&lt; bool, uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_index.html#a5f7c70180b49b73c02352ba1135a91f7">probe</a> (uint64_t, int, int)</td></tr>
 <tr class="memdesc:a5f7c70180b49b73c02352ba1135a91f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">btree quality probe on a single key using file descriptor. First, it traverses the btree index, then it calls probe_bin to probe the binary data file, looking for the offset of the key.  <a href="#a5f7c70180b49b73c02352ba1135a91f7">More...</a><br /></td></tr>
 <tr class="separator:a5f7c70180b49b73c02352ba1135a91f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,25 +169,6 @@ vector&lt; uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>f
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>max_level</b> = 20</td></tr>
 <tr class="separator:ae9453917f1f749a4ba4b74e0821c670c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ae737b5dea98c2e2036fd3b3d9bdcfc22"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">BTreeIndex::BTreeIndex </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Constructor of <a class="el" href="class_b_tree_index.html">BTreeIndex</a> that sets up the initial variables It needs to compute number of total keys per level, given max keys per page. </p>
-<p>Constructor of <a class="el" href="class_b_tree_index.html">BTreeIndex</a> that sets up the initial variables </p>
-
-</div>
-</div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a4517e016a4f60cd2e61471f6ba10f347"></a>
 <div class="memitem">
@@ -233,35 +218,24 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>max_level</b>
 
 </div>
 </div>
-<a class="anchor" id="a768090c78f62663632baa93b3786552f"></a>
+<a class="anchor" id="a42cb7169c0608f56cd34b9aa7eb91fb8"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pair&lt; bool, uint64_t &gt; BTreeIndex::probe </td>
+          <td class="memname">vector&lt; <a class="el" href="class_data_entry.html">DataEntry</a> &gt; BTreeIndex::parse_key_file </td>
           <td>(</td>
-          <td class="paramtype">uint64_t&#160;</td>
-          <td class="paramname"><em>key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">FILE *&#160;</td>
-          <td class="paramname"><em>indexFile</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>This method is not being used in the current implementation of probe. btree quality probe on a single key using file handler. First, it traverses the btree index, then it calls probe_bin to probe the binary data file, looking for the offset of the key. </p>
+<p>parser that expects a file with 2 tab-delimited columns with the following format: key where the middle value count is ignored </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">key</td><td>the key we are probing for </td></tr>
-    <tr><td class="paramname">indexFile</td><td>file handler of the btree index file </td></tr>
+    <tr><td class="paramname">path</td><td>of the idx file </td></tr>
   </table>
   </dd>
 </dl>
@@ -548,7 +522,7 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>max_level</b>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu May 4 2017 22:36:36 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 6 2017 05:15:01 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

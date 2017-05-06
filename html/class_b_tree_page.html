@@ -38,7 +38,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -95,32 +94,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab1a09989306d53d00fad36ec856f1d6a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab1a09989306d53d00fad36ec856f1d6a"></a>
-pair&lt; bool, uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>find</b> (uint64_t key)</td></tr>
+<tr class="memitem:a18912dc3a549e1e2cb219524cd4e49c6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a18912dc3a549e1e2cb219524cd4e49c6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_page.html#a18912dc3a549e1e2cb219524cd4e49c6">BTreePage</a> ()</td></tr>
+<tr class="memdesc:a18912dc3a549e1e2cb219524cd4e49c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor for a <a class="el" href="class_b_tree_page.html">BTreePage</a> which initializes current page's parent to null <br /></td></tr>
+<tr class="separator:a18912dc3a549e1e2cb219524cd4e49c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1a09989306d53d00fad36ec856f1d6a"><td class="memItemLeft" align="right" valign="top">pair&lt; bool, uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_page.html#ab1a09989306d53d00fad36ec856f1d6a">find</a> (uint64_t key)</td></tr>
+<tr class="memdesc:ab1a09989306d53d00fad36ec856f1d6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">given a key, finds the reference/rid to the child page  <a href="#ab1a09989306d53d00fad36ec856f1d6a">More...</a><br /></td></tr>
 <tr class="separator:ab1a09989306d53d00fad36ec856f1d6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a072d6f5aff5dbc4835843a1ce834d6a0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a072d6f5aff5dbc4835843a1ce834d6a0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setParent</b> (<a class="el" href="class_b_tree_page.html">BTreePage</a> *)</td></tr>
+<tr class="memitem:a072d6f5aff5dbc4835843a1ce834d6a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_page.html#a072d6f5aff5dbc4835843a1ce834d6a0">setParent</a> (<a class="el" href="class_b_tree_page.html">BTreePage</a> *)</td></tr>
+<tr class="memdesc:a072d6f5aff5dbc4835843a1ce834d6a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">function used by <a class="el" href="class_b_tree_index.html">BTreeIndex</a> to set the parent of the current page  <a href="#a072d6f5aff5dbc4835843a1ce834d6a0">More...</a><br /></td></tr>
 <tr class="separator:a072d6f5aff5dbc4835843a1ce834d6a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f0a55351b3575f1504a38c8e4ad5891"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6f0a55351b3575f1504a38c8e4ad5891"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>addKey</b> (uint64_t key)</td></tr>
+<tr class="memitem:a6f0a55351b3575f1504a38c8e4ad5891"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_page.html#a6f0a55351b3575f1504a38c8e4ad5891">addKey</a> (uint64_t key)</td></tr>
+<tr class="memdesc:a6f0a55351b3575f1504a38c8e4ad5891"><td class="mdescLeft">&#160;</td><td class="mdescRight">function used by <a class="el" href="class_b_tree_index.html">BTreeIndex</a> to add key to the current page  <a href="#a6f0a55351b3575f1504a38c8e4ad5891">More...</a><br /></td></tr>
 <tr class="separator:a6f0a55351b3575f1504a38c8e4ad5891"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a603a37a0dbbb8996d21063ecbe03a1c3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a603a37a0dbbb8996d21063ecbe03a1c3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>addChild</b> (<a class="el" href="class_b_tree_page.html">BTreePage</a> *)</td></tr>
+<tr class="memitem:a603a37a0dbbb8996d21063ecbe03a1c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_page.html#a603a37a0dbbb8996d21063ecbe03a1c3">addChild</a> (<a class="el" href="class_b_tree_page.html">BTreePage</a> *)</td></tr>
+<tr class="memdesc:a603a37a0dbbb8996d21063ecbe03a1c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">adds page to the end of children's vector  <a href="#a603a37a0dbbb8996d21063ecbe03a1c3">More...</a><br /></td></tr>
 <tr class="separator:a603a37a0dbbb8996d21063ecbe03a1c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a102c6fd32f4c2254c07b1e214530e23e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a102c6fd32f4c2254c07b1e214530e23e"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>isFull</b> ()</td></tr>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_page.html#a102c6fd32f4c2254c07b1e214530e23e">isFull</a> ()</td></tr>
+<tr class="memdesc:a102c6fd32f4c2254c07b1e214530e23e"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if current page is full <br /></td></tr>
 <tr class="separator:a102c6fd32f4c2254c07b1e214530e23e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afaceefe62feb4d475328616b4c2b8142"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afaceefe62feb4d475328616b4c2b8142"></a>
-ofstream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>flush</b> (ofstream &amp;)</td></tr>
+<tr class="memitem:afaceefe62feb4d475328616b4c2b8142"><td class="memItemLeft" align="right" valign="top">ofstream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_page.html#afaceefe62feb4d475328616b4c2b8142">flush</a> (ofstream &amp;)</td></tr>
+<tr class="memdesc:afaceefe62feb4d475328616b4c2b8142"><td class="mdescLeft">&#160;</td><td class="mdescRight">writes current page to binary index file Page format consists of a uint64_t counter maintaining the number of children in the page, followed by MAX_KEY_PER_PAGE uin64_t keys and MAX_KEY_PER_PAGE + 1 rids  <a href="#afaceefe62feb4d475328616b4c2b8142">More...</a><br /></td></tr>
 <tr class="separator:afaceefe62feb4d475328616b4c2b8142"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a6d96d17702420c219cb89d18f4841117"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6d96d17702420c219cb89d18f4841117"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (FILE *, <a class="el" href="class_b_tree_page.html">BTreePage</a> &amp;, bool)</td></tr>
-<tr class="separator:a6d96d17702420c219cb89d18f4841117"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6505accec8fefbec85a2b7bcba8b53ef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6505accec8fefbec85a2b7bcba8b53ef"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (int, <a class="el" href="class_b_tree_page.html">BTreePage</a> &amp;, bool, off_t)</td></tr>
+<tr class="memitem:a6505accec8fefbec85a2b7bcba8b53ef"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_tree_page.html#a6505accec8fefbec85a2b7bcba8b53ef">read</a> (int, <a class="el" href="class_b_tree_page.html">BTreePage</a> &amp;, bool, off_t)</td></tr>
+<tr class="memdesc:a6505accec8fefbec85a2b7bcba8b53ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads data into a <a class="el" href="class_b_tree_page.html">BTreePage</a> from an indexFile using a file descriptor  <a href="#a6505accec8fefbec85a2b7bcba8b53ef">More...</a><br /></td></tr>
 <tr class="separator:a6505accec8fefbec85a2b7bcba8b53ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
@@ -159,6 +160,185 @@ static constexpr unsigned int&#160;</td><td class="memItemRight" valign="bottom"
 static constexpr unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>fan_out</b> = MAX_KEY_PER_PAGE+1</td></tr>
 <tr class="separator:ac82396e8a895f09d853882a4673c5081"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a603a37a0dbbb8996d21063ecbe03a1c3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BTreePage::addChild </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_b_tree_page.html">BTreePage</a> *&#160;</td>
+          <td class="paramname"><em>c</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>adds page to the end of children's vector </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">c</td><td>a pointer to the child page </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a6f0a55351b3575f1504a38c8e4ad5891"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BTreePage::addKey </td>
+          <td>(</td>
+          <td class="paramtype">uint64_t&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>function used by <a class="el" href="class_b_tree_index.html">BTreeIndex</a> to add key to the current page </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>key to be added </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab1a09989306d53d00fad36ec856f1d6a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">pair&lt; bool, uint64_t &gt; BTreePage::find </td>
+          <td>(</td>
+          <td class="paramtype">uint64_t&#160;</td>
+          <td class="paramname"><em>key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>given a key, finds the reference/rid to the child page </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>search key </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a pair where the first item is a boolean indicating whether key is found in the current page and the second pair is the rid of the child corresponding to the key </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="afaceefe62feb4d475328616b4c2b8142"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ofstream &amp; BTreePage::flush </td>
+          <td>(</td>
+          <td class="paramtype">ofstream &amp;&#160;</td>
+          <td class="paramname"><em>indexFile</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>writes current page to binary index file Page format consists of a uint64_t counter maintaining the number of children in the page, followed by MAX_KEY_PER_PAGE uin64_t keys and MAX_KEY_PER_PAGE + 1 rids </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">indexFile</td><td>ofstream of index file </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a6505accec8fefbec85a2b7bcba8b53ef"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BTreePage::read </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>indexFile</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_b_tree_page.html">BTreePage</a> &amp;&#160;</td>
+          <td class="paramname"><em>page</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>is_leaf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">off_t&#160;</td>
+          <td class="paramname"><em>offset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>reads data into a <a class="el" href="class_b_tree_page.html">BTreePage</a> from an indexFile using a file descriptor </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">indexFile</td><td>is a file descriptor to the binary btree index file </td></tr>
+    <tr><td class="paramname">page</td><td>is an empty <a class="el" href="class_b_tree_page.html">BTreePage</a> which will be populated after read completes </td></tr>
+    <tr><td class="paramname">is_leaf</td><td>indicates whether the current page to be read should be a leaf page </td></tr>
+    <tr><td class="paramname">offset</td><td>is the offset of indexFile that indicates the start of the current page </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a072d6f5aff5dbc4835843a1ce834d6a0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BTreePage::setParent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_b_tree_page.html">BTreePage</a> *&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>function used by <a class="el" href="class_b_tree_index.html">BTreeIndex</a> to set the parent of the current page </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">p</td><td>pointer of the parent page </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_b_tree_page_8h_source.html">BTreePage.h</a></li>
 <li>BTreePage.cpp</li>
@@ -166,7 +346,7 @@ static constexpr unsigned int&#160;</td><td class="memItemRight" valign="bottom"
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu May 4 2017 22:36:36 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 6 2017 05:15:01 for My Project by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>
