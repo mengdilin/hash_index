@@ -39,9 +39,6 @@ class HashIndex {
 public:
   HashIndex(float load_capacity);
   uint32_t hash(uint64_t);
-  std::pair<bool,uint64_t> search(uint64_t, std::ifstream&);
-  std::pair<bool,uint64_t> search(uint64_t, FILE*);
-
   //fastest probing method using pread
   std::pair<bool,uint64_t> search(uint64_t, int);
   void build_index(std::string, std::string);

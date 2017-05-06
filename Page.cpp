@@ -144,36 +144,12 @@ void Page::mergePage(Page& other) {
 }
 
 /**
- * @brief OLD: reading a page into memory using ifstream
- */
-void Page::read(std::ifstream& indexFile, Page& page) {
-
-  uint32_t pad;
-
-  indexFile.read ((char *)&page.overflow_addr,sizeof(page.overflow_addr));
-  indexFile.read((char *)&page.counter, sizeof(page.counter));
-  indexFile.read ((char *)&pad,sizeof(uint32_t));
-  indexFile.read((char *)&page.data_entry_list, sizeof(page.data_entry_list));
-
-}
-
-/**
- * @brief OLD: reading a page into memory using pread
+ * @brief Helper function used during probing stage.
+ * reading a page into memory using pread
  */
 void Page::read(int indexFile, Page& page, uint64_t offset) {
   page.buffer = (uint8_t *)malloc(PAGE_SIZE);
   pread(indexFile, page.buffer, PAGE_SIZE, offset);
-  page.overflow_addr = *((uint64_t*)page.buffer);
-  page.counter = *((uint64_t*)&page.buffer[8]);
-  page.data_entry_list = (DataEntry*)&page.buffer[16];
-}
-/**
- * @brief Helper function used during probing stage.
- * reading a page into memory using fread
- */
-void Page::read(FILE* indexFile, Page& page) {
-  page.buffer = (uint8_t *)malloc(PAGE_SIZE);
-  fread(page.buffer, PAGE_SIZE, 1, indexFile);
   page.overflow_addr = *((uint64_t*)page.buffer);
   page.counter = *((uint64_t*)&page.buffer[8]);
   page.data_entry_list = (DataEntry*)&page.buffer[16];

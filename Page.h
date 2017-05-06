@@ -32,8 +32,6 @@ class Page {
     ~Page();
     void addEntry(DataEntry);
     std::ofstream& flush(std::ofstream&);
-    static void read(std::ifstream&, Page&);
-    static void read(FILE*, Page&);
     static void read(int, Page&, uint64_t);
 
     bool isFull();
