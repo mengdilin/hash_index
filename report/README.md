@@ -158,7 +158,7 @@ For a btree index, the larger the page size, the faster the probe since a large 
 
 ### Performance of BTree Index Range Probe
 
-To measure the performance of range probe, I generated an input file with 100000 rows using `generate_range_sample_for_test` in `test.cpp`. Within each row, there is a start key, an end key, and the number of keys inbetween start and end keys (which is 1000). start keys are in random order (obtained from /dev/shm/genome/probes/0/probes.idx). When I ran the experiment, I probed on start and end keys until the end of input file.
+To measure the performance of range probe, I generated an input file with 10000 rows using `generate_range_sample_for_test` in `test.cpp`. Within each row, there is a start key, an end key, and the number of keys inbetween start and end keys (which is 1000). start keys are in random order (obtained from /dev/shm/genome/probes/0/probes.idx). When I ran the experiment, I probed on start and end keys until the end of input file.
 
 #### running on data in /dev/shm/genome/probes/0
 page size | number of probes | result size (number of keys, rids) | avg microsecond per probe
@@ -403,7 +403,7 @@ Large page size and high load capacity correlates with a shorter index build tim
 
 #### running on data in /dev/shm/genome/probes/0
 page size | load capacity | build time (ms)
----:|---:|---:|---:
+---:|---:|---:
 1024 | 100 | 171389.135136
 1024 | 70 | 223710.145579
 1024 | 80 | 168161.630477
@@ -434,7 +434,7 @@ page size | load capacity | build time (ms)
 
 #### running on data in /dev/shm/genome/probes/1
 page size | load capacity | build time (ms)
----:|---:|---:|---:
+---:|---:|---:
 1024 | 100 | 169212.891371
 1024 | 70 | 170016.062537
 1024 | 80 | 162829.003763
