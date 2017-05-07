@@ -5,7 +5,7 @@
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>report</title>
+<title>README</title>
 
 
 <style type="text/css">
@@ -707,7 +707,7 @@ auto result = btree.range_probe_endpts(start_key, end_key, index_fd, data_bin_fd
 
 <h3 id="toc_25">Performance of BTree Index Range Probe</h3>
 
-<p>To measure the performance of range probe, I generated an input file with 100000 rows using <code>generate_range_sample_for_test</code> in <code>test.cpp</code>. Within each row, there is a start key, an end key, and the number of keys inbetween start and end keys (which is 1000). start keys are in random order (obtained from /dev/shm/genome/probes/0/probes.idx). When I ran the experiment, I probed on start and end keys until the end of input file.</p>
+<p>To measure the performance of range probe, I generated an input file with 10000 rows using <code>generate_range_sample_for_test</code> in <code>test.cpp</code>. Within each row, there is a start key, an end key, and the number of keys inbetween start and end keys (which is 1000). start keys are in random order (obtained from /dev/shm/genome/probes/0/probes.idx). When I ran the experiment, I probed on start and end keys until the end of input file.</p>
 
 <h4 id="toc_26">running on data in /dev/shm/genome/probes/0</h4>
 
