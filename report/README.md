@@ -458,7 +458,7 @@ page size | load capacity | build time (ms)
 
 #### running on data in /dev/shm/genome/probes/2
 page size | load capacity | build time (ms)
----:|---:|---:|---:
+---:|---:|---:
 1024 | 100 | 166695.284624
 1024 | 70 | 171969.419878
 1024 | 80 | 171068.201793
